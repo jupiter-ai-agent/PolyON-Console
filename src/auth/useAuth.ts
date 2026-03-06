@@ -89,21 +89,15 @@ function logout(): void {
   _email = '';
   useAppStore.getState().setUsername('');
   
+  // 즉시 페이지 이동 — React re-render에 의한 취소 방지
+  const origin = window.location.origin;
   if (keycloak.authenticated) {
-    // Keycloak 인증된 상태 — SSO 로그아웃
     const logoutUrl = `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/logout`
       + `?client_id=${keycloak.clientId}`
-      + `&post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
-    keycloak.clearToken();
-    window.location.href = logoutUrl;
+      + `&post_logout_redirect_uri=${encodeURIComponent(origin)}`;
+    window.location.replace(logoutUrl);
   } else {
-    // skipAuth 모드 — Keycloak 미초기화. 세션 클리어 + 강제 Keycloak 로그인으로 이동
-    const loginUrl = `https://auth.cmars.com/realms/admin/protocol/openid-connect/auth`
-      + `?client_id=polyon-console`
-      + `&redirect_uri=${encodeURIComponent(window.location.origin)}`
-      + `&response_type=code`
-      + `&scope=openid`;
-    window.location.href = loginUrl;
+    window.location.replace(origin);
   }
 }
 

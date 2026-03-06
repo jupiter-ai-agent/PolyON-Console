@@ -504,7 +504,7 @@ export default function ConsoleLayout() {
                 </div>
                 {/* 로그아웃 */}
                 <div className="he-user-panel__footer">
-                  <button className="he-user-panel__logout" onClick={() => { setUserMenuOpen(false); auth.logout(); }}>
+                  <button className="he-user-panel__logout" onClick={() => { auth.logout(); }}>
                     로그아웃 →
                   </button>
                 </div>
