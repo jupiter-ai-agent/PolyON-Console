@@ -537,6 +537,204 @@ body {
   align-items: center;
 }
 
+// ══════════════════════════════════════════════════════════════════
+// Database Pages (IBM Cloud Service Detail 스타일)
+// ══════════════════════════════════════════════════════════════════
+.he-db-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: -1.5rem -2rem; // 부모 he-main 패딩 상쇄
+}
+
+.he-db-page__header {
+  padding: 1.25rem 2rem 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid var(--cds-border-subtle);
+}
+
+.he-db-page__title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.he-db-page__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--cds-text-primary);
+}
+
+.he-db-page__desc {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--cds-text-secondary);
+}
+
+.he-db-page__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // Contained tabs — IBM Cloud 스타일
+  .cds--tabs--contained {
+    background: #ffffff;
+  }
+
+  .cds--tab-content {
+    padding: 0 !important;
+    flex: 1;
+    overflow: hidden;
+  }
+}
+
+.he-db-page__tab-panel--iframe {
+  padding: 0 !important;
+  height: 100%;
+}
+
+// ── Status 탭 내용 ──
+.he-db-status {
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  max-width: 56rem;
+}
+
+// ── 정보 카드 ──
+.he-db-card {
+  background: #ffffff;
+  border: 1px solid var(--cds-border-subtle);
+  padding: 1.25rem;
+
+  &--info {
+    font-size: 0.8125rem;
+    color: var(--cds-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #f4f4f4;
+  }
+}
+
+.he-db-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--cds-border-subtle);
+}
+
+.he-db-card__name {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--cds-text-primary);
+}
+
+// ── Key-Value 행 ──
+.he-db-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e8e8e8;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.he-db-row__label {
+  font-size: 0.8125rem;
+  color: var(--cds-text-secondary);
+}
+
+.he-db-row__value {
+  font-size: 0.8125rem;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--cds-text-primary);
+}
+
+// ── Grafana 메트릭 섹션 ──
+.he-db-metrics {
+  margin-top: 0.5rem;
+}
+
+.he-db-metrics__title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cds-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.32px;
+  margin: 0 0 0.75rem;
+}
+
+.he-db-metrics__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+// ── Grafana 패널 ──
+.he-db-grafana {
+  background: #ffffff;
+  border: 1px solid var(--cds-border-subtle);
+}
+
+.he-db-grafana__header {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cds-text-secondary);
+  border-bottom: 1px solid var(--cds-border-subtle);
+}
+
+.he-db-grafana__body {
+  position: relative;
+  height: 180px;
+}
+
+// ── Manager iframe ──
+.he-db-iframe {
+  position: relative;
+  height: calc(100vh - 180px);
+  min-height: 500px;
+}
+
+.he-db-iframe__frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.he-db-iframe__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cds-background);
+  z-index: 1;
+
+  &--error {
+    flex-direction: column;
+    gap: 1rem;
+    z-index: 2;
+  }
+}
+
+.he-db-iframe__error-text {
+  font-size: 0.875rem;
+  color: var(--cds-text-secondary);
+  margin: 0;
+}
+
 /* ── PolyON Design Override: borderRadius 금지 ── */
 .cds--content-switcher {
   border-radius: 0 !important;
