@@ -89,15 +89,13 @@ function logout(): void {
   _email = '';
   useAppStore.getState().setUsername('');
   
-  // Keycloak이 초기화된 경우 SSO 로그아웃
-  if (keycloak.authenticated) {
-    keycloak.logout({
-      redirectUri: window.location.origin,
-    });
-  } else {
-    // Keycloak 없이 skipAuth 모드 — 단순 리로드
-    window.location.href = window.location.origin;
-  }
+  // 직접 로그아웃 URL 구성 — keycloak-js 내부 로직 우회
+  const logoutUrl = `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/logout`
+    + `?client_id=${keycloak.clientId}`
+    + `&post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
+  
+  keycloak.clearToken();
+  window.location.href = logoutUrl;
 }
 
 export async function initAuth(): Promise<AuthState> {
