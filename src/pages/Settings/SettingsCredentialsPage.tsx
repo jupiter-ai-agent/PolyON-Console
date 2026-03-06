@@ -172,7 +172,7 @@ export default function SettingsCredentialsPage() {
                             </code>
                             <Button
                               kind="ghost"
-                              size="sm"
+                             
                               hasIconOnly
                               renderIcon={svc._revealed ? ViewOff : View}
                               iconDescription={svc._revealed ? '숨기기' : '표시'}
@@ -187,7 +187,7 @@ export default function SettingsCredentialsPage() {
                         {svc.editable && (
                           <Button
                             kind="ghost"
-                            size="sm"
+                           
                             renderIcon={Edit}
                             onClick={() => openEditModal(svc.id, svc.name)}
                           >

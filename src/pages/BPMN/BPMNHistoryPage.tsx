@@ -99,7 +99,7 @@ export default function BPMNHistoryPage() {
         title="실행 이력"
         description="완료 및 종료된 프로세스 인스턴스 이력"
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -115,7 +115,7 @@ export default function BPMNHistoryPage() {
           itemToString={(item: any) => item?.label || ''}
           selectedItem={STATE_FILTER_ITEMS.find(i => i.id === stateFilter) || STATE_FILTER_ITEMS[0]}
           onChange={({ selectedItem }: any) => setStateFilter(selectedItem?.id || 'ALL')}
-          size="sm"
+         
         />
       </div>
 
@@ -134,7 +134,7 @@ export default function BPMNHistoryPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {tableHeaders.map(h => (
@@ -164,7 +164,7 @@ export default function BPMNHistoryPage() {
                                 {cell.value}
                               </span>
                             ) : cell.info.header === 'state' ? (
-                              <Tag type={tagType} size="sm">{tagLabel}</Tag>
+                              <Tag type={tagType}>{tagLabel}</Tag>
                             ) : (
                               cell.value
                             )}

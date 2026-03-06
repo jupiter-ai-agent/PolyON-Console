@@ -68,7 +68,7 @@ export default function ChatChannelsPage() {
         actions={
           <Button
             kind="ghost"
-            size="sm"
+           
             renderIcon={Renew}
             onClick={() => load(teamId)}
           >
@@ -112,7 +112,7 @@ export default function ChatChannelsPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {tableHeaders.map(h => (

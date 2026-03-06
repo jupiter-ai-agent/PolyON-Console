@@ -13,8 +13,9 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { Add, Close, Copy, TrashCan } from '@carbon/icons-react';
+import { Add, Close, Copy, TrashCan, Api } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import { aiApi }      from '../../api/ai';
 import type { AIKey } from '../../api/ai';
 
@@ -182,7 +183,6 @@ export default function AIKeysPage() {
             kind="primary"
             renderIcon={Add}
             onClick={() => setShowCreate(true)}
-            size="sm"
           >
             Create Key
           </Button>
@@ -202,7 +202,7 @@ export default function AIKeysPage() {
               </code>
               <Button
                 kind="ghost"
-                size="sm"
+               
                 renderIcon={Copy}
                 onClick={handleCopy}
               >
@@ -216,7 +216,7 @@ export default function AIKeysPage() {
             renderIcon={Close}
             iconDescription="Dismiss"
             onClick={() => setCreatedKey('')}
-            size="sm"
+           
           />
         </div>
       )}
@@ -227,8 +227,21 @@ export default function AIKeysPage() {
         ) : error ? (
           <div style={{ padding: '2rem', color: '#da1e28' }}>Error: {error}</div>
         ) : keys.length === 0 ? (
-          <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--cds-text-secondary)', fontSize: '0.875rem', background: '#fff', border: '1px solid #e0e0e0' }}>
-            No API keys issued. Click "Create Key" to get started.
+          <div style={{ background: '#fff', border: '1px solid #e0e0e0' }}>
+            <EmptyState
+              icon={Api}
+              title="No API keys created"
+              description="Create your first API key to start accessing our AI services."
+              action={
+                <Button
+                  kind="primary"
+                  renderIcon={Add}
+                  onClick={() => setShowCreate(true)}
+                >
+                  Create Key
+                </Button>
+              }
+            />
           </div>
         ) : (
           <DataTable rows={tableRows} headers={tableHeaders}>
@@ -270,7 +283,7 @@ export default function AIKeysPage() {
                             <TableCell key={cell.id}>
                               <Button
                                 kind="danger--ghost"
-                                size="sm"
+                               
                                 renderIcon={TrashCan}
                                 onClick={() => handleDelete(cell.value as string)}
                               >

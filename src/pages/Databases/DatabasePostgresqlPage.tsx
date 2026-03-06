@@ -23,14 +23,14 @@ export default function DatabasePostgresqlPage() {
       <div className="he-db-page__header">
         <div className="he-db-page__title-row">
           <h2 className="he-db-page__title">PostgreSQL</h2>
-          <Tag size="sm" type="blue">Database</Tag>
+          <Tag type="blue">Database</Tag>
         </div>
         <p className="he-db-page__desc">pgweb 쿼리 매니저 및 서비스 상태 모니터링</p>
       </div>
 
       <div className="he-db-page__body">
         <Tabs onChange={({ selectedIndex }) => { if (selectedIndex === 1) fetchStatus(); }}>
-          <TabList aria-label="PostgreSQL 탭" contained>
+          <TabList contained aria-label="PostgreSQL 탭">
             <Tab>Query Manager</Tab>
             <Tab>Status</Tab>
           </TabList>

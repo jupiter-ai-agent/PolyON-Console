@@ -150,14 +150,14 @@ export default function DNSPage() {
     return {
       id: String(i),
       name: r.name,
-      type: <Tag type={getDnsTagType(r.type)} size="sm">{r.type}</Tag>,
+      type: <Tag type={getDnsTagType(r.type)}>{r.type}</Tag>,
       data: cd,
       actions: !isSystem ? (
         <div style={{ display: 'flex', gap: '4px' }}>
-          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Edit} iconDescription="편집" onClick={() => startEdit(r)} />
+          <Button kind="ghost" hasIconOnly renderIcon={Edit} iconDescription="편집" onClick={() => startEdit(r)} />
           <Button
             kind="ghost"
-            size="sm"
+           
             hasIconOnly
             renderIcon={TrashCan}
             iconDescription="삭제"
@@ -179,8 +179,8 @@ export default function DNSPage() {
             <p style={{ fontSize: '13px', color: 'var(--cds-text-secondary)', margin: '4px 0 0' }}>Active Directory DNS 존 및 레코드 관리</p>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
-            <Button kind="primary" size="sm" renderIcon={Add} disabled={!selectedZone} onClick={() => { setEditRecord(null); setForm({ name: '', type: 'A', data: '' }); setShowAddForm(true); }}>레코드 추가</Button>
-            <Button kind="ghost" size="sm" renderIcon={Renew} onClick={loadZones}>새로고침</Button>
+            <Button kind="primary"  renderIcon={Add} disabled={!selectedZone} onClick={() => { setEditRecord(null); setForm({ name: '', type: 'A', data: '' }); setShowAddForm(true); }}>레코드 추가</Button>
+            <Button kind="ghost" renderIcon={Renew} onClick={loadZones}>새로고침</Button>
           </div>
         </div>
       </div>
@@ -194,7 +194,7 @@ export default function DNSPage() {
             id="dns-search"
             labelText=""
             placeholder="항목 검색"
-            size="sm"
+           
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ marginBottom: '8px' }}
@@ -246,8 +246,8 @@ export default function DNSPage() {
                 <TextInput id="add-data" labelText="Data" placeholder={PLACEHOLDERS[form.type] || ''} value={form.data} onChange={e => setForm(f => ({ ...f, data: e.target.value }))} />
               </div>
               <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                <Button kind="secondary" size="sm" onClick={() => { setShowAddForm(false); setEditRecord(null); }}>취소</Button>
-                <Button kind="primary" size="sm" onClick={submitAdd}>{editRecord ? '변경' : '추가'}</Button>
+                <Button kind="secondary" onClick={() => { setShowAddForm(false); setEditRecord(null); }}>취소</Button>
+                <Button kind="primary"  onClick={submitAdd}>{editRecord ? '변경' : '추가'}</Button>
               </div>
             </div>
           )}
@@ -261,7 +261,7 @@ export default function DNSPage() {
             <div style={{ border: '1px solid var(--cds-border-subtle-00)', overflowY: 'auto', maxHeight: 'calc(100vh - 280px)' }}>
               <DataTable rows={dnsRows} headers={dnsHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map(h => (

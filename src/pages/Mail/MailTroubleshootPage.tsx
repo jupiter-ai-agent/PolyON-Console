@@ -195,7 +195,7 @@ export default function MailTroubleshootPage() {
         <div style={{ maxWidth: 800 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <h3 style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>추적 결과</h3>
-            <Tag type="blue" size="sm">{steps.length}단계</Tag>
+            <Tag type="blue">{steps.length}단계</Tag>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {steps.map((step, idx) => (
@@ -212,7 +212,7 @@ export default function MailTroubleshootPage() {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                       <span style={{ fontSize: 13, fontWeight: 500 }}>{step.title}</span>
-                      <Tag type={tagType(step.status) as any} size="sm">{step.type}</Tag>
+                      <Tag type={tagType(step.status) as any}>{step.type}</Tag>
                       <span style={{ fontSize: 11, color: 'var(--cds-text-secondary)', marginLeft: 'auto' }}>
                         {step.timestamp}
                       </span>

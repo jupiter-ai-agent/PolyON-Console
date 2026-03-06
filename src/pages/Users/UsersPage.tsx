@@ -43,8 +43,10 @@ import {
   UserAvatar,
   Close,
   Filter,
+  UserMultiple,
 } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import {
   listUsers,
   getUser,
@@ -158,7 +160,7 @@ function UserDetailPanel({ user, groups, domainLower, onClose, onEdit, onDelete,
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
         <span style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{user.username}</span>
-        <Button kind="ghost" size="sm" renderIcon={Close} iconDescription="닫기" hasIconOnly onClick={onClose} />
+        <Button kind="ghost" renderIcon={Close} iconDescription="닫기" hasIconOnly onClick={onClose} />
       </div>
 
       {loading ? (
@@ -182,7 +184,7 @@ function UserDetailPanel({ user, groups, domainLower, onClose, onEdit, onDelete,
               </div>
               <div style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)', fontFamily: 'IBM Plex Mono' }}>{upn}</div>
             </div>
-            <Tag type={user.enabled ? 'green' : 'red'} size="sm">
+            <Tag type={user.enabled ? 'green' : 'red'}>
               {user.enabled ? '활성' : '비활성'}
             </Tag>
           </div>
@@ -224,14 +226,14 @@ function UserDetailPanel({ user, groups, domainLower, onClose, onEdit, onDelete,
                 value={addGroupName}
                 onChange={(e) => setAddGroupName(e.target.value)}
                 style={{ flex: 1 }}
-                size="sm"
+               
               >
                 <SelectItem value="" text="그룹 선택" />
                 {orgGroups.map((g) => (
                   <SelectItem key={g.name} value={g.name} text={g.name} />
                 ))}
               </Select>
-              <Button size="sm" kind="secondary" onClick={handleAddGroup} disabled={!addGroupName}>
+              <Button kind="secondary" onClick={handleAddGroup} disabled={!addGroupName}>
                 추가
               </Button>
             </div>
@@ -246,9 +248,9 @@ function UserDetailPanel({ user, groups, domainLower, onClose, onEdit, onDelete,
 
           {/* Actions */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', borderTop: '1px solid var(--cds-border-subtle)', paddingTop: '1rem' }}>
-            <Button size="sm" renderIcon={Edit} onClick={() => onEdit(user)}>편집</Button>
-            <Button size="sm" kind="secondary" renderIcon={Password} onClick={() => onResetPw(user)}>비밀번호 변경</Button>
-            <Button size="sm" kind="danger--ghost" renderIcon={TrashCan} onClick={() => onDelete(user)}>삭제</Button>
+            <Button renderIcon={Edit} onClick={() => onEdit(user)}>편집</Button>
+            <Button kind="secondary" renderIcon={Password} onClick={() => onResetPw(user)}>비밀번호 변경</Button>
+            <Button kind="danger--ghost" renderIcon={TrashCan} onClick={() => onDelete(user)}>삭제</Button>
           </div>
         </div>
       )}
@@ -341,7 +343,7 @@ function CreateEditModal({ open, mode, user, groups, domainLower, onClose, onSuc
       onRequestClose={onClose}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={submitting}
-      size="sm"
+     
     >
       {error && (
         <InlineNotification kind="error" title="오류" subtitle={error} style={{ marginBottom: '1rem' }} lowContrast />
@@ -387,7 +389,7 @@ function CreateEditModal({ open, mode, user, groups, domainLower, onClose, onSuc
           />
           <Button
             kind="ghost"
-            size="sm"
+           
             renderIcon={Renew}
             iconDescription="재생성"
             hasIconOnly
@@ -534,7 +536,7 @@ function ResetPwModal({ open, user, onClose }: ResetPwModalProps) {
         />
         <Button
           kind="ghost"
-          size="sm"
+         
           renderIcon={Renew}
           iconDescription="재생성"
           hasIconOnly
@@ -685,7 +687,7 @@ export default function UsersPage() {
           title={`사용자 관리 ${!loading ? `(${filteredUsers.length})` : ''}`}
           description="Active Directory 사용자 관리"
           actions={
-            <Button size="sm" renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>
+            <Button renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>
               Add User
             </Button>
           }
@@ -704,7 +706,7 @@ export default function UsersPage() {
             {/* Status filter tabs */}
             <div style={{ marginBottom: '0.5rem' }}>
               <Tabs selectedIndex={statusFilter} onChange={({ selectedIndex }) => { setStatusFilter(selectedIndex); setPage(1); }}>
-                <TabList aria-label="사용자 상태 필터">
+                <TabList contained aria-label="사용자 상태 필터">
                   <Tab>{`활성 사용자 (${users.filter((u) => u.enabled).length})`}</Tab>
                   <Tab>{`비활성 (${users.filter((u) => !u.enabled).length})`}</Tab>
                   <Tab>{`전체 (${users.length})`}</Tab>
@@ -751,12 +753,19 @@ export default function UsersPage() {
                           onInputChange(e as unknown as Parameters<typeof onInputChange>[0]);
                           setPage(1);
                         }}
-                        persistent
                       />
                       <Button kind="ghost" renderIcon={Filter} iconDescription="필터" hasIconOnly tooltipPosition="bottom" />
                       <Button kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly tooltipPosition="bottom" onClick={loadData} />
-                      <Button kind="ghost" renderIcon={Download} iconDescription="CSV 다운로드" hasIconOnly tooltipPosition="bottom" onClick={downloadCSV} />
-                      <Button size="sm" renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>
+                      <Button 
+                        kind="ghost" 
+                        renderIcon={Download} 
+                        iconDescription="CSV 다운로드" 
+                        hasIconOnly 
+                        tooltipPosition="bottom" 
+                        onClick={downloadCSV}
+                        disabled={filteredUsers.length === 0}
+                      />
+                      <Button renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>
                         Add User
                       </Button>
                     </TableToolbarContent>
@@ -778,8 +787,20 @@ export default function UsersPage() {
                     <TableBody>
                       {tableRows.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={headers.length + 1} style={{ textAlign: 'center', padding: '3rem', color: 'var(--cds-text-secondary)' }}>
-                            사용자가 없습니다
+                          <TableCell colSpan={headers.length + 1} style={{ padding: 0 }}>
+                            <EmptyState
+                              icon={UserMultiple}
+                              title="사용자가 없습니다"
+                              description="새 사용자를 추가하여 시작하세요."
+                              action={
+                                <Button
+                                  renderIcon={Add}
+                                  onClick={() => setModal({ mode: 'create' })}
+                                >
+                                  Add User
+                                </Button>
+                              }
+                            />
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -797,7 +818,7 @@ export default function UsersPage() {
                                 if (cell.info.header === 'status') {
                                   return (
                                     <TableCell key={cell.id}>
-                                      <Tag type={cell.value ? 'green' : 'red'} size="sm">
+                                      <Tag type={cell.value ? 'green' : 'red'}>
                                         {cell.value ? 'Active' : 'Disabled'}
                                       </Tag>
                                     </TableCell>
@@ -807,7 +828,7 @@ export default function UsersPage() {
                                   return (
                                     <TableCell key={cell.id}>
                                       {cell.value > 0 ? (
-                                        <Tag type="blue" size="sm">{cell.value} groups</Tag>
+                                        <Tag type="blue">{cell.value} groups</Tag>
                                       ) : (
                                         <span style={{ color: 'var(--cds-text-placeholder)' }}>—</span>
                                       )}
@@ -818,7 +839,7 @@ export default function UsersPage() {
                                   return (
                                     <TableCell key={cell.id}>
                                       {cell.value ? (
-                                        <Tag type="teal" size="sm">{cell.value}</Tag>
+                                        <Tag type="teal">{cell.value}</Tag>
                                       ) : (
                                         <span style={{ color: 'var(--cds-text-placeholder)' }}>—</span>
                                       )}
@@ -835,7 +856,7 @@ export default function UsersPage() {
                                 if (cell.info.header === 'actions') {
                                   return (
                                     <TableCell key={cell.id} onClick={(e) => e.stopPropagation()}>
-                                      <OverflowMenu size="sm" flipped>
+                                      <OverflowMenu flipped>
                                         <OverflowMenuItem itemText="편집" onClick={() => raw && setModal({ mode: 'edit', user: raw })} />
                                         <OverflowMenuItem itemText="비밀번호 변경" onClick={() => raw && setModal({ mode: 'resetPw', user: raw })} />
                                         <OverflowMenuItem itemText={raw?.enabled ? '비활성화' : '활성화'} onClick={() => raw && handleToggleUser(raw)} />

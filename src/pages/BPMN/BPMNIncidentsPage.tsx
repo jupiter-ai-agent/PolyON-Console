@@ -83,7 +83,7 @@ export default function BPMNIncidentsPage() {
         title="인시던트"
         description="프로세스 오류 및 실패 이벤트"
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -107,7 +107,7 @@ export default function BPMNIncidentsPage() {
           <div style={{ background: '#fff', border: '1px solid #e0e0e0' }}>
             <DataTable rows={rows} headers={headers}>
               {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-                <Table {...getTableProps()} size="sm">
+                <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
                       {tableHeaders.map(h => (
@@ -127,7 +127,7 @@ export default function BPMNIncidentsPage() {
                           {row.cells.map(cell => (
                             <TableCell key={cell.id}>
                               {cell.info.header === 'incidentType' ? (
-                                <Tag type="red" size="sm">{cell.value}</Tag>
+                                <Tag type="red">{cell.value}</Tag>
                               ) : cell.info.header === 'processDefinitionId' ? (
                                 <span
                                   style={{ color: '#0f62fe', cursor: 'pointer', textDecoration: 'underline' }}
@@ -158,7 +158,7 @@ export default function BPMNIncidentsPage() {
                               ) : cell.info.header === 'actions' ? (
                                 <Button
                                   kind="ghost"
-                                  size="sm"
+                                 
                                   disabled={retrying === retryKey}
                                   onClick={(e: any) => { e.stopPropagation(); handleRetry(incident); }}
                                 >

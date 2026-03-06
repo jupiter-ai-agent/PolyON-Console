@@ -105,7 +105,7 @@ function ApiKeyModal({
       onRequestSubmit={handleSave}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={saving}
-      size="sm"
+     
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <TextInput
@@ -241,7 +241,7 @@ export default function MailApiKeysPage() {
     <>
       <PageHeader title="API 키 관리" description="Stalwart API 키 관리 — 외부 앱 인증 토큰" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -253,10 +253,9 @@ export default function MailApiKeysPage() {
                     setPage(1);
                   }}
                   placeholder="API 키 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
-                <Button size="sm" renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>키 추가</Button>
+                <Button renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>키 추가</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
@@ -283,20 +282,20 @@ export default function MailApiKeysPage() {
                                 {String(cell.value).length > 20 ? String(cell.value).slice(0, 20) + '…' : String(cell.value)}
                               </code>
                               {String(cell.value) !== '—' && (
-                                <Button kind="ghost" size="sm" renderIcon={Copy} hasIconOnly iconDescription="복사"
+                                <Button kind="ghost" renderIcon={Copy} hasIconOnly iconDescription="복사"
                                   onClick={() => handleCopy(String(cell.value))} />
                               )}
                             </div>
                           ) : cell.info.header === 'permsCount' ? (
-                            <Tag type="blue" size="sm">{cell.value}개</Tag>
+                            <Tag type="blue">{cell.value}개</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                          <Button kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                             onClick={() => { setEditItem(orig ?? null); setModalOpen(true); }} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && setDeleteTarget(orig)} />
                         </div>
                       </TableCell>

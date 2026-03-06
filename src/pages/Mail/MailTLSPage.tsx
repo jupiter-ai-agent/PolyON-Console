@@ -46,11 +46,11 @@ function CertCard({ cert, onEdit }: { cert: CertInfo; onEdit: (c: CertInfo) => v
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
         {isFile ? (
           <>
-            <Tag type="blue" size="sm">파일 참조</Tag>
+            <Tag type="blue">파일 참조</Tag>
             <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--cds-text-secondary)' }}>{extractFilePath(val)}</span>
           </>
         ) : val ? (
-          <Tag type="green" size="sm">PEM 직접 입력</Tag>
+          <Tag type="green">PEM 직접 입력</Tag>
         ) : (
           <span style={{ color: 'var(--cds-text-placeholder)', fontSize: 12 }}>미설정</span>
         )}
@@ -63,12 +63,12 @@ function CertCard({ cert, onEdit }: { cert: CertInfo; onEdit: (c: CertInfo) => v
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--cds-border-subtle-01)' }}>
         <Certificate size={20} style={{ color: 'var(--cds-interactive)' }} />
         <span style={{ fontWeight: 600, fontSize: 15, fontFamily: 'monospace', flex: 1 }}>{cert.name}</span>
-        {isDefault && <Tag type="green" size="sm">기본</Tag>}
+        {isDefault && <Tag type="green">기본</Tag>}
       </div>
       {renderSource(certVal, certIsFile, 'Certificate')}
       {renderSource(keyVal, keyIsFile, 'Private Key')}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 'auto', paddingTop: 12 }}>
-        <Button kind="ghost" size="sm" renderIcon={Edit} onClick={() => onEdit(cert)}>
+        <Button kind="ghost" renderIcon={Edit} onClick={() => onEdit(cert)}>
           편집
         </Button>
       </div>
@@ -184,7 +184,7 @@ function CertModal({
               <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--cds-text-secondary)', flex: 1 }}>
                 {extractFilePath(editCert?.cert ?? '')}
               </span>
-              <Tag type="blue" size="sm">파일 참조</Tag>
+              <Tag type="blue">파일 참조</Tag>
             </div>
           )}
           <TextArea
@@ -212,7 +212,7 @@ function CertModal({
               <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--cds-text-secondary)', flex: 1 }}>
                 {extractFilePath(editCert?.['private-key'] ?? '')}
               </span>
-              <Tag type="blue" size="sm">파일 참조</Tag>
+              <Tag type="blue">파일 참조</Tag>
             </div>
           )}
           <TextArea
@@ -307,7 +307,7 @@ export default function MailTLSPage() {
       />
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-        <Button size="sm" renderIcon={Add} onClick={openAdd}>인증서 추가</Button>
+        <Button renderIcon={Add} onClick={openAdd}>인증서 추가</Button>
         <Button kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly onClick={load} tooltipPosition="bottom" />
       </div>
 

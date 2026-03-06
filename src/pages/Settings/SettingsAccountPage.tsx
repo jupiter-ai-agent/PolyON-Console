@@ -142,7 +142,7 @@ export default function SettingsAccountPage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h3 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>프로필 정보</h3>
             {!profileEditMode && !loading && (
-              <Button kind="ghost" size="sm" renderIcon={Edit} onClick={() => setProfileEditMode(true)}>
+              <Button kind="ghost" renderIcon={Edit} onClick={() => setProfileEditMode(true)}>
                 편집
               </Button>
             )}
@@ -185,7 +185,7 @@ export default function SettingsAccountPage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <h3 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 600 }}>{pwEditMode ? '비밀번호 변경' : '비밀번호'}</h3>
             {!pwEditMode && (
-              <Button kind="ghost" size="sm" renderIcon={Edit} onClick={() => setPwEditMode(true)}>변경</Button>
+              <Button kind="ghost" renderIcon={Edit} onClick={() => setPwEditMode(true)}>변경</Button>
             )}
           </div>
 

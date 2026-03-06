@@ -233,7 +233,7 @@ function EditDomainModal({
       onRequestSubmit={handleSave}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={saving}
-      size="sm"
+     
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <TextInput
@@ -368,7 +368,7 @@ export default function MailDomainsPage() {
     <>
       <PageHeader title="메일 도메인" description="도메인 등록 및 DKIM 키 관리" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -379,10 +379,9 @@ export default function MailDomainsPage() {
                     setFilterText(typeof e === 'string' ? e : (e.target as HTMLInputElement).value);
                   }}
                   placeholder="도메인 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
-                <Button size="sm" renderIcon={Add} onClick={() => setAddOpen(true)}>도메인 추가</Button>
+                <Button renderIcon={Add} onClick={() => setAddOpen(true)}>도메인 추가</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
@@ -406,7 +405,7 @@ export default function MailDomainsPage() {
                           {cell.info.header === 'dkim' ? (
                             <Button
                               kind="ghost"
-                              size="sm"
+                             
                               renderIcon={Key}
                               onClick={() => handleDkim(String(cell.value))}
                             >
@@ -417,9 +416,9 @@ export default function MailDomainsPage() {
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                          <Button kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                             onClick={() => orig && setEditTarget(orig)} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && setDeleteTarget(orig)} />
                         </div>
                       </TableCell>

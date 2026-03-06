@@ -126,7 +126,7 @@ export default function SettingsBackupPage() {
       <div style={{ display: 'flex', gap: '0.25rem', justifyContent: 'flex-end' }}>
         <Button
           kind="ghost"
-          size="sm"
+         
           renderIcon={Reset}
           iconDescription="복원"
           hasIconOnly
@@ -135,7 +135,7 @@ export default function SettingsBackupPage() {
         />
         <Button
           kind="danger--ghost"
-          size="sm"
+         
           renderIcon={TrashCan}
           iconDescription="삭제"
           hasIconOnly
@@ -153,10 +153,10 @@ export default function SettingsBackupPage() {
         description="시스템 데이터를 백업하고 복원합니다"
         actions={
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load} disabled={loading}>
+            <Button kind="ghost" renderIcon={Renew} onClick={load} disabled={loading}>
               새로고침
             </Button>
-            <Button kind="primary" size="sm" renderIcon={Save} onClick={handleStart} disabled={creating}>
+            <Button kind="primary" renderIcon={Save} onClick={handleStart} disabled={creating}>
               {creating ? '진행 중...' : '지금 백업'}
             </Button>
           </div>

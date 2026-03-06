@@ -118,12 +118,12 @@ export default function SettingsSmtpPage() {
         actions={
           configured && !editing ? (
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <Button kind="ghost" size="sm" onClick={testConnection}>연결 테스트</Button>
-              <Button kind="ghost" size="sm" onClick={testMail}>테스트 메일</Button>
-              <Button kind="primary" size="sm" renderIcon={Edit} onClick={startEdit}>편집</Button>
+              <Button kind="ghost" onClick={testConnection}>연결 테스트</Button>
+              <Button kind="ghost" onClick={testMail}>테스트 메일</Button>
+              <Button kind="primary" renderIcon={Edit} onClick={startEdit}>편집</Button>
             </div>
           ) : (!editing ? (
-            <Button kind="primary" size="sm" renderIcon={Edit} onClick={startEdit}>SMTP 설정</Button>
+            <Button kind="primary" renderIcon={Edit} onClick={startEdit}>SMTP 설정</Button>
           ) : undefined)
         }
       />
@@ -175,7 +175,7 @@ export default function SettingsSmtpPage() {
                 <span style={{ fontWeight: 500, color: 'var(--cds-text-secondary)' }}>서버</span>
                 <code>{config.host}:{config.port || 587}</code>
                 <span style={{ fontWeight: 500, color: 'var(--cds-text-secondary)' }}>보안</span>
-                <Tag type="blue" size="sm">{SEC_LABELS[config.security || 'starttls']}</Tag>
+                <Tag type="blue">{SEC_LABELS[config.security || 'starttls']}</Tag>
                 <span style={{ fontWeight: 500, color: 'var(--cds-text-secondary)' }}>인증</span>
                 <span>{config.username || <span style={{ color: 'var(--cds-text-helper)' }}>설정 안함</span>}</span>
                 <span style={{ fontWeight: 500, color: 'var(--cds-text-secondary)' }}>발신 주소</span>

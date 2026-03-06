@@ -23,14 +23,14 @@ export default function DatabaseRedisPage() {
       <div className="he-db-page__header">
         <div className="he-db-page__title-row">
           <h2 className="he-db-page__title">Redis</h2>
-          <Tag size="sm" type="blue">Cache</Tag>
+          <Tag type="blue">Cache</Tag>
         </div>
         <p className="he-db-page__desc">redis-commander 매니저 및 서비스 상태 모니터링</p>
       </div>
 
       <div className="he-db-page__body">
         <Tabs onChange={({ selectedIndex }) => { if (selectedIndex === 1) fetchStatus(); }}>
-          <TabList aria-label="Redis 탭" contained>
+          <TabList contained aria-label="Redis 탭">
             <Tab>Manager</Tab>
             <Tab>Status</Tab>
           </TabList>

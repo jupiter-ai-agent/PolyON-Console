@@ -143,7 +143,7 @@ export default function ContainersResourcesPage() {
       <div style={{ marginBottom: '32px' }}>
         <DataTable rows={memRows} headers={memHeaders}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <Table {...getTableProps()} size="sm">
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map(h => (
@@ -209,7 +209,7 @@ export default function ContainersResourcesPage() {
         ) : (
           <DataTable rows={volRows} headers={volHeaders}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map(h => (

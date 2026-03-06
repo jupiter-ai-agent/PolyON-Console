@@ -67,7 +67,7 @@ export default function BPMNInstancesPage() {
         title="실행 중 인스턴스"
         description="현재 실행 중인 프로세스 인스턴스"
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -104,7 +104,7 @@ export default function BPMNInstancesPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map(h => (
@@ -131,12 +131,12 @@ export default function BPMNInstancesPage() {
                         {row.cells.map(cell => (
                           <TableCell key={cell.id}>
                             {cell.info.header === 'status' ? (
-                              <Tag type={original?.suspended ? 'teal' : 'green'} size="sm">
+                              <Tag type={original?.suspended ? 'teal' : 'green'}>
                                 {cell.value}
                               </Tag>
                             ) : cell.info.header === 'incidents' ? (
                               incidentCount > 0 ? (
-                                <Tag type="red" size="sm">{cell.value}</Tag>
+                                <Tag type="red">{cell.value}</Tag>
                               ) : (
                                 <span style={{ fontSize: '0.6875rem', color: 'var(--cds-text-secondary)' }}>{cell.value}</span>
                               )

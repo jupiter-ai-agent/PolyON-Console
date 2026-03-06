@@ -108,7 +108,7 @@ function GroupModal({
       onRequestSubmit={handleSave}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={saving}
-      size="sm"
+     
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <TextInput
@@ -253,7 +253,7 @@ export default function MailGroupsPage() {
     <>
       <PageHeader title="메일 그룹" description="Stalwart 메일 그룹 관리 — 생성, 편집, 삭제" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -265,10 +265,9 @@ export default function MailGroupsPage() {
                     setPage(1);
                   }}
                   placeholder="그룹 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
-                <Button size="sm" renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>그룹 추가</Button>
+                <Button renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>그룹 추가</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
@@ -295,15 +294,15 @@ export default function MailGroupsPage() {
                             fontSize: cell.info.header === 'email' ? 13 : undefined,
                           }}>
                           {cell.info.header === 'memberCount' ? (
-                            <Tag type="blue" size="sm">{cell.value}명</Tag>
+                            <Tag type="blue">{cell.value}명</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                          <Button kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                             onClick={() => { setEditItem(orig ?? null); setModalOpen(true); }} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && setDeleteTarget(orig)} />
                         </div>
                       </TableCell>

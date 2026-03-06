@@ -169,7 +169,7 @@ export default function SetupPage() {
                     {revealedCreds.has(c.id) ? c.password : '••••••••••••'}
                   </code>
                   <Button
-                    kind="ghost" size="sm"
+                    kind="ghost"
                     onClick={() => setRevealedCreds(prev => {
                       const n = new Set(prev);
                       n.has(c.id) ? n.delete(c.id) : n.add(c.id);

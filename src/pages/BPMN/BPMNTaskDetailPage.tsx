@@ -175,7 +175,7 @@ export default function BPMNTaskDetailPage() {
             labelB="True"
             toggled={!!val}
             onToggle={(v: boolean) => setVal(v)}
-            size="sm"
+           
           />
         </div>
       );
@@ -188,7 +188,7 @@ export default function BPMNTaskDetailPage() {
             label={key}
             value={val ?? 0}
             onChange={(_e: any, { value }: any) => setVal(value)}
-            size="sm"
+           
           />
         </div>
       );
@@ -200,7 +200,7 @@ export default function BPMNTaskDetailPage() {
           labelText={key}
           value={val ?? ''}
           onChange={(e: any) => setVal(e.target.value)}
-          size="sm"
+         
         />
       </div>
     );
@@ -229,12 +229,12 @@ export default function BPMNTaskDetailPage() {
         actions={
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             {task.assignee ? (
-              <Button kind="secondary" size="sm" onClick={handleUnclaim}>Unclaim</Button>
+              <Button kind="secondary" onClick={handleUnclaim}>Unclaim</Button>
             ) : (
-              <Button kind="primary" size="sm" onClick={handleClaim}>Claim</Button>
+              <Button kind="primary" onClick={handleClaim}>Claim</Button>
             )}
-            <Button kind="ghost" size="sm" onClick={() => setDelegateOpen(true)}>Delegate</Button>
-            <Button kind="ghost" size="sm" renderIcon={Renew} onClick={loadTask}>새로고침</Button>
+            <Button kind="ghost" onClick={() => setDelegateOpen(true)}>Delegate</Button>
+            <Button kind="ghost" renderIcon={Renew} onClick={loadTask}>새로고침</Button>
           </div>
         }
       />
@@ -304,7 +304,7 @@ export default function BPMNTaskDetailPage() {
           <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-helper)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.32px' }}>Assignee</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             {task.assignee ? (
-              <Tag type="blue" size="sm">{task.assignee}</Tag>
+              <Tag type="blue">{task.assignee}</Tag>
             ) : (
               <span style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>미배정</span>
             )}
@@ -329,7 +329,7 @@ export default function BPMNTaskDetailPage() {
       {/* Tabs */}
       <div style={{ background: '#fff', border: '1px solid #e0e0e0' }}>
         <Tabs>
-          <TabList aria-label="Task detail tabs">
+          <TabList contained aria-label="Task detail tabs">
             <Tab>Form</Tab>
             <Tab>History</Tab>
             <Tab>Diagram</Tab>
@@ -350,14 +350,14 @@ export default function BPMNTaskDetailPage() {
                   <>
                     {Object.entries(formVars).map(([k, v]) => renderFormField(k, v))}
                     <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.75rem' }}>
-                      <Button kind="secondary" size="sm" onClick={handleSave}>Save</Button>
-                      <Button kind="primary" size="sm" onClick={handleComplete}>Complete</Button>
+                      <Button kind="secondary" onClick={handleSave}>Save</Button>
+                      <Button kind="primary" onClick={handleComplete}>Complete</Button>
                     </div>
                   </>
                 )}
                 {Object.keys(formVars).length === 0 && (
                   <div style={{ marginTop: '1rem', display: 'flex', gap: '0.75rem' }}>
-                    <Button kind="primary" size="sm" onClick={handleComplete}>Complete</Button>
+                    <Button kind="primary" onClick={handleComplete}>Complete</Button>
                   </div>
                 )}
               </div>
@@ -410,7 +410,7 @@ export default function BPMNTaskDetailPage() {
         secondaryButtonText="취소"
         onRequestClose={() => setDelegateOpen(false)}
         onRequestSubmit={handleDelegate}
-        size="sm"
+       
       >
         <TextInput
           id="delegate-user"
@@ -432,7 +432,7 @@ export default function BPMNTaskDetailPage() {
           setTask((prev: any) => ({ ...prev, followUp: followUpDate ? new Date(followUpDate).toISOString() : null }));
           setFollowUpOpen(false);
         }}
-        size="sm"
+       
       >
         <TextInput
           id="follow-up-date"
@@ -454,7 +454,7 @@ export default function BPMNTaskDetailPage() {
           setTask((prev: any) => ({ ...prev, due: dueDate ? new Date(dueDate).toISOString() : null }));
           setDueOpen(false);
         }}
-        size="sm"
+       
       >
         <TextInput
           id="due-date"

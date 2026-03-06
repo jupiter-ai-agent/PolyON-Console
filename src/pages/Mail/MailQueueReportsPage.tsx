@@ -77,7 +77,7 @@ function ReportTable({ reportType }: { reportType: string }) {
 
   return (
     <>
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -110,12 +110,12 @@ function ReportTable({ reportType }: { reportType: string }) {
                           whiteSpace: cell.info.header === 'nextDelivery' ? 'nowrap' : undefined,
                         }}>
                           {cell.info.header === 'size' ? (
-                            <Tag type="gray" size="sm">{String(cell.value)}</Tag>
+                            <Tag type="gray">{String(cell.value)}</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
                       <TableCell>
-                        <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                        <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                           onClick={() => orig && setDeleteTarget(orig)} />
                       </TableCell>
                     </TableRow>
@@ -168,7 +168,7 @@ export default function MailQueueReportsPage() {
       />
 
       <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}>
-        <TabList aria-label="리포트 유형">
+        <TabList contained aria-label="리포트 유형">
           {REPORT_TYPES.map((t) => (
             <Tab key={t.key}>{t.label}</Tab>
           ))}

@@ -105,7 +105,7 @@ function RoleModal({
       onRequestSubmit={handleSave}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={saving}
-      size="sm"
+     
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <TextInput
@@ -239,7 +239,7 @@ export default function MailRolesPage() {
     <>
       <PageHeader title="메일 역할" description="Stalwart 역할 관리 — 권한 그룹 생성 및 편집" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -251,10 +251,9 @@ export default function MailRolesPage() {
                     setPage(1);
                   }}
                   placeholder="역할 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
-                <Button size="sm" renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>역할 추가</Button>
+                <Button renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>역할 추가</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
@@ -276,19 +275,19 @@ export default function MailRolesPage() {
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id} style={{ fontWeight: cell.info.header === 'name' ? 500 : undefined }}>
                           {cell.info.header === 'enabledCount' ? (
-                            <Tag type="green" size="sm">{cell.value}</Tag>
+                            <Tag type="green">{cell.value}</Tag>
                           ) : cell.info.header === 'disabledCount' ? (
-                            <Tag type="red" size="sm">{cell.value}</Tag>
+                            <Tag type="red">{cell.value}</Tag>
                           ) : cell.info.header === 'memberCount' ? (
-                            <Tag type="blue" size="sm">{cell.value}</Tag>
+                            <Tag type="blue">{cell.value}</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                          <Button kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                             onClick={() => { setEditItem(orig ?? null); setModalOpen(true); }} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && setDeleteTarget(orig)} />
                         </div>
                       </TableCell>

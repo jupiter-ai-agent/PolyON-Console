@@ -101,7 +101,7 @@ export default function MonitoringLogsPage() {
 
       {/* Tab Bar */}
       <Tabs selectedIndex={activeIndex} onChange={handleTabChange}>
-        <TabList aria-label="서비스 로그 탭" style={{ paddingLeft: '32px' }}>
+        <TabList contained aria-label="서비스 로그 탭" style={{ paddingLeft: '32px' }}>
           {LOG_SERVICES.map(svc => (
             <Tab key={svc.id}>{svc.label}</Tab>
           ))}

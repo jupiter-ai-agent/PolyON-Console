@@ -68,7 +68,7 @@ export function DomainInfoCard() {
             <StructuredListRow>
               <StructuredListCell noWrap style={{ fontWeight: 600 }}>API</StructuredListCell>
               <StructuredListCell>
-                <Tag type="green" size="sm">Healthy</Tag>
+                <Tag type="green">Healthy</Tag>
               </StructuredListCell>
             </StructuredListRow>
           </StructuredListBody>

@@ -222,9 +222,9 @@ export default function AIPipelinePage() {
       }}>
         <span style={{ fontSize: '0.9375rem', fontWeight: 600 }}>AI Models</span>
         <div style={{ display: 'flex', gap: 8 }}>
-          <Button kind="tertiary" size="sm" renderIcon={Add} onClick={() => setShowAddService(true)}>Service</Button>
-          <Button kind="primary" size="sm" renderIcon={Add} onClick={() => setShowAddModel(true)}>Model</Button>
-          <Button kind="ghost" size="sm" renderIcon={Renew} hasIconOnly iconDescription="Refresh" onClick={load} />
+          <Button kind="tertiary" renderIcon={Add} onClick={() => setShowAddService(true)}>Service</Button>
+          <Button kind="primary" renderIcon={Add} onClick={() => setShowAddModel(true)}>Model</Button>
+          <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="Refresh" onClick={load} />
         </div>
       </div>
 
@@ -316,7 +316,7 @@ export default function AIPipelinePage() {
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
                   <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>{svcName}</span>
-                  <Button kind="ghost" hasIconOnly renderIcon={TrashCan} iconDescription="Delete service" size="sm" onClick={() => handleDeleteService(svcName)} />
+                  <Button kind="ghost" hasIconOnly renderIcon={TrashCan} iconDescription="Delete service" onClick={() => handleDeleteService(svcName)} />
                 </div>
                 <div style={{ fontSize: '0.6875rem', color: 'var(--cds-text-secondary)', marginBottom: 6 }}>
                   {items.length} model{items.length !== 1 ? 's' : ''} connected
@@ -341,7 +341,7 @@ export default function AIPipelinePage() {
           {serviceNames.length === 0 && !loading && (
             <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--cds-text-secondary)', fontSize: '0.8125rem' }}>
               <p style={{ marginBottom: 8 }}>서비스 없음</p>
-              <Button kind="tertiary" size="sm" renderIcon={Add} onClick={() => setShowAddService(true)}>추가</Button>
+              <Button kind="tertiary" renderIcon={Add} onClick={() => setShowAddService(true)}>추가</Button>
             </div>
           )}
         </div>
@@ -390,7 +390,7 @@ export default function AIPipelinePage() {
                 </div>
                 {entry.usedBy.length > 0 && (
                   <div style={{ marginTop: 4, display: 'flex', gap: 4, flexWrap: 'wrap' }}>
-                    {entry.usedBy.map(s => <Tag key={s} type="blue" size="sm">{s}</Tag>)}
+                    {entry.usedBy.map(s => <Tag key={s} type="blue">{s}</Tag>)}
                   </div>
                 )}
               </div>
@@ -399,7 +399,7 @@ export default function AIPipelinePage() {
           {modelActuals.length === 0 && !loading && (
             <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--cds-text-secondary)', fontSize: '0.8125rem' }}>
               <p style={{ marginBottom: 8 }}>모델 없음</p>
-              <Button kind="primary" size="sm" renderIcon={Add} onClick={() => setShowAddModel(true)}>등록</Button>
+              <Button kind="primary" renderIcon={Add} onClick={() => setShowAddModel(true)}>등록</Button>
             </div>
           )}
         </div>

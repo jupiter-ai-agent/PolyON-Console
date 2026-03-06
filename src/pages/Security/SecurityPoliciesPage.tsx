@@ -100,7 +100,7 @@ export default function SecurityPoliciesPage() {
           <h1 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>보안 정책</h1>
           <p style={{ color: 'var(--cds-text-secondary)', fontSize: '13px', margin: '4px 0 0' }}>도메인 패스워드 정책, 계정 잠금, Kerberos 인증 설정</p>
         </div>
-        <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>새로고침</Button>
+        <Button kind="ghost" renderIcon={Renew} onClick={load}>새로고침</Button>
       </div>
 
       {/* Password Policy */}
@@ -110,7 +110,7 @@ export default function SecurityPoliciesPage() {
             <Key size={20} /> 패스워드 정책
           </h4>
           {!editPwd && (
-            <Button kind="ghost" size="sm" renderIcon={Edit} onClick={() => setEditPwd(true)}>편집</Button>
+            <Button kind="ghost" renderIcon={Edit} onClick={() => setEditPwd(true)}>편집</Button>
           )}
         </div>
 
@@ -149,7 +149,7 @@ export default function SecurityPoliciesPage() {
             <Locked size={20} /> 계정 잠금 정책
           </h4>
           {!editLock && (
-            <Button kind="ghost" size="sm" renderIcon={Edit} onClick={() => setEditLock(true)}>편집</Button>
+            <Button kind="ghost" renderIcon={Edit} onClick={() => setEditLock(true)}>편집</Button>
           )}
         </div>
 

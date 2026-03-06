@@ -112,7 +112,7 @@ export default function SettingsWorkstreamEventsPage() {
                 <TableToolbarContent>
                   <Button
                     kind="ghost"
-                    size="sm"
+                   
                     renderIcon={Activity}
                     onClick={() => { setFilterWsId(null); fetchEvents(); }}
                   >
@@ -120,7 +120,7 @@ export default function SettingsWorkstreamEventsPage() {
                   </Button>
                 </TableToolbarContent>
               </TableToolbar>
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((h) => (
@@ -148,7 +148,7 @@ export default function SettingsWorkstreamEventsPage() {
                               <TableCell key={cell.id}>
                                 <Button
                                   kind="ghost"
-                                  size="sm"
+                                 
                                   onClick={() => setFilterWsId(cell.value)}
                                   style={{ padding: 0, minHeight: 'auto' }}
                                 >

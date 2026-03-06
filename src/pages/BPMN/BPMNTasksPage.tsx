@@ -106,13 +106,13 @@ export default function BPMNTasksPage() {
         description="대기 중인 사용자 태스크 목록"
         actions={
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-            <Button kind="secondary" size="sm" onClick={() => { setShowCreateNotif(true); setTimeout(() => setShowCreateNotif(false), 3000); }}>
+            <Button kind="secondary" onClick={() => { setShowCreateNotif(true); setTimeout(() => setShowCreateNotif(false), 3000); }}>
               Create task
             </Button>
-            <Button kind="primary" size="sm" onClick={() => setStartModalOpen(true)}>
+            <Button kind="primary" onClick={() => setStartModalOpen(true)}>
               Start process
             </Button>
-            <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+            <Button kind="ghost" renderIcon={Renew} onClick={load}>
               새로고침
             </Button>
           </div>
@@ -195,9 +195,9 @@ export default function BPMNTasksPage() {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <span style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{t.name || '(이름 없음)'}</span>
                       {t.assignee ? (
-                        <Tag type="blue" size="sm">{t.assignee}</Tag>
+                        <Tag type="blue">{t.assignee}</Tag>
                       ) : (
-                        <Tag type="gray" size="sm">미배정</Tag>
+                        <Tag type="gray">미배정</Tag>
                       )}
                     </div>
                     {processKey && (

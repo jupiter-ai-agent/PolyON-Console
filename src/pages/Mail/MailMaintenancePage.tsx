@@ -95,7 +95,7 @@ function ActionCard({ item, onResult }: { item: ActionItem; onResult: (data: Rel
         <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{item.title}</h4>
         <p style={{ fontSize: 12, color: 'var(--cds-text-secondary)' }}>{item.desc}</p>
       </div>
-      <Button kind="ghost" size="sm" onClick={run} disabled={running}>
+      <Button kind="ghost" onClick={run} disabled={running}>
         {running ? '실행 중…' : '실행'}
       </Button>
     </Tile>

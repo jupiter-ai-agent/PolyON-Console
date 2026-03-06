@@ -210,7 +210,7 @@ export default function SettingsMirrorsPage() {
                 <TableToolbarContent>
                   <Button
                     kind="primary"
-                    size="sm"
+                   
                     renderIcon={Add}
                     onClick={() => setPushModalOpen(true)}
                   >
@@ -243,13 +243,13 @@ export default function SettingsMirrorsPage() {
                           {row.cells.map(cell => (
                             <TableCell key={cell.id}>
                               {cell.info.header === 'syncOnCommit' ? (
-                                <Tag type={cell.value ? 'green' : 'gray'} size="sm">
+                                <Tag type={cell.value ? 'green' : 'gray'}>
                                   {cell.value ? 'ON' : 'OFF'}
                                 </Tag>
                               ) : cell.info.header === 'actions' ? (
                                 <Button
                                   kind="danger--ghost"
-                                  size="sm"
+                                 
                                   renderIcon={TrashCan}
                                   hasIconOnly
                                   iconDescription="\uc0ad\uc81c"
@@ -274,7 +274,7 @@ export default function SettingsMirrorsPage() {
         <h4 style={{ margin: '2rem 0 1rem' }}>Pull Mirror (\uc678\ubd80 \u2192 \ub0b4\ubd80 \ub3d9\uae30\ud654)</h4>
         <Button
           kind="tertiary"
-          size="sm"
+         
           renderIcon={Add}
           onClick={() => setPullModalOpen(true)}
           style={{ marginBottom: '1rem' }}
@@ -297,7 +297,7 @@ export default function SettingsMirrorsPage() {
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map(h => (

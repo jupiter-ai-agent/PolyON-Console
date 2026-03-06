@@ -129,10 +129,10 @@ export default function MailSpamTestPage() {
                   placeholder="recipient@example.com"
                   style={{ flex: 1 }}
                 />
-                <Button kind="danger--ghost" size="sm" onClick={() => removeRcpt(i)} disabled={rcptTo.length === 1}>삭제</Button>
+                <Button kind="danger--ghost" onClick={() => removeRcpt(i)} disabled={rcptTo.length === 1}>삭제</Button>
               </div>
             ))}
-            <Button kind="ghost" size="sm" onClick={addRcpt}>+ 수신자 추가</Button>
+            <Button kind="ghost" onClick={addRcpt}>+ 수신자 추가</Button>
           </div>
         </Tile>
 
@@ -152,7 +152,7 @@ export default function MailSpamTestPage() {
 
         {/* 버튼 */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-          <Button size="sm" renderIcon={Play} onClick={runTest} disabled={testing}>
+          <Button renderIcon={Play} onClick={runTest} disabled={testing}>
             {testing ? '분석 중…' : '테스트 실행'}
           </Button>
           <Button kind="ghost" renderIcon={Reset} onClick={clear}>초기화</Button>
@@ -179,7 +179,7 @@ export default function MailSpamTestPage() {
                 <h4 style={{ fontSize: 12, fontWeight: 600, color: 'var(--cds-text-secondary)', letterSpacing: '0.32px', textTransform: 'uppercase', marginBottom: 8 }}>
                   태그 상세
                 </h4>
-                <Table size="sm">
+                <Table>
                   <TableHead>
                     <TableRow>
                       <TableHeader>규칙</TableHeader>

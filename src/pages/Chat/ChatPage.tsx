@@ -195,7 +195,7 @@ export default function ChatPage() {
           <div style={{ background: '#fff', border: '1px solid #e0e0e0', marginTop: '1.5rem' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>팀 목록</h4>
-              <Button kind="ghost" size="sm" onClick={() => navigate('/chat/teams')}>
+              <Button kind="ghost" onClick={() => navigate('/chat/teams')}>
                 전체 보기
               </Button>
             </div>
@@ -204,7 +204,7 @@ export default function ChatPage() {
             ) : (
               <DataTable rows={teamRows} headers={teamHeaders}>
                 {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {tableHeaders.map(h => (
@@ -233,7 +233,7 @@ export default function ChatPage() {
           <div style={{ background: '#fff', border: '1px solid #e0e0e0', marginTop: '1rem' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>최근 사용자</h4>
-              <Button kind="ghost" size="sm" onClick={() => navigate('/chat/users')}>
+              <Button kind="ghost" onClick={() => navigate('/chat/users')}>
                 전체 보기
               </Button>
             </div>
@@ -242,7 +242,7 @@ export default function ChatPage() {
             ) : (
               <DataTable rows={userRows} headers={userHeaders}>
                 {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {tableHeaders.map(h => (

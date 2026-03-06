@@ -245,7 +245,7 @@ export default function SettingsDomainPage() {
             {!editMode && (
               <Button
                 kind="ghost"
-                size="sm"
+               
                 renderIcon={Edit}
                 onClick={() => setEditMode(true)}
               >
@@ -259,12 +259,12 @@ export default function SettingsDomainPage() {
             <span style={{ fontWeight: 500, color: 'var(--cds-text-secondary)' }}>DC Domain</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <code>{dcDomain || '미설정'}</code>
-              <Tag type="gray" size="sm">변경 불가</Tag>
+              <Tag type="gray">변경 불가</Tag>
             </span>
             <span style={{ fontWeight: 500, color: 'var(--cds-text-secondary)' }}>Mail Domain</span>
             <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <code>{mailDomain || '미설정'}</code>
-              <Tag type="gray" size="sm">변경 불가</Tag>
+              <Tag type="gray">변경 불가</Tag>
             </span>
           </div>
 

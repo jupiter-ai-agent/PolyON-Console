@@ -61,8 +61,11 @@ export default function AIOverviewPage() {
             icon={Bot}
             title="이 서비스는 아직 설치되지 않았습니다"
             description="AI Platform은 현재 설치되지 않았습니다. Applications에서 설치할 수 있습니다."
-            actionLabel="Applications로 이동"
-            onAction={() => navigate('/apps')}
+            action={
+              <Button onClick={() => navigate('/apps')}>
+                Applications로 이동
+              </Button>
+            }
           />
         </div>
       </>
@@ -248,7 +251,7 @@ export default function AIOverviewPage() {
                 <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>Agent Status</h4>
                 <Button
                   kind="ghost"
-                  size="sm"
+                 
                   onClick={() => navigate('/ai/agents')}
                 >
                   View all
@@ -262,7 +265,7 @@ export default function AIOverviewPage() {
               ) : (
                 <DataTable rows={agentRows} headers={agentHeaders}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (

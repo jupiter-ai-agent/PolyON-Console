@@ -131,7 +131,7 @@ export default function ContainersPage() {
           <h1 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>Pods & Services</h1>
           <p style={{ fontSize: '13px', color: 'var(--cds-text-secondary)', margin: '4px 0 0' }}>PolyON Kubernetes Pod 상태</p>
         </div>
-        <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>새로고침</Button>
+        <Button kind="ghost" renderIcon={Renew} onClick={load}>새로고침</Button>
       </div>
 
       {loading ? (
@@ -156,7 +156,7 @@ export default function ContainersPage() {
 
           <DataTable rows={tableRows} headers={tableHeaders}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map(h => (
@@ -211,8 +211,8 @@ export default function ContainersPage() {
                             return (
                               <TableCell key={cell.id}>
                                 <div style={{ display: 'flex', gap: '4px' }}>
-                                  <Button kind="ghost" size="sm" hasIconOnly renderIcon={Terminal} iconDescription="로그" onClick={() => showLogs(cell.value)} />
-                                  <Button kind="ghost" size="sm" hasIconOnly renderIcon={Renew}    iconDescription="재시작" onClick={() => restart(cell.value)} />
+                                  <Button kind="ghost" hasIconOnly renderIcon={Terminal} iconDescription="로그" onClick={() => showLogs(cell.value)} />
+                                  <Button kind="ghost" hasIconOnly renderIcon={Renew}    iconDescription="재시작" onClick={() => restart(cell.value)} />
                                 </div>
                               </TableCell>
                             );
@@ -232,7 +232,7 @@ export default function ContainersPage() {
             <div style={{ marginTop: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600 }}>Pod {logPod} 로그</h4>
-                <Button kind="ghost" size="sm" onClick={() => setLogPod(null)}>닫기</Button>
+                <Button kind="ghost" onClick={() => setLogPod(null)}>닫기</Button>
               </div>
               <div style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: '12px', background: '#262626', color: '#f4f4f4', padding: '16px', maxHeight: '400px', overflowY: 'auto' }}>
                 {logLoading ? '로딩 중...' : logs}

@@ -183,7 +183,7 @@ export default function BPMNProcessDetailPage() {
           </span>
         }
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -248,7 +248,7 @@ export default function BPMNProcessDetailPage() {
             {/* Tabs */}
             <div style={{ background: '#fff', borderTop: '1px solid #e0e0e0' }}>
               <Tabs>
-                <TabList aria-label="Process detail tabs">
+                <TabList contained aria-label="Process detail tabs">
                   <Tab>Process Instances ({instances.length})</Tab>
                   <Tab>Incidents ({incidents.length})</Tab>
                   <Tab>Called Process Definitions</Tab>
@@ -265,7 +265,7 @@ export default function BPMNProcessDetailPage() {
                           placeholder="ID 또는 Business Key로 검색..."
                           value={instanceFilter}
                           onChange={(e: any) => setInstanceFilter(e.target.value)}
-                          size="sm"
+                         
                         />
                       </div>
                       {instanceRows.length === 0 ? (
@@ -289,7 +289,7 @@ export default function BPMNProcessDetailPage() {
                           ]}
                         >
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (
@@ -312,7 +312,7 @@ export default function BPMNProcessDetailPage() {
                                       {row.cells.map(cell => (
                                         <TableCell key={cell.id}>
                                           {cell.info.header === 'state' ? (
-                                            <Tag type={orig?.suspended ? 'teal' : 'green'} size="sm">
+                                            <Tag type={orig?.suspended ? 'teal' : 'green'}>
                                               {cell.value}
                                             </Tag>
                                           ) : cell.info.header === 'instanceId' ? (
@@ -345,7 +345,7 @@ export default function BPMNProcessDetailPage() {
                       ) : (
                         <DataTable rows={incidentRows} headers={incidentHeaders}>
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (

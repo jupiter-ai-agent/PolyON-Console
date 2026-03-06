@@ -64,7 +64,7 @@ export default function MailLogsPage() {
           selectedIndex={(['all', 'INFO', 'WARN', 'ERROR'] as LevelFilter[]).indexOf(level)}
           onChange={({ selectedIndex }) => setLevel((['all', 'INFO', 'WARN', 'ERROR'] as LevelFilter[])[selectedIndex])}
         >
-          <TabList aria-label="로그 레벨 필터">
+          <TabList contained aria-label="로그 레벨 필터">
             <Tab>전체</Tab>
             <Tab>INFO</Tab>
             <Tab>WARN</Tab>
@@ -80,7 +80,7 @@ export default function MailLogsPage() {
         <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
       </div>
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps }) => (
           <Table {...getTableProps()}>
             <TableHead>
@@ -109,7 +109,7 @@ export default function MailLogsPage() {
                       }}
                     >
                       {cell.info.header === 'level' ? (
-                        <Tag type={cell.value === 'ERROR' ? 'red' : cell.value === 'WARN' ? 'purple' : 'blue'} size="sm">
+                        <Tag type={cell.value === 'ERROR' ? 'red' : cell.value === 'WARN' ? 'purple' : 'blue'}>
                           {cell.value}
                         </Tag>
                       ) : String(cell.value)}

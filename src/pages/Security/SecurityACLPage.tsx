@@ -64,7 +64,7 @@ function AceTable({ aces }) {
   return (
     <DataTable rows={rows} headers={aceHeaders}>
       {({ rows: tRows, headers: tHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-        <Table {...getTableProps()} size="sm">
+        <Table {...getTableProps()}>
           <TableHead>
             <TableRow>
               {tHeaders.map(h => (
@@ -178,7 +178,7 @@ export default function SecurityACLPage() {
         </h4>
         <DataTable rows={serviceRows} headers={serviceHeaders}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <Table {...getTableProps()} size="sm">
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map(h => (
@@ -211,7 +211,7 @@ export default function SecurityACLPage() {
           <h4 style={{ margin: 0, fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Folder size={20} /> OU별 DACL
           </h4>
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={loadOuAcls}>새로고침</Button>
+          <Button kind="ghost" renderIcon={Renew} onClick={loadOuAcls}>새로고침</Button>
         </div>
         {ouLoading ? (
           <InlineLoading description="OU ACL을 불러오는 중..." />

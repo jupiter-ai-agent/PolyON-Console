@@ -127,7 +127,7 @@ export default function MailLiveTracingPage() {
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12, flexWrap: 'wrap' }}>
         <Button
           kind={paused ? 'primary' : 'tertiary'}
-          size="sm"
+         
           renderIcon={paused ? Play : Pause}
           onClick={() => setPaused((p) => !p)}
         >
@@ -135,7 +135,7 @@ export default function MailLiveTracingPage() {
         </Button>
         <Button
           kind="ghost"
-          size="sm"
+         
           renderIcon={TrashCan}
           onClick={() => setLogs([])}
         >
@@ -155,7 +155,7 @@ export default function MailLiveTracingPage() {
             key={cat}
             id={`cat-toggle-${cat}`}
             labelText={cat}
-            size="sm"
+           
             toggled={enabledCats.has(cat)}
             onToggle={() => toggleCat(cat)}
             hideLabel={false}
@@ -164,7 +164,7 @@ export default function MailLiveTracingPage() {
       </div>
 
       {/* 로그 테이블 */}
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps }) => (
           <div style={{ fontFamily: "monospace", fontSize: 12 }}><Table {...getTableProps()}>
             <TableHead>
@@ -189,7 +189,7 @@ export default function MailLiveTracingPage() {
                       textOverflow: 'ellipsis',
                     }}>
                       {cell.info.header === 'level' ? (
-                        <Tag type={(LEVEL_TAG[String(cell.value).toLowerCase()] ?? 'gray') as 'gray'} size="sm">
+                        <Tag type={(LEVEL_TAG[String(cell.value).toLowerCase()] ?? 'gray') as 'gray'}>
                           {String(cell.value).toUpperCase()}
                         </Tag>
                       ) : String(cell.value)}

@@ -298,7 +298,7 @@ export default function OUsPage() {
         actions={
           <>
             <Button kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly onClick={loadTree} />
-            <Button size="sm" renderIcon={Add} onClick={() => { setCreateOUParent(undefined); setCreateOUOpen(true); }}>
+            <Button renderIcon={Add} onClick={() => { setCreateOUParent(undefined); setCreateOUOpen(true); }}>
               OU 추가
             </Button>
           </>
@@ -320,8 +320,8 @@ export default function OUsPage() {
             <div style={{ padding: '10px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--cds-border-subtle)' }}>
               <span style={{ fontSize: '0.8125rem', fontWeight: 600 }}>조직 구조</span>
               <div style={{ display: 'flex', gap: 4 }}>
-                <Button size="sm" kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly onClick={loadTree} />
-                <Button size="sm" kind="ghost" renderIcon={Add} iconDescription="OU 추가" hasIconOnly onClick={() => { setCreateOUParent(undefined); setCreateOUOpen(true); }} />
+                <Button kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly onClick={loadTree} />
+                <Button kind="ghost" renderIcon={Add} iconDescription="OU 추가" hasIconOnly onClick={() => { setCreateOUParent(undefined); setCreateOUOpen(true); }} />
               </div>
             </div>
 
@@ -367,7 +367,7 @@ export default function OUsPage() {
                     <div style={{ display: 'flex', gap: 8 }}>
                       {!isBase && selectedOU && (
                         <Button
-                          size="sm"
+                         
                           kind="danger--ghost"
                           renderIcon={TrashCan}
                           onClick={() => { setDeletingDn(selectedDn!); setDeleteOUOpen(true); }}
@@ -376,7 +376,7 @@ export default function OUsPage() {
                         </Button>
                       )}
                       <Button
-                        size="sm"
+                       
                         kind="ghost"
                         renderIcon={Add}
                         onClick={() => { setCreateOUParent(selectedDn || undefined); setCreateOUOpen(true); }}
@@ -387,9 +387,9 @@ export default function OUsPage() {
                   </div>
 
                   <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-                    <Tag type="blue" size="sm">{filteredUsers.length} 사용자</Tag>
-                    <Tag type="teal" size="sm">{contentGroups.length} 그룹</Tag>
-                    <Tag type="purple" size="sm">{subOUs.length} 하위 OU</Tag>
+                    <Tag type="blue">{filteredUsers.length} 사용자</Tag>
+                    <Tag type="teal">{contentGroups.length} 그룹</Tag>
+                    <Tag type="purple">{subOUs.length} 하위 OU</Tag>
                   </div>
 
                   {/* Sub OUs */}
@@ -480,7 +480,7 @@ export default function OUsPage() {
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
                 <span style={{ fontSize: '0.9375rem', fontWeight: 600 }}>{panelTitle}</span>
-                <Button kind="ghost" size="sm" renderIcon={() => <span style={{ fontSize: '1rem' }}>✕</span>} iconDescription="닫기" hasIconOnly onClick={() => setPanelOpen(false)} />
+                <Button kind="ghost" renderIcon={() => <span style={{ fontSize: '1rem' }}>✕</span>} iconDescription="닫기" hasIconOnly onClick={() => setPanelOpen(false)} />
               </div>
 
               <div style={{ padding: '1rem' }}>
@@ -491,12 +491,12 @@ export default function OUsPage() {
                       <p style={{ fontSize: '0.75rem', fontFamily: 'IBM Plex Mono', color: 'var(--cds-text-secondary)', wordBreak: 'break-all' }}>{panelUser.dn}</p>
                     </div>
                     <div style={{ marginBottom: '0.5rem' }}>
-                      <TextInput id="pGiven" labelText="Given Name" value={editGiven} onChange={(e) => setEditGiven(e.target.value)} size="sm" style={{ marginBottom: '0.5rem' }} />
-                      <TextInput id="pSurname" labelText="Surname" value={editSurname} onChange={(e) => setEditSurname(e.target.value)} size="sm" style={{ marginBottom: '0.5rem' }} />
-                      <TextInput id="pMail" labelText="외부 메일" value={editMail} onChange={(e) => setEditMail(e.target.value)} size="sm" style={{ marginBottom: '0.75rem' }} />
+                      <TextInput id="pGiven" labelText="Given Name" value={editGiven} onChange={(e) => setEditGiven(e.target.value)} style={{ marginBottom: '0.5rem' }} />
+                      <TextInput id="pSurname" labelText="Surname" value={editSurname} onChange={(e) => setEditSurname(e.target.value)} style={{ marginBottom: '0.5rem' }} />
+                      <TextInput id="pMail" labelText="외부 메일" value={editMail} onChange={(e) => setEditMail(e.target.value)} style={{ marginBottom: '0.75rem' }} />
                       <div style={{ display: 'flex', gap: 8 }}>
-                        <Button size="sm" onClick={saveUser}>저장</Button>
-                        <Button size="sm" kind="ghost" onClick={() => {
+                        <Button onClick={saveUser}>저장</Button>
+                        <Button kind="ghost" onClick={() => {
                           setMovingUsername(panelUser.username);
                           setMovingGroupName('');
                           setMoveTarget('');
@@ -512,7 +512,7 @@ export default function OUsPage() {
                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.5rem' }}>
                           {panelUser.member_of.map((g) => {
                             const cn = g.match(/^CN=([^,]+)/i)?.[1] || g;
-                            return <Tag key={cn} type="blue" size="sm">{cn}</Tag>;
+                            return <Tag key={cn} type="blue">{cn}</Tag>;
                           })}
                         </div>
                       </div>
@@ -532,12 +532,12 @@ export default function OUsPage() {
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.25rem', marginTop: '0.5rem' }}>
                         {(panelGroup.members || []).map((m) => {
                           const cn = m.match(/^CN=([^,]+)/i)?.[1] || m;
-                          return <Tag key={cn} type="blue" size="sm">{cn}</Tag>;
+                          return <Tag key={cn} type="blue">{cn}</Tag>;
                         })}
                         {!(panelGroup.members || []).length && <span style={{ fontSize: '0.8125rem', color: 'var(--cds-text-placeholder)' }}>멤버 없음</span>}
                       </div>
                     </div>
-                    <Button size="sm" kind="ghost" onClick={() => {
+                    <Button kind="ghost" onClick={() => {
                       setMovingGroupName(panelGroup.name);
                       setMovingUsername('');
                       setMoveTarget('');

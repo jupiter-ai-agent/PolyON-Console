@@ -160,7 +160,7 @@ export default function BPMNDeploymentsPage() {
         <div style={{ width: 280, borderRight: '1px solid #e0e0e0', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
           <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f4f4f4' }}>
             <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>배포 목록</span>
-            <Button kind="primary" size="sm" onClick={() => { setDeployNotification(null); setNewDeployOpen(true); }}>
+            <Button kind="primary" onClick={() => { setDeployNotification(null); setNewDeployOpen(true); }}>
               새 배포
             </Button>
           </div>
@@ -196,7 +196,7 @@ export default function BPMNDeploymentsPage() {
                     <div style={{ marginTop: '0.5rem' }}>
                       <Button
                         kind="danger--ghost"
-                        size="sm"
+                       
                         onClick={(e) => {
                           e.stopPropagation();
                           setDeleteTarget(deploy);

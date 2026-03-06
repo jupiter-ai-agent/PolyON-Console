@@ -164,7 +164,7 @@ export default function HomepageBuildPage() {
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <Button
               kind="ghost"
-              size="sm"
+             
               renderIcon={ArrowLeft}
               onClick={() => navigate('/homepage/sites')}
             >
@@ -173,7 +173,7 @@ export default function HomepageBuildPage() {
             {selectedSite && (
               <Button
                 kind="primary"
-                size="sm"
+               
                 renderIcon={Launch}
                 onClick={triggerBuild}
                 disabled={building}
@@ -213,7 +213,7 @@ export default function HomepageBuildPage() {
       {/* Tabs */}
       <div style={{ marginTop: '1rem' }}>
         <Tabs>
-          <TabList aria-label="빌드 관리 탭">
+          <TabList contained aria-label="빌드 관리 탭">
             <Tab>빌드 이력</Tab>
             <Tab>설정</Tab>
           </TabList>
@@ -229,7 +229,7 @@ export default function HomepageBuildPage() {
               ) : (
                 <DataTable rows={buildRows} headers={buildHeaders}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (

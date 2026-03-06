@@ -182,9 +182,9 @@ export default function SettingsDomainMgmtPage() {
               style={{ width: 160 }}
               hideLabel
             />
-            <Button kind="primary" size="sm" onClick={() => setAppDomain(app)}>설정</Button>
+            <Button kind="primary"  onClick={() => setAppDomain(app)}>설정</Button>
             {app.subdomain && (
-              <Button kind="ghost" size="sm" onClick={() => removeAppDomain(app)} style={{ color: 'var(--cds-support-error)' }}>제거</Button>
+              <Button kind="ghost" onClick={() => removeAppDomain(app)} style={{ color: 'var(--cds-support-error)' }}>제거</Button>
             )}
           </div>
           {st && (
@@ -216,7 +216,7 @@ export default function SettingsDomainMgmtPage() {
               <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600 }}>기본 도메인 설정</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>플랫폼 서비스 도메인 기본값</p>
             </div>
-            <Button kind="primary" size="sm" onClick={saveDomainSettings} disabled={saving}>
+            <Button kind="primary" onClick={saveDomainSettings} disabled={saving}>
               {saving ? '저장 중...' : '저장'}
             </Button>
           </div>
@@ -258,7 +258,7 @@ export default function SettingsDomainMgmtPage() {
                   return (
                     <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', padding: '0.5rem 0', borderBottom: '1px solid var(--cds-border-subtle)' }}>
                       <span style={{ fontSize: '0.8125rem', fontWeight: 500, minWidth: 80 }}>{s.name || s.step}</span>
-                      <Tag type={st.type} size="sm">{st.label}</Tag>
+                      <Tag type={st.type}>{st.label}</Tag>
                       {s.message && <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>{s.message}</span>}
                     </div>
                   );
@@ -275,7 +275,7 @@ export default function SettingsDomainMgmtPage() {
               <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600 }}>앱별 서브도메인 매핑</h4>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>backend_url이 등록된 앱의 외부 접근 도메인 설정</p>
             </div>
-            <Button kind="ghost" size="sm" renderIcon={Renew} onClick={loadApps} disabled={loadingApps}>
+            <Button kind="ghost" renderIcon={Renew} onClick={loadApps} disabled={loadingApps}>
               새로고침
             </Button>
           </div>

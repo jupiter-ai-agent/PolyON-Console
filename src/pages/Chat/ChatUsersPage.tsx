@@ -66,7 +66,7 @@ export default function ChatUsersPage() {
         actions={
           <Button
             kind="ghost"
-            size="sm"
+           
             renderIcon={Renew}
             onClick={load}
           >
@@ -104,7 +104,7 @@ export default function ChatUsersPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {tableHeaders.map(h => (

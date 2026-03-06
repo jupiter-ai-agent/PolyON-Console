@@ -105,7 +105,7 @@ function ListModal({
       onRequestSubmit={handleSave}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={saving}
-      size="sm"
+     
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <TextInput
@@ -239,7 +239,7 @@ export default function MailListsPage() {
     <>
       <PageHeader title="메일링 리스트" description="Stalwart 메일링 리스트 관리 — 내부·외부 구독자 관리" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -251,10 +251,9 @@ export default function MailListsPage() {
                     setPage(1);
                   }}
                   placeholder="리스트 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
-                <Button size="sm" renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>리스트 추가</Button>
+                <Button renderIcon={Add} onClick={() => { setEditItem(null); setModalOpen(true); }}>리스트 추가</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
@@ -281,17 +280,17 @@ export default function MailListsPage() {
                             fontSize: cell.info.header === 'email' ? 13 : undefined,
                           }}>
                           {cell.info.header === 'memberCount' ? (
-                            <Tag type="blue" size="sm">{cell.value}명</Tag>
+                            <Tag type="blue">{cell.value}명</Tag>
                           ) : cell.info.header === 'extMemberCount' ? (
-                            <Tag type="teal" size="sm">{cell.value}명</Tag>
+                            <Tag type="teal">{cell.value}명</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                          <Button kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                             onClick={() => { setEditItem(orig ?? null); setModalOpen(true); }} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && setDeleteTarget(orig)} />
                         </div>
                       </TableCell>

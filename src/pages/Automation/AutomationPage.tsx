@@ -127,7 +127,7 @@ export default function AutomationPage() {
             <>
               <Tile style={{ background: '#fff' }}>
                 <p className="cds--label">엔진 상태</p>
-                <Tag type={statusColor} size="sm">{statusLabel}</Tag>
+                <Tag type={statusColor}>{statusLabel}</Tag>
               </Tile>
               <Tile style={{ background: '#fff' }}>
                 <p className="cds--label">워크플로우</p>
@@ -174,7 +174,7 @@ export default function AutomationPage() {
                     <tr key={i} style={{ borderBottom: '1px solid var(--cds-border-subtle)' }}>
                       <td style={{ padding: '0.5rem 0.75rem', fontWeight: 500 }}>{w.name || '—'}</td>
                       <td style={{ padding: '0.5rem 0.75rem' }}>
-                        <Tag type={w.active ? 'green' : 'gray'} size="sm">{w.active ? 'Active' : 'Inactive'}</Tag>
+                        <Tag type={w.active ? 'green' : 'gray'}>{w.active ? 'Active' : 'Inactive'}</Tag>
                       </td>
                       <td style={{ padding: '0.5rem 0.75rem', color: 'var(--cds-text-secondary)' }}>
                         {w.updatedAt ? new Date(w.updatedAt).toLocaleString('ko-KR') : '—'}
@@ -225,7 +225,7 @@ export default function AutomationPage() {
                       <tr key={i} style={{ borderBottom: '1px solid var(--cds-border-subtle)' }}>
                         <td style={{ padding: '0.5rem 0.75rem', fontWeight: 500 }}>{e.workflow || '—'}</td>
                         <td style={{ padding: '0.5rem 0.75rem' }}>
-                          <Tag type={s.type} size="sm">{s.label}</Tag>
+                          <Tag type={s.type}>{s.label}</Tag>
                         </td>
                         <td style={{ padding: '0.5rem 0.75rem', color: 'var(--cds-text-secondary)' }}>
                           {e.startedAt ? new Date(e.startedAt).toLocaleString('ko-KR') : '—'}

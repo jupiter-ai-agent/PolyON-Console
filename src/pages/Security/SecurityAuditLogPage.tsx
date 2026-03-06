@@ -81,7 +81,7 @@ function ActionTag({ action }: { action: string }) {
   };
   const type = colorMap[action] ?? 'gray';
   return (
-    <Tag type={type} size="sm" style={action === 'POLICY_DENY' ? { fontWeight: 700 } : {}}>
+    <Tag type={type} style={action === 'POLICY_DENY' ? { fontWeight: 700 } : {}}>
       {action}
     </Tag>
   );

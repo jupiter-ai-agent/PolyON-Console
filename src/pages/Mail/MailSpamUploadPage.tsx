@@ -96,7 +96,7 @@ export default function MailSpamUploadPage() {
             />
             <Button
               kind="tertiary"
-              size="sm"
+             
               renderIcon={Upload}
               onClick={() => fileRef.current?.click()}
             >

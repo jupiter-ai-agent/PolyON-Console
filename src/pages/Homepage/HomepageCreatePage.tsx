@@ -50,7 +50,7 @@ export default function HomepageCreatePage() {
         actions={
           <Button
             kind="ghost"
-            size="sm"
+           
             renderIcon={ArrowLeft}
             onClick={() => navigate('/homepage/sites')}
           >

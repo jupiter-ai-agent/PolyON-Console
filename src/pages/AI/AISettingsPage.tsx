@@ -144,7 +144,7 @@ kubectl rollout restart deployment/polyon-ai`}
                 </code>
                 <Button
                   kind="ghost"
-                  size="sm"
+                 
                   onClick={() => setKeyVisible(!keyVisible)}
                 >
                   {keyVisible ? 'Hide' : 'Show'}

@@ -98,7 +98,7 @@ export default function BPMNProcessesPage() {
         title="프로세스 정의"
         description="배포된 BPMN 프로세스 목록"
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -113,11 +113,11 @@ export default function BPMNProcessesPage() {
             placeholder="프로세스 검색 (이름 또는 키)"
             value={search}
             onChange={(e: any) => setSearch(e.target.value)}
-            size="sm"
+           
           />
         </div>
         <ContentSwitcher
-          size="sm"
+         
           onChange={({ name }: any) => setViewMode(name)}
           selectedIndex={viewMode === 'list' ? 0 : 1}
         >
@@ -141,7 +141,7 @@ export default function BPMNProcessesPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {tableHeaders.map(h => (
@@ -166,7 +166,7 @@ export default function BPMNProcessesPage() {
                         {row.cells.map(cell => (
                           <TableCell key={cell.id}>
                             {cell.info.header === 'stateTag' ? (
-                              <Tag type={orig?.suspended ? 'gray' : 'green'} size="sm">
+                              <Tag type={orig?.suspended ? 'gray' : 'green'}>
                                 {orig?.suspended ? '일시정지' : '활성'}
                               </Tag>
                             ) : cell.info.header === 'incidents' ? (
@@ -201,7 +201,7 @@ export default function BPMNProcessesPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                   <span style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{p.name || '(없음)'}</span>
-                  <Tag type={p.suspended ? 'gray' : 'green'} size="sm">
+                  <Tag type={p.suspended ? 'gray' : 'green'}>
                     {p.suspended ? '일시정지' : '활성'}
                   </Tag>
                 </div>

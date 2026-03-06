@@ -96,7 +96,7 @@ function AccountModal({
       onRequestSubmit={handleSave}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={saving}
-      size="sm"
+     
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
         <TextInput
@@ -290,7 +290,7 @@ export default function MailAccountsPage() {
     <>
       <PageHeader title="메일 계정" description="Stalwart 메일 계정 관리 — 생성, 편집, 삭제" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -302,10 +302,9 @@ export default function MailAccountsPage() {
                     setPage(1);
                   }}
                   placeholder="계정 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
-                <Button size="sm" renderIcon={Add} onClick={() => { setEditAcc(null); setModalOpen(true); }}>계정 추가</Button>
+                <Button renderIcon={Add} onClick={() => { setEditAcc(null); setModalOpen(true); }}>계정 추가</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
@@ -327,7 +326,7 @@ export default function MailAccountsPage() {
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id} style={{ fontWeight: cell.info.header === 'name' ? 500 : undefined, fontFamily: cell.info.header === 'email' ? 'monospace' : undefined, fontSize: cell.info.header === 'email' ? 13 : undefined }}>
                           {cell.info.header === 'type' ? (
-                            <Tag type={cell.value === 'admin' ? 'purple' : 'gray'} size="sm">
+                            <Tag type={cell.value === 'admin' ? 'purple' : 'gray'}>
                               {cell.value === 'admin' ? '관리자' : '사용자'}
                             </Tag>
                           ) : String(cell.value)}
@@ -335,9 +334,9 @@ export default function MailAccountsPage() {
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                          <Button kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                             onClick={() => { setEditAcc(orig ?? null); setModalOpen(true); }} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && setDeleteTarget(orig)} />
                         </div>
                       </TableCell>

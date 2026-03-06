@@ -97,7 +97,7 @@ export default function MailHistoryDeliveryPage() {
     <>
       <PageHeader title="발송 시도 이력" description="SMTP 발송 시도 이력 조회 및 검색" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -109,7 +109,6 @@ export default function MailHistoryDeliveryPage() {
                     setPage(1);
                   }}
                   placeholder="발신자/수신자/Queue ID 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
               </TableToolbarContent>
@@ -140,7 +139,7 @@ export default function MailHistoryDeliveryPage() {
                           whiteSpace: cell.info.header === 'timestamp' ? 'nowrap' : undefined,
                         }}>
                           {cell.info.header === 'status' ? (
-                            <Tag type={(statusInfo?.type ?? 'gray') as 'gray'} size="sm">
+                            <Tag type={(statusInfo?.type ?? 'gray') as 'gray'}>
                               {statusInfo?.label ?? String(cell.value)}
                             </Tag>
                           ) : String(cell.value)}

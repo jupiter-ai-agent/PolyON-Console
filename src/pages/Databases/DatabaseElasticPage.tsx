@@ -40,14 +40,14 @@ export default function DatabaseElasticPage() {
       <div className="he-db-page__header">
         <div className="he-db-page__title-row">
           <h2 className="he-db-page__title">Elasticsearch</h2>
-          <Tag size="sm" type="blue">Search</Tag>
+          <Tag type="blue">Search</Tag>
         </div>
         <p className="he-db-page__desc">Elasticvue 매니저 및 클러스터 상태 모니터링</p>
       </div>
 
       <div className="he-db-page__body">
         <Tabs onChange={({ selectedIndex }) => { if (selectedIndex === 1) fetchStatus(); }}>
-          <TabList aria-label="Elasticsearch 탭" contained>
+          <TabList contained aria-label="Elasticsearch 탭">
             <Tab>Manager</Tab>
             <Tab>Status</Tab>
           </TabList>

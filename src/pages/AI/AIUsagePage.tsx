@@ -138,7 +138,7 @@ export default function AIUsagePage() {
               <CardSection title="Usage by Model">
                 <DataTable rows={modelRows} headers={modelHeaders}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (
@@ -178,7 +178,7 @@ export default function AIUsagePage() {
             <CardSection title={`Recent Request Logs (${Math.min(logs.length, 50)} entries)`}>
               <DataTable rows={logRows} headers={logHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map(h => (

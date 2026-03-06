@@ -114,7 +114,7 @@ export default function DCsPage() {
                 <>
                   <DataTable rows={dcRows} headers={dcHeaders}>
                     {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                      <Table {...getTableProps()} size="sm">
+                      <Table {...getTableProps()}>
                         <TableHead>
                           <TableRow>
                             {headers.map(h => (
@@ -149,7 +149,7 @@ export default function DCsPage() {
               {fsmo ? (
                 <DataTable rows={fsmoRows} headers={fsmoHeaders}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (
@@ -186,7 +186,7 @@ export default function DCsPage() {
             {level ? (
               <DataTable rows={levelRows} headers={levelHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map(h => (

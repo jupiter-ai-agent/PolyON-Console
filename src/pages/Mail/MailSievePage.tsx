@@ -115,7 +115,7 @@ function TemplateCard({ template, onPreview }: { template: SieveTemplate; onPrev
     >
       <h4 style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{template.title}</h4>
       <p style={{ fontSize: 12, color: 'var(--cds-text-secondary)', marginBottom: 12 }}>{template.desc}</p>
-      <Button kind="ghost" size="sm" renderIcon={Code} onClick={(e) => { e.stopPropagation(); onPreview(template); }}>
+      <Button kind="ghost" renderIcon={Code} onClick={(e) => { e.stopPropagation(); onPreview(template); }}>
         코드 보기
       </Button>
     </Tile>
@@ -291,10 +291,10 @@ export default function MailSievePage() {
                     placeholder="예: default, main"
                     style={{ flex: 1, fontFamily: 'monospace', fontSize: 13 }}
                   />
-                  <Button size="sm" renderIcon={Checkmark} onClick={saveGlobalScriptName} disabled={savingName}>
+                  <Button renderIcon={Checkmark} onClick={saveGlobalScriptName} disabled={savingName}>
                     적용
                   </Button>
-                  <Button kind="ghost" size="sm" renderIcon={Close} onClick={() => setClearConfirmOpen(true)} disabled={savingName}>
+                  <Button kind="ghost" renderIcon={Close} onClick={() => setClearConfirmOpen(true)} disabled={savingName}>
                     해제
                   </Button>
                 </div>
@@ -309,7 +309,7 @@ export default function MailSievePage() {
                 {sieveStatus === 'loading' ? (
                   <InlineLoading description="" />
                 ) : (
-                  <Tag type={sieveStatus === 'active' ? 'green' : 'gray'} size="sm">
+                  <Tag type={sieveStatus === 'active' ? 'green' : 'gray'}>
                     {sieveStatus === 'active' ? '활성화 (포트 4190)' : '설정 미확인'}
                   </Tag>
                 )}
@@ -379,7 +379,7 @@ export default function MailSievePage() {
           </div>
 
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <Button size="sm" renderIcon={Checkmark} onClick={applyScript} disabled={saving}>
+            <Button renderIcon={Checkmark} onClick={applyScript} disabled={saving}>
               {saving ? '저장 중…' : '글로벌 스크립트로 저장'}
             </Button>
             <Button kind="ghost" renderIcon={Download} onClick={loadCurrentScript} disabled={loadingScript}>

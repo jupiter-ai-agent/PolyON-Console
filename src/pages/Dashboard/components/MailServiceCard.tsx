@@ -98,7 +98,7 @@ export function MailServiceCard() {
           <p style={{ color: 'var(--cds-text-secondary)', fontSize: '13px', marginBottom: '12px' }}>
             메일 서비스가 구성되지 않았습니다
           </p>
-          <Button kind="primary" size="sm" onClick={() => navigate('/mail')}>
+          <Button kind="primary" onClick={() => navigate('/mail')}>
             메일 구성
           </Button>
         </div>
@@ -177,7 +177,7 @@ export function MailServiceCard() {
 
       {/* Stalwart 상태 */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-        <Tag type="green" size="sm" renderIcon={CheckmarkFilled}>Stalwart 실행 중</Tag>
+        <Tag type="green" renderIcon={CheckmarkFilled}>Stalwart 실행 중</Tag>
         <span style={{ fontSize: '12px', color: 'var(--cds-text-secondary)' }}>
           도메인: {data.domain}
         </span>

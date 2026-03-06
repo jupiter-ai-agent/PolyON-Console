@@ -488,7 +488,7 @@ export default function TreePage() {
                 placeholder="Search..."
                 value={searchQ}
                 onChange={(e) => setSearchQ(e.target.value)}
-                size="sm"
+               
               />
             </div>
             <div>
@@ -564,7 +564,7 @@ export default function TreePage() {
                   </div>
                 ))}
                 <div style={{ marginTop: 16 }}>
-                  <Button size="sm" kind="ghost" renderIcon={Add} onClick={() => { setCreateOUParent(baseDN); setCreateOUOpen(true); }}>
+                  <Button kind="ghost" renderIcon={Add} onClick={() => { setCreateOUParent(baseDN); setCreateOUOpen(true); }}>
                     OU 추가
                   </Button>
                 </div>
@@ -581,7 +581,7 @@ export default function TreePage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
                       <UserAvatar size={20} />
                       <strong style={{ fontSize: '1rem' }}>{detail.name}</strong>
-                      <Tag type={detailUser.enabled ? 'green' : 'red'} size="sm">{detailUser.enabled ? 'Active' : 'Disabled'}</Tag>
+                      <Tag type={detailUser.enabled ? 'green' : 'red'}>{detailUser.enabled ? 'Active' : 'Disabled'}</Tag>
                     </div>
 
                     {/* Profile */}
@@ -599,16 +599,16 @@ export default function TreePage() {
 
                     {/* Editable fields */}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                      <TextInput id="tvGiven" labelText="Given Name" value={editGiven} onChange={(e) => setEditGiven(e.target.value)} size="sm" />
-                      <TextInput id="tvSurname" labelText="Surname" value={editSurname} onChange={(e) => setEditSurname(e.target.value)} size="sm" />
+                      <TextInput id="tvGiven" labelText="Given Name" value={editGiven} onChange={(e) => setEditGiven(e.target.value)} />
+                      <TextInput id="tvSurname" labelText="Surname" value={editSurname} onChange={(e) => setEditSurname(e.target.value)} />
                     </div>
-                    <TextInput id="tvMail" labelText="외부 메일" value={editMail} onChange={(e) => setEditMail(e.target.value)} size="sm" style={{ marginBottom: '0.5rem' }} />
-                    <TextInput id="tvDesc" labelText="Description" value={editDesc} onChange={(e) => setEditDesc(e.target.value)} size="sm" style={{ marginBottom: '0.75rem' }} />
+                    <TextInput id="tvMail" labelText="외부 메일" value={editMail} onChange={(e) => setEditMail(e.target.value)} style={{ marginBottom: '0.5rem' }} />
+                    <TextInput id="tvDesc" labelText="Description" value={editDesc} onChange={(e) => setEditDesc(e.target.value)} style={{ marginBottom: '0.75rem' }} />
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: '1rem' }}>
-                      <Button size="sm" onClick={handleSaveUser}>저장</Button>
-                      <Button size="sm" kind="ghost" renderIcon={Move} onClick={() => { setMovingUser(detailUser.username); setMovingGroup(''); setMoveTarget(''); setMoveModalOpen(true); }}>OU 이동</Button>
-                      <Button size="sm" kind="ghost" onClick={() => { setNewPw(generatePassword()); setResetPwOpen(true); }}>비밀번호 변경</Button>
-                      <Button size="sm" kind={detailUser.enabled ? 'danger--ghost' : 'ghost'} onClick={handleToggleUser}>
+                      <Button onClick={handleSaveUser}>저장</Button>
+                      <Button kind="ghost" renderIcon={Move} onClick={() => { setMovingUser(detailUser.username); setMovingGroup(''); setMoveTarget(''); setMoveModalOpen(true); }}>OU 이동</Button>
+                      <Button kind="ghost" onClick={() => { setNewPw(generatePassword()); setResetPwOpen(true); }}>비밀번호 변경</Button>
+                      <Button kind={detailUser.enabled ? 'danger--ghost' : 'ghost'} onClick={handleToggleUser}>
                         {detailUser.enabled ? '비활성화' : '활성화'}
                       </Button>
                     </div>
@@ -627,7 +627,7 @@ export default function TreePage() {
                           <div style={{ fontSize: '0.6875rem', fontWeight: 600, color: 'var(--cds-text-secondary)', marginBottom: 4 }}>{label}</div>
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                             {list.map((g) => (
-                              <Tag key={g} type={color as 'blue' | 'purple' | 'green' | 'teal' | 'gray'} size="sm" style={{ cursor: 'pointer' }} onClick={() => selectGroup(g)}>
+                              <Tag key={g} type={color as 'blue' | 'purple' | 'green' | 'teal' | 'gray'} style={{ cursor: 'pointer' }} onClick={() => selectGroup(g)}>
                                 {g}
                               </Tag>
                             ))}
@@ -653,7 +653,7 @@ export default function TreePage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
                       <UserMultiple size={20} />
                       <strong style={{ fontSize: '1rem' }}>{detail.name}</strong>
-                      <Tag type={groupTypeColor(detail.name)} size="sm">
+                      <Tag type={groupTypeColor(detail.name)}>
                         {detail.name.startsWith('SG-ORG-') ? '조직' : detail.name.startsWith('SG-ROLE-') ? '역할' : detail.name.startsWith('SG-PROJ-') ? '프로젝트' : detail.name.startsWith('SG-SYS-') ? '시스템' : '기타'}
                       </Tag>
                     </div>
@@ -667,7 +667,7 @@ export default function TreePage() {
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: '0.75rem' }}>
                         {groupMembers.map((m) => (
-                          <Tag key={m} type="blue" size="sm" filter onClose={() => handleRemoveMember(detail.name, m)}>
+                          <Tag key={m} type="blue" filter onClose={() => handleRemoveMember(detail.name, m)}>
                             {m}
                           </Tag>
                         ))}
@@ -676,7 +676,7 @@ export default function TreePage() {
 
                       {/* Add member */}
                       <div style={{ display: 'flex', gap: 8 }}>
-                        <Select id="addMember" labelText="" value={addMemberVal} onChange={(e) => setAddMemberVal(e.target.value)} size="sm" style={{ flex: 1 }}>
+                        <Select id="addMember" labelText="" value={addMemberVal} onChange={(e) => setAddMemberVal(e.target.value)} style={{ flex: 1 }}>
                           <SelectItem value="" text="멤버 추가" />
                           <optgroup label="사용자">
                             {users.filter((u) => u.username !== 'krbtgt').map((u) => {
@@ -690,12 +690,12 @@ export default function TreePage() {
                             ))}
                           </optgroup>
                         </Select>
-                        <Button size="sm" kind="secondary" disabled={!addMemberVal} onClick={() => { if (addMemberVal) { handleAddMember(detail.name, addMemberVal); setAddMemberVal(''); } }}>추가</Button>
+                        <Button kind="secondary" disabled={!addMemberVal} onClick={() => { if (addMemberVal) { handleAddMember(detail.name, addMemberVal); setAddMemberVal(''); } }}>추가</Button>
                       </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: 8 }}>
-                      <Button size="sm" kind="ghost" renderIcon={Move} onClick={() => { setMovingGroup(detail.name); setMovingUser(''); setMoveTarget(''); setMoveModalOpen(true); }}>OU 이동</Button>
+                      <Button kind="ghost" renderIcon={Move} onClick={() => { setMovingGroup(detail.name); setMovingUser(''); setMoveTarget(''); setMoveModalOpen(true); }}>OU 이동</Button>
                     </div>
                   </>
                 ) : (
@@ -713,8 +713,8 @@ export default function TreePage() {
                 </div>
                 <div style={{ fontSize: '0.75rem', fontFamily: 'IBM Plex Mono', color: 'var(--cds-text-placeholder)', wordBreak: 'break-all', marginBottom: '1rem' }}>{detailOU.dn}</div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <Button size="sm" kind="ghost" renderIcon={Add} onClick={() => { setCreateOUParent(detailOU.dn); setCreateOUOpen(true); }}>하위 OU 추가</Button>
-                  <Button size="sm" kind="danger--ghost" renderIcon={TrashCan} onClick={() => handleDeleteOU(detailOU.dn, detailOU.name)}>삭제</Button>
+                  <Button kind="ghost" renderIcon={Add} onClick={() => { setCreateOUParent(detailOU.dn); setCreateOUOpen(true); }}>하위 OU 추가</Button>
+                  <Button kind="danger--ghost" renderIcon={TrashCan} onClick={() => handleDeleteOU(detailOU.dn, detailOU.name)}>삭제</Button>
                 </div>
               </>
             )}
@@ -746,7 +746,7 @@ export default function TreePage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
                   <ServerDns size={20} />
                   <strong style={{ fontSize: '1rem' }}>{detail.name}</strong>
-                  <Tag type="green" size="sm">Online</Tag>
+                  <Tag type="green">Online</Tag>
                 </div>
                 {[
                   { label: 'Name', value: detailDC.name || '—' },

@@ -124,7 +124,7 @@ function DmarcReportTable({ onSelect }: { onSelect: (r: ReceivedReport) => void 
 
   return (
     <>
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -151,11 +151,11 @@ function DmarcReportTable({ onSelect }: { onSelect: (r: ReceivedReport) => void 
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id} style={{ whiteSpace: 'nowrap', fontSize: 13 }}>
                           {cell.info.header === 'pass' ? (
-                            <Tag type="green" size="sm">{cell.value}</Tag>
+                            <Tag type="green">{cell.value}</Tag>
                           ) : cell.info.header === 'reject' ? (
-                            <Tag type="red" size="sm">{cell.value}</Tag>
+                            <Tag type="red">{cell.value}</Tag>
                           ) : cell.info.header === 'quarantine' ? (
-                            <Tag type="purple" size="sm">{cell.value}</Tag>
+                            <Tag type="purple">{cell.value}</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
@@ -218,7 +218,7 @@ function TlsReportTable({ onSelect }: { onSelect: (r: ReceivedReport) => void })
 
   return (
     <>
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -245,9 +245,9 @@ function TlsReportTable({ onSelect }: { onSelect: (r: ReceivedReport) => void })
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id} style={{ whiteSpace: 'nowrap', fontSize: 13 }}>
                           {cell.info.header === 'success' ? (
-                            <Tag type="green" size="sm">{cell.value}</Tag>
+                            <Tag type="green">{cell.value}</Tag>
                           ) : cell.info.header === 'failures' ? (
-                            <Tag type="red" size="sm">{cell.value}</Tag>
+                            <Tag type="red">{cell.value}</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
@@ -310,7 +310,7 @@ function ArfReportTable({ onSelect }: { onSelect: (r: ReceivedReport) => void })
 
   return (
     <>
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -337,9 +337,9 @@ function ArfReportTable({ onSelect }: { onSelect: (r: ReceivedReport) => void })
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id} style={{ whiteSpace: 'nowrap', fontSize: 13 }}>
                           {cell.info.header === 'feedbackType' ? (
-                            <Tag type="red" size="sm">{String(cell.value)}</Tag>
+                            <Tag type="red">{String(cell.value)}</Tag>
                           ) : cell.info.header === 'incidents' ? (
-                            <Tag type="warm-gray" size="sm">{cell.value}건</Tag>
+                            <Tag type="warm-gray">{cell.value}건</Tag>
                           ) : String(cell.value)}
                         </TableCell>
                       ))}
@@ -374,7 +374,7 @@ export default function MailReportsPage() {
       <PageHeader title="수신 리포트" description="DMARC · TLS-RPT · ARF 피드백 리포트 조회" />
 
       <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}>
-        <TabList aria-label="리포트 유형">
+        <TabList contained aria-label="리포트 유형">
           {REPORT_TABS.map((t) => <Tab key={t.key}>{t.label}</Tab>)}
         </TabList>
         <TabPanels>

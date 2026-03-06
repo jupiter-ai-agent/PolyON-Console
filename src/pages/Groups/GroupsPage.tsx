@@ -31,6 +31,7 @@ import {
 } from '@carbon/react';
 import { Add, Renew, Download, TrashCan, UserMultiple } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
 import {
   listGroups,
   getGroup,
@@ -63,13 +64,13 @@ const SYSTEM_GROUPS = new Set([
 function isSystem(name: string) { return SYSTEM_GROUPS.has(name); }
 
 function groupTypeTag(name: string, isSystemGroup: boolean) {
-  if (isSystemGroup) return <Tag type="gray" size="sm">시스템</Tag>;
-  if (name.startsWith('SG-ORG-')) return <Tag type="teal" size="sm">조직</Tag>;
-  if (name.startsWith('SG-ROLE-')) return <Tag type="purple" size="sm">역할</Tag>;
-  if (name.startsWith('SG-PROJ-')) return <Tag type="cyan" size="sm">프로젝트</Tag>;
-  if (name.startsWith('SG-SYS-')) return <Tag type="blue" size="sm">시스템</Tag>;
-  if (name.startsWith('ML-')) return <Tag type="magenta" size="sm">메일링</Tag>;
-  return <Tag type="teal" size="sm">일반</Tag>;
+  if (isSystemGroup) return <Tag type="gray">시스템</Tag>;
+  if (name.startsWith('SG-ORG-')) return <Tag type="teal">조직</Tag>;
+  if (name.startsWith('SG-ROLE-')) return <Tag type="purple">역할</Tag>;
+  if (name.startsWith('SG-PROJ-')) return <Tag type="cyan">프로젝트</Tag>;
+  if (name.startsWith('SG-SYS-')) return <Tag type="blue">시스템</Tag>;
+  if (name.startsWith('ML-')) return <Tag type="magenta">메일링</Tag>;
+  return <Tag type="teal">일반</Tag>;
 }
 
 function extractCN(dn: string): string {
@@ -141,7 +142,7 @@ function GroupDetailPanel({ group, users, onClose, onEdit, onDelete, onRefresh }
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
         <span style={{ fontWeight: 600, fontSize: '0.9375rem' }}>{group.name}</span>
-        <Button kind="ghost" size="sm" renderIcon={() => <span style={{ fontSize: '1rem' }}>✕</span>} iconDescription="닫기" hasIconOnly onClick={onClose} />
+        <Button kind="ghost" renderIcon={() => <span style={{ fontSize: '1rem' }}>✕</span>} iconDescription="닫기" hasIconOnly onClick={onClose} />
       </div>
 
       {loading ? (
@@ -185,7 +186,7 @@ function GroupDetailPanel({ group, users, onClose, onEdit, onDelete, onRefresh }
                   value={addMemberName}
                   onChange={(e) => setAddMemberName(e.target.value)}
                   style={{ flex: 1 }}
-                  size="sm"
+                 
                 >
                   <SelectItem value="" text="멤버 선택" />
                   {activeUsers.map((u) => {
@@ -193,7 +194,7 @@ function GroupDetailPanel({ group, users, onClose, onEdit, onDelete, onRefresh }
                     return <SelectItem key={u.username} value={u.username} text={display ? `${u.username} (${display})` : u.username} />;
                   })}
                 </Select>
-                <Button size="sm" kind="secondary" onClick={handleAddMember} disabled={!addMemberName}>추가</Button>
+                <Button kind="secondary" onClick={handleAddMember} disabled={!addMemberName}>추가</Button>
               </div>
             )}
           </div>
@@ -201,8 +202,8 @@ function GroupDetailPanel({ group, users, onClose, onEdit, onDelete, onRefresh }
           {/* Actions */}
           {!isSys && (
             <div style={{ display: 'flex', gap: '0.5rem', borderTop: '1px solid var(--cds-border-subtle)', paddingTop: '1rem' }}>
-              <Button size="sm" kind="secondary" onClick={() => onEdit(group)}>편집</Button>
-              <Button size="sm" kind="danger--ghost" renderIcon={TrashCan} onClick={() => onDelete(group)}>삭제</Button>
+              <Button kind="secondary" onClick={() => onEdit(group)}>편집</Button>
+              <Button kind="danger--ghost" renderIcon={TrashCan} onClick={() => onDelete(group)}>삭제</Button>
             </div>
           )}
         </div>
@@ -289,7 +290,7 @@ function CreateEditModal({ open, mode, group, onClose, onSuccess }: CreateEditMo
       onRequestClose={onClose}
       onSecondarySubmit={onClose}
       primaryButtonDisabled={submitting}
-      size="sm"
+     
     >
       {error && (
         <InlineNotification kind="error" title="오류" subtitle={error} style={{ marginBottom: '1rem' }} lowContrast />
@@ -474,7 +475,7 @@ export default function GroupsPage() {
           title="그룹 관리"
           description="Active Directory 그룹 관리"
           actions={
-            <Button size="sm" renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>Add Group</Button>
+            <Button renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>Add Group</Button>
           }
         />
 
@@ -490,7 +491,7 @@ export default function GroupsPage() {
           <>
             <div style={{ marginBottom: '0.5rem' }}>
               <Tabs selectedIndex={filterIndex} onChange={({ selectedIndex }) => { setFilterIndex(selectedIndex as number); setPage(1); }}>
-                <TabList aria-label="그룹 필터">
+                <TabList contained aria-label="그룹 필터">
                   <Tab>{`조직 그룹 (${orgCount})`}</Tab>
                   <Tab>{`시스템 그룹 (${sysCount})`}</Tab>
                   <Tab>{`전체 (${groups.length})`}</Tab>
@@ -511,11 +512,18 @@ export default function GroupsPage() {
                       <TableToolbarSearch
                         placeholder="그룹 검색..."
                         onChange={(e) => { onInputChange(e); setPage(1); }}
-                        persistent
                       />
                       <Button kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly tooltipPosition="bottom" onClick={loadData} />
-                      <Button kind="ghost" renderIcon={Download} iconDescription="CSV 다운로드" hasIconOnly tooltipPosition="bottom" onClick={downloadCSV} />
-                      <Button size="sm" renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>Add Group</Button>
+                      <Button 
+                        kind="ghost" 
+                        renderIcon={Download} 
+                        iconDescription="CSV 다운로드" 
+                        hasIconOnly 
+                        tooltipPosition="bottom" 
+                        onClick={downloadCSV}
+                        disabled={filteredGroups.length === 0}
+                      />
+                      <Button renderIcon={Add} onClick={() => setModal({ mode: 'create' })}>Add Group</Button>
                     </TableToolbarContent>
                   </TableToolbar>
                   <Table {...getTableProps()} size="md">
@@ -529,8 +537,20 @@ export default function GroupsPage() {
                     <TableBody>
                       {tableRows.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={headers.length} style={{ textAlign: 'center', padding: '3rem', color: 'var(--cds-text-secondary)' }}>
-                            그룹이 없습니다
+                          <TableCell colSpan={headers.length} style={{ padding: 0 }}>
+                            <EmptyState
+                              icon={UserMultiple}
+                              title="그룹이 없습니다"
+                              description="새 그룹을 생성하여 시작하세요."
+                              action={
+                                <Button
+                                  renderIcon={Add}
+                                  onClick={() => setModal({ mode: 'create' })}
+                                >
+                                  Add Group
+                                </Button>
+                              }
+                            />
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -552,7 +572,7 @@ export default function GroupsPage() {
                                   return (
                                     <TableCell key={cell.id}>
                                       {(cell.value as number) > 0 ? (
-                                        <Tag type="blue" size="sm">{cell.value}</Tag>
+                                        <Tag type="blue">{cell.value}</Tag>
                                       ) : (
                                         <span style={{ color: 'var(--cds-text-placeholder)' }}>0</span>
                                       )}
@@ -572,7 +592,7 @@ export default function GroupsPage() {
                                 if (cell.info.header === 'actions') {
                                   return (
                                     <TableCell key={cell.id} onClick={(e) => e.stopPropagation()}>
-                                      <OverflowMenu size="sm" flipped>
+                                      <OverflowMenu flipped>
                                         <OverflowMenuItem itemText="멤버 관리" onClick={() => raw && setSelectedGroup(raw)} />
                                         {!isSys && <OverflowMenuItem itemText="편집" onClick={() => raw && setModal({ mode: 'edit', group: raw })} />}
                                         {!isSys && <OverflowMenuItem itemText="삭제" isDelete onClick={() => raw && setModal({ mode: 'delete', group: raw })} />}

@@ -104,7 +104,7 @@ export default function FirewallPage() {
         title="Firewall Rules"
         description="서비스별 외부 네트워크 노출을 제어합니다. 토글 변경 시 Traefik 게이트웨이를 통해 즉시 반영됩니다."
         actions={
-          <Button kind="ghost" size="sm" onClick={load}>새로고침</Button>
+          <Button kind="ghost" onClick={load}>새로고침</Button>
         }
       />
 
@@ -151,12 +151,12 @@ export default function FirewallPage() {
                   <div style={{ fontWeight: 500 }}>{svc.name}</div>
                   <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-secondary)', marginTop: '0.125rem' }}>{svc.description}</div>
                   {svc.essential && (
-                    <Tag type="green" size="sm">필수</Tag>
+                    <Tag type="green">필수</Tag>
                   )}
                 </div>
               ),
               protocol: (
-                <Tag type={svc.type === 'tcp' ? 'purple' : 'blue'} size="sm">
+                <Tag type={svc.type === 'tcp' ? 'purple' : 'blue'}>
                   {(svc.type || 'HTTP').toUpperCase()}
                 </Tag>
               ),
@@ -166,7 +166,7 @@ export default function FirewallPage() {
                 </span>
               ),
               statusTag: (
-                <Tag type={svc.exposed ? 'blue' : 'gray'} size="sm">
+                <Tag type={svc.exposed ? 'blue' : 'gray'}>
                   {svc.exposed ? '외부 노출' : '로컬 전용'}
                 </Tag>
               ),
@@ -178,7 +178,7 @@ export default function FirewallPage() {
                   onToggle={(checked) => handleToggle(svc, checked)}
                   hideLabel
                   labelText={svc.name}
-                  size="sm"
+                 
                 />
               ),
             }));
@@ -195,7 +195,7 @@ export default function FirewallPage() {
                 </div>
                 <DataTable rows={rows} headers={fwHeaders}>
                   {({ rows: tRows, headers: tHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()} size="sm" style={{ fontSize: '0.8125rem' }}>
+                    <Table {...getTableProps()} style={{ fontSize: '0.8125rem' }}>
                       <TableHead>
                         <TableRow>
                           {tHeaders.map(h => (

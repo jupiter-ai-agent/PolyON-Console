@@ -103,7 +103,7 @@ export default function MailHistoryReceivedPage() {
     <>
       <PageHeader title="수신 메시지 이력" description="수신된 이메일 이력 조회 및 검색" />
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -115,7 +115,6 @@ export default function MailHistoryReceivedPage() {
                     setPage(1);
                   }}
                   placeholder="발신자/수신자/Message-ID 검색…"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
               </TableToolbarContent>
@@ -147,7 +146,7 @@ export default function MailHistoryReceivedPage() {
                         textOverflow: 'ellipsis',
                       }}>
                         {cell.info.header === 'status' ? (
-                          <Tag type={(STATUS_TAG[String(cell.value).toLowerCase()] ?? 'gray') as 'gray'} size="sm">
+                          <Tag type={(STATUS_TAG[String(cell.value).toLowerCase()] ?? 'gray') as 'gray'}>
                             {String(cell.value)}
                           </Tag>
                         ) : String(cell.value)}

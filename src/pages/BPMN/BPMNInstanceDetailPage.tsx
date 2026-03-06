@@ -270,18 +270,18 @@ export default function BPMNInstanceDetailPage() {
         }
         actions={
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+            <Button kind="ghost" renderIcon={Renew} onClick={load}>
               새로고침
             </Button>
             <Button
               kind="secondary"
-              size="sm"
+             
               disabled={suspendLoading || instance?.suspended}
               onClick={handleSuspend}
             >
               인스턴스 일시정지
             </Button>
-            <Button kind="danger" size="sm" onClick={() => setShowDeleteModal(true)}>
+            <Button kind="danger" onClick={() => setShowDeleteModal(true)}>
               인스턴스 삭제
             </Button>
           </div>
@@ -304,7 +304,7 @@ export default function BPMNInstanceDetailPage() {
           }}>
             {/* Sidebar tabs */}
             <Tabs>
-              <TabList aria-label="Instance sidebar tabs">
+              <TabList contained aria-label="Instance sidebar tabs">
                 <Tab>Information</Tab>
                 <Tab>Filter</Tab>
               </TabList>
@@ -356,7 +356,7 @@ export default function BPMNInstanceDetailPage() {
             {/* Bottom Tabs */}
             <div style={{ background: '#fff', borderTop: '1px solid #e0e0e0' }}>
               <Tabs>
-                <TabList aria-label="Instance detail tabs">
+                <TabList contained aria-label="Instance detail tabs">
                   <Tab>Variables ({variables.length})</Tab>
                   <Tab>Incidents ({incidents.length})</Tab>
                   <Tab>Called Process Instances</Tab>
@@ -384,7 +384,7 @@ export default function BPMNInstanceDetailPage() {
                           ]}
                         >
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (
@@ -403,7 +403,7 @@ export default function BPMNInstanceDetailPage() {
                                             <div style={{ display: 'flex', gap: '0.25rem' }}>
                                               <Button
                                                 kind="ghost"
-                                                size="sm"
+                                               
                                                 renderIcon={Edit}
                                                 iconDescription="편집"
                                                 hasIconOnly
@@ -415,7 +415,7 @@ export default function BPMNInstanceDetailPage() {
                                               />
                                               <Button
                                                 kind="ghost"
-                                                size="sm"
+                                               
                                                 renderIcon={TrashCan}
                                                 iconDescription="삭제"
                                                 hasIconOnly
@@ -459,7 +459,7 @@ export default function BPMNInstanceDetailPage() {
                           ]}
                         >
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (
@@ -509,7 +509,7 @@ export default function BPMNInstanceDetailPage() {
                           ]}
                         >
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (
@@ -560,7 +560,7 @@ export default function BPMNInstanceDetailPage() {
                           ]}
                         >
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (

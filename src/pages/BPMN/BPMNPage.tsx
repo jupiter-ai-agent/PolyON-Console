@@ -292,7 +292,7 @@ export default function BPMNPage() {
               <span style={{ fontSize: '0.875rem', fontWeight: 500, color: '#da1e28' }}>
                 {incidents.length}개의 인시던트가 발생했습니다.
               </span>
-              <Button kind="ghost" size="sm" onClick={() => navigate('/bpmn/incidents')}>
+              <Button kind="ghost" onClick={() => navigate('/bpmn/incidents')}>
                 인시던트 보기
               </Button>
             </div>
@@ -333,7 +333,7 @@ export default function BPMNPage() {
           <div ref={humanTasksRef} style={{ marginTop: '1.5rem' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', background: '#fff', border: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>Human Tasks</h4>
-              <Button kind="ghost" size="sm" onClick={() => navigate('/bpmn/tasks')}>
+              <Button kind="ghost" onClick={() => navigate('/bpmn/tasks')}>
                 전체 보기
               </Button>
             </div>
@@ -398,7 +398,7 @@ export default function BPMNPage() {
           <div style={{ background: '#fff', border: '1px solid #e0e0e0', marginTop: '1.5rem' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>최근 프로세스 정의</h4>
-              <Button kind="ghost" size="sm" onClick={() => navigate('/bpmn/processes')}>
+              <Button kind="ghost" onClick={() => navigate('/bpmn/processes')}>
                 전체 보기
               </Button>
             </div>
@@ -407,7 +407,7 @@ export default function BPMNPage() {
             ) : (
               <DataTable rows={processRows} headers={processHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map(h => (
@@ -436,7 +436,7 @@ export default function BPMNPage() {
           <div style={{ background: '#fff', border: '1px solid #e0e0e0', marginTop: '1rem' }}>
             <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>실행 중 인스턴스</h4>
-              <Button kind="ghost" size="sm" onClick={() => navigate('/bpmn/instances')}>
+              <Button kind="ghost" onClick={() => navigate('/bpmn/instances')}>
                 전체 보기
               </Button>
             </div>
@@ -456,7 +456,7 @@ export default function BPMNPage() {
                 ]}
               >
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                  <Table {...getTableProps()} size="sm">
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map(h => (
@@ -474,7 +474,7 @@ export default function BPMNPage() {
                             {row.cells.map(cell => (
                               <TableCell key={cell.id}>
                                 {cell.info.header === 'status' ? (
-                                  <Tag type={original?.suspended ? 'teal' : 'green'} size="sm">
+                                  <Tag type={original?.suspended ? 'teal' : 'green'}>
                                     {cell.value}
                                   </Tag>
                                 ) : (

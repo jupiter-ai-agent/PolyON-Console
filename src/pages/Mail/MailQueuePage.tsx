@@ -40,7 +40,7 @@ function RecipientStatusTag({ status }: { status?: QueueRecipient['status'] }) {
   const typeMap: Record<string, 'blue' | 'green' | 'purple' | 'red' | 'gray'> = {
     blue: 'blue', green: 'green', purple: 'purple', red: 'red', gray: 'gray',
   };
-  return <Tag type={typeMap[cls] ?? 'gray'} size="sm">{label}</Tag>;
+  return <Tag type={typeMap[cls] ?? 'gray'}>{label}</Tag>;
 }
 
 // ── 메시지 상세 패널 ──────────────────────────────────────────────────────
@@ -109,7 +109,7 @@ function MessageDetailModal({
           <h4 style={{ fontSize: 12, fontWeight: 600, color: 'var(--cds-text-secondary)', letterSpacing: '0.32px', marginBottom: 8, textTransform: 'uppercase' }}>
             수신자 ({recipients.length})
           </h4>
-          <div style={{ marginBottom: 16 }}><Table size="sm">
+          <div style={{ marginBottom: 16 }}><Table>
             <TableHead>
               <TableRow>
                 <TableHeader>주소</TableHeader>
@@ -135,8 +135,8 @@ function MessageDetailModal({
           </Table></div>
 
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button kind="ghost" size="sm" renderIcon={Restart} onClick={() => { onRetry(msg.id); onClose(); }}>재시도</Button>
-            <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} onClick={() => { onDelete(msg.id); onClose(); }}>취소/삭제</Button>
+            <Button kind="ghost" renderIcon={Restart} onClick={() => { onRetry(msg.id); onClose(); }}>재시도</Button>
+            <Button kind="danger--ghost" renderIcon={TrashCan} onClick={() => { onDelete(msg.id); onClose(); }}>취소/삭제</Button>
           </div>
         </div>
       )}
@@ -228,16 +228,16 @@ export default function MailQueuePage() {
 
       {selectedIds.size > 0 && (
         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-          <Button kind="ghost" size="sm" renderIcon={Restart} onClick={handleBulkRetry}>
+          <Button kind="ghost" renderIcon={Restart} onClick={handleBulkRetry}>
             재시도 ({selectedIds.size})
           </Button>
-          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} onClick={handleBulkDelete}>
+          <Button kind="danger--ghost" renderIcon={TrashCan} onClick={handleBulkDelete}>
             삭제 ({selectedIds.size})
           </Button>
         </div>
       )}
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({
           rows: dtRows,
           headers: dtHeaders,
@@ -261,7 +261,6 @@ export default function MailQueuePage() {
                     setPage(1);
                   }}
                   placeholder="발신자/수신자 검색…"
-                  persistent
                 />
                 <Button
                   kind="ghost"
@@ -336,9 +335,9 @@ export default function MailQueuePage() {
                       ))}
                       <TableCell>
                         <div style={{ display: 'flex', gap: 4 }}>
-                          <Button kind="ghost" size="sm" renderIcon={Restart} hasIconOnly iconDescription="재시도"
+                          <Button kind="ghost" renderIcon={Restart} hasIconOnly iconDescription="재시도"
                             onClick={() => orig && handleRetry(orig.id)} />
-                          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
+                          <Button kind="danger--ghost" renderIcon={TrashCan} hasIconOnly iconDescription="삭제"
                             onClick={() => orig && handleDelete(orig.id)} />
                         </div>
                       </TableCell>

@@ -165,7 +165,7 @@ export default function MonitoringAlertsPage() {
           <h1 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>Alerts</h1>
           <p style={{ color: 'var(--cds-text-secondary)', fontSize: '13px', margin: '4px 0 0' }}>규칙 기반 임계값 감시</p>
         </div>
-        <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>새로고침</Button>
+        <Button kind="ghost" renderIcon={Renew} onClick={load}>새로고침</Button>
       </div>
 
       <SummaryCards firing={firing.length} pending={pending.length} total={activeAlerts.length} rulesCount={totalRules} />
@@ -211,13 +211,13 @@ export default function MonitoringAlertsPage() {
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <div style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.32px', color: 'var(--cds-text-secondary)', textTransform: 'uppercase' }}>알림 규칙</div>
-          <Button kind="primary" size="sm" renderIcon={Add} onClick={() => openModal()}>규칙 추가</Button>
+          <Button kind="primary" renderIcon={Add} onClick={() => openModal()}>규칙 추가</Button>
         </div>
 
         {ruleGroups.length === 0 ? (
           <div style={{ background: 'var(--cds-layer-01)', border: '1px solid var(--cds-border-subtle-00)', padding: '32px', textAlign: 'center' }}>
             <div style={{ fontSize: '13px', color: 'var(--cds-text-secondary)' }}>등록된 알림 규칙이 없습니다.</div>
-            <Button kind="primary" size="sm" renderIcon={Add} style={{ marginTop: '12px' }} onClick={() => openModal()}>첫 규칙 추가</Button>
+            <Button kind="primary" renderIcon={Add} style={{ marginTop: '12px' }} onClick={() => openModal()}>첫 규칙 추가</Button>
           </div>
         ) : (
           ruleGroups.map((g, gi) => (
@@ -228,9 +228,9 @@ export default function MonitoringAlertsPage() {
                   onClick={() => setExpandedGroups(prev => ({ ...prev, [gi]: !prev[gi] }))}
                 >
                   <span style={{ fontSize: '13px', fontWeight: 600 }}>{g.name}</span>
-                  <Tag type="gray" size="sm">{g.rules?.length || 0}</Tag>
+                  <Tag type="gray">{g.rules?.length || 0}</Tag>
                 </div>
-                <Button kind="ghost" size="sm" renderIcon={Add} onClick={() => openModal(g.name)} style={{ fontSize: '11px' }}>규칙 추가</Button>
+                <Button kind="ghost" renderIcon={Add} onClick={() => openModal(g.name)} style={{ fontSize: '11px' }}>규칙 추가</Button>
               </div>
               {expandedGroups[gi] !== false && (
                 <div>
@@ -247,12 +247,12 @@ export default function MonitoringAlertsPage() {
                             <span style={{ width: '7px', height: '7px', background: 'var(--cds-border-strong)', flexShrink: 0 }} />
                             <span style={{ flex: 1, fontWeight: 500 }}>{r.alert}</span>
                             {r.annotations?.summary && <span style={{ fontSize: '11px', color: 'var(--cds-text-secondary)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.annotations.summary}</span>}
-                            {r.labels?.severity && <Tag type={sevMap[r.labels.severity] || 'gray'} size="sm">{r.labels.severity}</Tag>}
+                            {r.labels?.severity && <Tag type={sevMap[r.labels.severity] || 'gray'}>{r.labels.severity}</Tag>}
                             {r.for && <span style={{ fontSize: '10px', color: 'var(--cds-text-secondary)', whiteSpace: 'nowrap' }}>for {r.for}</span>}
                           </div>
                           <div style={{ display: 'flex', gap: '4px', flexShrink: 0 }}>
-                            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Edit} iconDescription="편집" onClick={() => openModal(g.name, r.alert, r)} />
-                            <Button kind="ghost" size="sm" hasIconOnly renderIcon={TrashCan} iconDescription="삭제" onClick={() => deleteRule(g.name, r.alert)} style={{ color: 'var(--cds-support-error)' }} />
+                            <Button kind="ghost" hasIconOnly renderIcon={Edit} iconDescription="편집" onClick={() => openModal(g.name, r.alert, r)} />
+                            <Button kind="ghost" hasIconOnly renderIcon={TrashCan} iconDescription="삭제" onClick={() => deleteRule(g.name, r.alert)} style={{ color: 'var(--cds-support-error)' }} />
                           </div>
                         </div>
                         {expandedExprs[exprKey] && (

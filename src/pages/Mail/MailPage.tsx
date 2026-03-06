@@ -208,7 +208,7 @@ function OverviewTab() {
 
       {/* 최근 로그 */}
       <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>최근 활동</h3>
-      <DataTable rows={logRows} headers={logHeaders} size="sm">
+      <DataTable rows={logRows} headers={logHeaders}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <Table {...getTableProps()}>
             <TableHead>
@@ -224,7 +224,7 @@ function OverviewTab() {
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id} style={{ fontFamily: cell.info.header === 'details' || cell.info.header === 'event' ? 'var(--font-mono, monospace)' : undefined, fontSize: 12, maxWidth: cell.info.header === 'details' ? 400 : undefined, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: cell.info.header === 'timestamp' ? 'nowrap' : undefined }}>
                       {cell.info.header === 'level' ? (
-                        <Tag type={cell.value === 'ERROR' ? 'red' : cell.value === 'WARN' ? 'purple' : 'blue'} size="sm">{cell.value}</Tag>
+                        <Tag type={cell.value === 'ERROR' ? 'red' : cell.value === 'WARN' ? 'purple' : 'blue'}>{cell.value}</Tag>
                       ) : String(cell.value)}
                     </TableCell>
                   ))}
@@ -302,7 +302,7 @@ function NetworkTab() {
       </Tile>
       <Tile>
         <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>프로토콜 포트</h3>
-        <DataTable rows={protocolRows} headers={protoHeaders} size="sm">
+        <DataTable rows={protocolRows} headers={protoHeaders}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <Table {...getTableProps()}>
               <TableHead>
@@ -363,7 +363,7 @@ function SecurityTab() {
   ];
 
   const renderFeatureTable = (rows: typeof authFeatures) => (
-    <Table size="sm">
+    <Table>
       <TableHead>
         <TableRow>
           <TableHeader>기능</TableHeader>
@@ -375,7 +375,7 @@ function SecurityTab() {
         {rows.map((r) => (
           <TableRow key={r.feature}>
             <TableCell style={{ fontWeight: 500 }}>{r.feature}</TableCell>
-            <TableCell><Tag type={r.type} size="sm">{r.status}</Tag></TableCell>
+            <TableCell><Tag type={r.type}>{r.status}</Tag></TableCell>
             <TableCell style={{ fontSize: 12 }}>{r.desc}</TableCell>
           </TableRow>
         ))}
@@ -412,7 +412,7 @@ function SecurityTab() {
           authEvents.length === 0 ? (
             <p style={{ color: 'var(--cds-text-placeholder)', fontSize: 13 }}>최근 인증 이벤트 없음</p>
           ) : (
-            <DataTable rows={authEvtRows} headers={authEvtHeaders} size="sm">
+            <DataTable rows={authEvtRows} headers={authEvtHeaders}>
               {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
                 <Table {...getTableProps()}>
                   <TableHead>
@@ -424,7 +424,7 @@ function SecurityTab() {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id} style={{ fontSize: 12, fontFamily: cell.info.header === 'details' ? 'monospace' : undefined, whiteSpace: cell.info.header === 'ts' ? 'nowrap' : undefined }}>
                             {cell.info.header === 'result' ? (
-                              <Tag type={(row as unknown as { _success: boolean })._success ? 'green' : 'red'} size="sm">{cell.value}</Tag>
+                              <Tag type={(row as unknown as { _success: boolean })._success ? 'green' : 'red'}>{cell.value}</Tag>
                             ) : String(cell.value)}
                           </TableCell>
                         ))}
@@ -504,7 +504,7 @@ function DeliveryTab() {
       </div>
       <Tile style={{ marginBottom: 16 }}>
         <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>DNS 레코드 체크리스트</h3>
-        <DataTable rows={dnsRows} headers={dnsHeaders} size="sm">
+        <DataTable rows={dnsRows} headers={dnsHeaders}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <Table {...getTableProps()}>
               <TableHead>
@@ -531,7 +531,7 @@ function DeliveryTab() {
           deliveryEvents.length === 0 ? (
             <p style={{ color: 'var(--cds-text-placeholder)', fontSize: 13 }}>최근 발송 이벤트 없음</p>
           ) : (
-            <DataTable rows={evtRows} headers={evtHeaders} size="sm">
+            <DataTable rows={evtRows} headers={evtHeaders}>
               {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
                 <Table {...getTableProps()}>
                   <TableHead>
@@ -543,7 +543,7 @@ function DeliveryTab() {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id} style={{ fontSize: 12, fontFamily: cell.info.header === 'event' || cell.info.header === 'details' ? 'monospace' : undefined, whiteSpace: cell.info.header === 'ts' ? 'nowrap' : undefined }}>
                             {cell.info.header === 'level' ? (
-                              <Tag type={cell.value === 'ERROR' ? 'red' : cell.value === 'WARN' ? 'purple' : 'blue'} size="sm">{cell.value}</Tag>
+                              <Tag type={cell.value === 'ERROR' ? 'red' : cell.value === 'WARN' ? 'purple' : 'blue'}>{cell.value}</Tag>
                             ) : String(cell.value)}
                           </TableCell>
                         ))}
@@ -573,7 +573,7 @@ export default function MailPage() {
       />
       <div style={{ padding: '0 0 24px' }}>
         <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => setSelectedTab(selectedIndex)}>
-          <TabList aria-label="Mail dashboard tabs">
+          <TabList contained aria-label="Mail dashboard tabs">
             <Tab>Overview</Tab>
             <Tab>Network</Tab>
             <Tab>Security</Tab>

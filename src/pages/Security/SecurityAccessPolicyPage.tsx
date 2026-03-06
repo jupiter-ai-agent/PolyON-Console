@@ -42,11 +42,11 @@ const PERMISSION_MATRIX = [
 ];
 
 function PermCell({ value }: { value: string | null }) {
-  if (!value) return <Tag type="red" size="sm">거부</Tag>;
-  if (value === '전체') return <Tag type="green" size="sm">전체</Tag>;
-  if (value === '조회+수정') return <Tag type="blue" size="sm">조회+수정</Tag>;
-  if (value === '조회') return <Tag type="teal" size="sm">조회</Tag>;
-  return <Tag type="gray" size="sm">{value}</Tag>;
+  if (!value) return <Tag type="red">거부</Tag>;
+  if (value === '전체') return <Tag type="green">전체</Tag>;
+  if (value === '조회+수정') return <Tag type="blue">조회+수정</Tag>;
+  if (value === '조회') return <Tag type="teal">조회</Tag>;
+  return <Tag type="gray">{value}</Tag>;
 }
 
 export default function SecurityAccessPolicyPage() {
@@ -201,15 +201,15 @@ export default function SecurityAccessPolicyPage() {
             ) : status ? (
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <span style={{ fontSize: '13px', color: 'var(--cds-text-secondary)' }}>연결 상태:</span>
-                <Tag type={status.healthy ? 'green' : 'red'} size="sm">
+                <Tag type={status.healthy ? 'green' : 'red'}>
                   {status.healthy ? 'Healthy' : 'Down'}
                 </Tag>
                 <span style={{ fontSize: '13px', color: 'var(--cds-text-secondary)' }}>정책 로드:</span>
-                <Tag type={status.policy_loaded ? 'green' : 'gray'} size="sm">
+                <Tag type={status.policy_loaded ? 'green' : 'gray'}>
                   {status.policy_loaded ? '로드됨' : '미로드'}
                 </Tag>
                 <span style={{ fontSize: '13px', color: 'var(--cds-text-secondary)' }}>모드:</span>
-                <Tag type="blue" size="sm">Fail-Open</Tag>
+                <Tag type="blue">Fail-Open</Tag>
               </div>
             ) : (
               <span style={{ fontSize: '13px', color: 'var(--cds-text-secondary)' }}>OPA 상태를 가져올 수 없습니다</span>
@@ -262,12 +262,12 @@ export default function SecurityAccessPolicyPage() {
                     <StructuredListRow key={group}>
                       <StructuredListCell>{group}</StructuredListCell>
                       <StructuredListCell>
-                        <Tag type={roleTagType(role)} size="sm">{role}</Tag>
+                        <Tag type={roleTagType(role)}>{role}</Tag>
                       </StructuredListCell>
                       <StructuredListCell>
                         <Button
                           kind="danger--ghost"
-                          size="sm"
+                         
                           onClick={() => handleDeleteRole(group)}
                         >
                           삭제
@@ -304,7 +304,7 @@ export default function SecurityAccessPolicyPage() {
               <div style={{ paddingBottom: '1px' }}>
                 <Button
                   kind="primary"
-                  size="sm"
+                 
                   disabled={!newGroup.trim()}
                   onClick={handleAddRole}
                 >
@@ -405,7 +405,7 @@ export default function SecurityAccessPolicyPage() {
                 </Tag>
                 {testResult.user_role && (
                   <span style={{ fontSize: '13px', color: 'var(--cds-text-secondary)' }}>
-                    판정 역할: <Tag type={roleTagType(testResult.user_role)} size="sm">{testResult.user_role}</Tag>
+                    판정 역할: <Tag type={roleTagType(testResult.user_role)}>{testResult.user_role}</Tag>
                   </span>
                 )}
               </div>

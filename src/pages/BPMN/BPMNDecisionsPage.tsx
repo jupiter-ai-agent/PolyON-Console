@@ -60,7 +60,7 @@ export default function BPMNDecisionsPage() {
         title="의사결정 정의"
         description="배포된 DMN 의사결정 테이블"
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -81,7 +81,7 @@ export default function BPMNDecisionsPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map(h => (

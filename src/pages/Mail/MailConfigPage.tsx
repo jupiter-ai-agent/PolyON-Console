@@ -121,7 +121,7 @@ export default function MailConfigPage() {
           <Button
             key={p || 'all'}
             kind={p === prefix ? 'primary' : 'ghost'}
-            size="sm"
+           
             onClick={() => setPrefix(p)}
             style={{ fontSize: 12, fontWeight: p === prefix ? 600 : 400 }}
           >
@@ -130,7 +130,7 @@ export default function MailConfigPage() {
         ))}
       </div>
 
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers}>
         {({ rows: dtRows, headers: dtHeaders, getTableProps, getHeaderProps, getRowProps, getToolbarProps, onInputChange }) => (
           <>
             <TableToolbar {...getToolbarProps()}>
@@ -141,7 +141,6 @@ export default function MailConfigPage() {
                     setFilterText(typeof e === 'string' ? e : (e.target as HTMLInputElement).value);
                   }}
                   placeholder="설정 키 검색… (예: server.hostname)"
-                  persistent
                 />
                 <Button kind="ghost" renderIcon={Renew} hasIconOnly iconDescription="새로고침" onClick={load} tooltipPosition="bottom" />
                 <Button kind="ghost" onClick={handleReload} disabled={reloading}>
@@ -170,7 +169,7 @@ export default function MailConfigPage() {
                     ))}
                     <TableCell>
                       <Button
-                        kind="ghost" size="sm" renderIcon={Edit} hasIconOnly iconDescription="편집"
+                        kind="ghost" renderIcon={Edit} hasIconOnly iconDescription="편집"
                         onClick={() => { const entry = items.find(([k]) => k === row.id); if (entry) openEdit(entry[0], entry[1]); }}
                       />
                     </TableCell>
@@ -196,7 +195,7 @@ export default function MailConfigPage() {
         onRequestSubmit={handleSave}
         onSecondarySubmit={() => setDeleteConfirmOpen(true)}
         primaryButtonDisabled={saving}
-        size="sm"
+       
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div>

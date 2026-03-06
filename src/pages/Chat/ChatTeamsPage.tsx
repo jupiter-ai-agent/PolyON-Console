@@ -59,7 +59,7 @@ export default function ChatTeamsPage() {
         actions={
           <Button
             kind="ghost"
-            size="sm"
+           
             renderIcon={Renew}
             onClick={load}
           >
@@ -83,7 +83,7 @@ export default function ChatTeamsPage() {
           </div>
           <DataTable rows={rows} headers={headers}>
             {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {tableHeaders.map(h => (

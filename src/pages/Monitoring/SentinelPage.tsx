@@ -160,10 +160,10 @@ function OverviewTab({ refreshKey }: { refreshKey: number }) {
             ) : !config ? (
               <div style={{ color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>구성 정보 없음</div>
             ) : (
-              <DataTable rows={configRows} headers={configHeaders} size="sm">
+              <DataTable rows={configRows} headers={configHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
                   <TableContainer>
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (
@@ -199,10 +199,10 @@ function OverviewTab({ refreshKey }: { refreshKey: number }) {
             ) : !container ? (
               <div style={{ color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>컨테이너 정보 없음</div>
             ) : (
-              <DataTable rows={containerRows} headers={configHeaders} size="sm">
+              <DataTable rows={containerRows} headers={configHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
                   <TableContainer>
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (
@@ -233,8 +233,8 @@ function OverviewTab({ refreshKey }: { refreshKey: number }) {
         <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>최근 알림</h4>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
-            <Button kind="ghost" size="sm" onClick={load}>새로고침</Button>
-            <Button kind="ghost" size="sm" onClick={clearInfo}>INFO 정리</Button>
+            <Button kind="ghost" onClick={load}>새로고침</Button>
+            <Button kind="ghost" onClick={clearInfo}>INFO 정리</Button>
           </div>
         </div>
         {loading ? (
@@ -242,10 +242,10 @@ function OverviewTab({ refreshKey }: { refreshKey: number }) {
         ) : alerts.length === 0 ? (
           <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>알림 없음</div>
         ) : (
-          <DataTable rows={alertRows} headers={alertHeaders} size="sm">
+          <DataTable rows={alertRows} headers={alertHeaders}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
               <TableContainer>
-                <Table {...getTableProps()} size="sm">
+                <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
                       {headers.map(h => (
@@ -314,10 +314,10 @@ function ThresholdsTab({ refreshKey }: { refreshKey: number }) {
         ) : thresholdRows.length === 0 ? (
           <div style={{ color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>임계값 구성 없음</div>
         ) : (
-          <DataTable rows={thresholdRows} headers={thresholdHeaders} size="sm">
+          <DataTable rows={thresholdRows} headers={thresholdHeaders}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
               <TableContainer>
-                <Table {...getTableProps()} size="sm">
+                <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
                       {headers.map(h => (
@@ -386,17 +386,17 @@ function HistoryTab({ refreshKey }: { refreshKey: number }) {
     <div style={{ background: '#fff', border: '1px solid #e0e0e0' }}>
       <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>분석 이력</h4>
-        <Button kind="ghost" size="sm" onClick={load}>새로고침</Button>
+        <Button kind="ghost" onClick={load}>새로고침</Button>
       </div>
       {loading ? (
         <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>로딩 중...</div>
       ) : items.length === 0 ? (
         <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--cds-text-secondary)', fontSize: '0.875rem' }}>분석 이력 없음</div>
       ) : (
-        <DataTable rows={historyRows} headers={historyHeaders} size="sm">
+        <DataTable rows={historyRows} headers={historyHeaders}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map(h => (
@@ -449,13 +449,13 @@ export default function SentinelPage() {
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <StatusBadge status={agentStatus as any} />
-            <Button kind="ghost" size="sm" onClick={() => setRefreshKey(k => k + 1)}>새로고침</Button>
+            <Button kind="ghost" onClick={() => setRefreshKey(k => k + 1)}>새로고침</Button>
           </div>
         }
       />
 
       <Tabs selectedIndex={tabIndex} onChange={({ selectedIndex }) => setTabIndex(selectedIndex)}>
-        <TabList aria-label="Sentinel 탭">
+        <TabList contained aria-label="Sentinel 탭">
           <Tab>개요</Tab>
           <Tab>알림 임계값</Tab>
           <Tab>분석 이력</Tab>

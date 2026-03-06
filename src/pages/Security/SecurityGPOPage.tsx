@@ -162,12 +162,12 @@ export default function SecurityGPOPage() {
       actions: (
         <div style={{ display: 'flex', gap: '4px', justifyContent: 'flex-end' }}>
           <Button
-            kind="ghost" size="sm" hasIconOnly renderIcon={Link} iconDescription="OU 링크"
+            kind="ghost" hasIconOnly renderIcon={Link} iconDescription="OU 링크"
             onClick={e => { e.stopPropagation(); setLinkGuid(guid); setLinkDn(''); setLinkEnforce(false); setLinkDisable(false); setLinkOpen(true); }}
           />
           {!isDefault && (
             <Button
-              kind="ghost" size="sm" hasIconOnly renderIcon={TrashCan} iconDescription="삭제"
+              kind="ghost" hasIconOnly renderIcon={TrashCan} iconDescription="삭제"
               onClick={e => { e.stopPropagation(); doDelete(guid, name); }}
               style={{ color: 'var(--cds-support-error)' }}
             />
@@ -188,8 +188,8 @@ export default function SecurityGPOPage() {
           <p style={{ color: 'var(--cds-text-secondary)', fontSize: '13px', margin: '4px 0 0' }}>Active Directory 그룹 정책 객체 생성, 삭제, OU 링크 관리</p>
         </div>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>새로고침</Button>
-          <Button kind="primary" size="sm" renderIcon={Add} onClick={() => { setCreateName(''); setCreateOpen(true); }}>새 GPO 생성</Button>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>새로고침</Button>
+          <Button kind="primary"  renderIcon={Add} onClick={() => { setCreateName(''); setCreateOpen(true); }}>새 GPO 생성</Button>
         </div>
       </div>
 
@@ -203,7 +203,7 @@ export default function SecurityGPOPage() {
         <div style={{ background: 'var(--cds-layer-01)', border: '1px solid var(--cds-border-subtle-00)' }}>
           <DataTable rows={gpoRows} headers={gpoHeaders}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getExpandHeaderProps, getExpandedRowProps }) => (
-              <Table {...getTableProps()} size="sm">
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader {...getExpandHeaderProps()} />
@@ -267,7 +267,7 @@ export default function SecurityGPOPage() {
                                   <div key={ci} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 0', borderBottom: '1px solid var(--cds-border-subtle-00)' }}>
                                     <span style={{ fontFamily: 'IBM Plex Mono, monospace', fontSize: '12px' }}>{c}</span>
                                     <Button
-                                      kind="ghost" size="sm" hasIconOnly renderIcon={Unlink} iconDescription="링크 해제"
+                                      kind="ghost" hasIconOnly renderIcon={Unlink} iconDescription="링크 해제"
                                       onClick={() => doUnlink(c, guid)}
                                       style={{ color: 'var(--cds-support-error)' }}
                                     />
@@ -295,7 +295,7 @@ export default function SecurityGPOPage() {
         modalHeading="새 GPO 생성"
         primaryButtonText="생성"
         secondaryButtonText="취소"
-        size="sm"
+       
       >
         <TextInput
           id="gpo-name"
@@ -316,7 +316,7 @@ export default function SecurityGPOPage() {
         modalHeading="GPO 링크"
         primaryButtonText="링크"
         secondaryButtonText="취소"
-        size="sm"
+       
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingTop: '8px' }}>
           <TextInput

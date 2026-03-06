@@ -248,14 +248,14 @@ function GridView({ containers, metrics }: { containers: ContainerInfo[]; metric
               {meta.desc}
             </p>
             <div style={{ marginTop: 'auto' }}>
-              <Tag type={getTagType(status.healthy, status.healthy || c.state === 'running')} size="sm">
+              <Tag type={getTagType(status.healthy, status.healthy || c.state === 'running')}>
                 {status.text}
               </Tag>
             </div>
             {svcMetrics.length > 0 && (
               <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                 {svcMetrics.map((m, i) => (
-                  <Tag key={i} type="gray" size="sm">{m}</Tag>
+                  <Tag key={i} type="gray">{m}</Tag>
                 ))}
               </div>
             )}
@@ -292,14 +292,14 @@ function ListView({ containers, metrics }: { containers: ContainerInfo[]; metric
       name: <span style={{ fontWeight: 600, fontSize: '13px' }}>{meta.name}</span>,
       desc: <span style={{ fontSize: '12px', color: 'var(--cds-text-secondary)' }}>{meta.desc}</span>,
       state: (
-        <Tag type={getTagType(status.healthy, isRunning)} size="sm">
+        <Tag type={getTagType(status.healthy, isRunning)}>
           {status.text}
         </Tag>
       ),
       metric: (
         <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {svcMetrics.map((m, i) => (
-            <Tag key={i} type="gray" size="sm">{m}</Tag>
+            <Tag key={i} type="gray">{m}</Tag>
           ))}
         </div>
       ),
@@ -310,7 +310,7 @@ function ListView({ containers, metrics }: { containers: ContainerInfo[]; metric
     <DataTable rows={rows} headers={listHeaders}>
       {({ rows: tRows, headers: tHeaders, getHeaderProps, getRowProps, getTableProps }) => (
         <TableContainer>
-          <Table {...getTableProps()} size="sm">
+          <Table {...getTableProps()}>
             <TableHead>
               <TableRow>
                 {tHeaders.map(header => (
@@ -422,14 +422,14 @@ export function ServiceStatusCard() {
         <Activity size={16} />
         <h4 className="cds--productive-heading-02">Service Status</h4>
         {!loading && !error && (
-          <Tag type="gray" size="sm">{containers.length} 서비스</Tag>
+          <Tag type="gray">{containers.length} 서비스</Tag>
         )}
       </div>
       <div style={{ display: 'flex', gap: '2px' }}>
         <IconButton
           label="그리드 뷰"
           kind={viewMode === 'grid' ? 'primary' : 'ghost'}
-          size="sm"
+         
           onClick={() => setViewMode('grid')}
         >
           <Application size={16} />
@@ -437,7 +437,7 @@ export function ServiceStatusCard() {
         <IconButton
           label="리스트 뷰"
           kind={viewMode === 'list' ? 'primary' : 'ghost'}
-          size="sm"
+         
           onClick={() => setViewMode('list')}
         >
           <Catalog size={16} />
@@ -445,7 +445,7 @@ export function ServiceStatusCard() {
         <IconButton
           label="파이프라인 뷰"
           kind={viewMode === 'pipeline' ? 'primary' : 'ghost'}
-          size="sm"
+         
           onClick={() => setViewMode('pipeline')}
         >
           <Activity size={16} />

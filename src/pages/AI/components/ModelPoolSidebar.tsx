@@ -56,7 +56,7 @@ export function ModelPoolSidebar({ poolMap }: ModelPoolSidebarProps) {
           placeholder="Search models..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          size="sm"
+         
         />
       </div>
 

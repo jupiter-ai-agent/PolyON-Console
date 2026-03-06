@@ -255,13 +255,13 @@ export default function AppsPage() {
             id="app-search"
             labelText=""
             placeholder="앱 검색"
-            size="sm"
+           
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
         </div>
         <ContentSwitcher
-          size="sm"
+         
           selectedIndex={['all', 'active', 'available', 'coming-soon'].indexOf(filterTab)}
           onChange={({ index }) => {
             const tabs: FilterTab[] = ['all', 'active', 'available', 'coming-soon'];

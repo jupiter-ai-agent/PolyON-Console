@@ -9,10 +9,10 @@ import { Renew } from '@carbon/icons-react';
 /* ── Status Tag ── */
 export function StatusTag({ status }: { status?: string }) {
   const s = (status || '').toLowerCase();
-  if (s === 'up' || s === 'green' || s === 'running') return <Tag type="green" size="sm">Running</Tag>;
-  if (s === 'yellow' || s === 'degraded') return <Tag type="teal" size="sm">Degraded</Tag>;
-  if (s === 'down' || s === 'red' || s === 'failed') return <Tag type="red" size="sm">Down</Tag>;
-  return <Tag type="gray" size="sm">Unknown</Tag>;
+  if (s === 'up' || s === 'green' || s === 'running') return <Tag type="green">Running</Tag>;
+  if (s === 'yellow' || s === 'degraded') return <Tag type="teal">Degraded</Tag>;
+  if (s === 'down' || s === 'red' || s === 'failed') return <Tag type="red">Down</Tag>;
+  return <Tag type="gray">Unknown</Tag>;
 }
 
 /* ── Key-Value Row ── */
@@ -80,7 +80,7 @@ export function ManagerIframe({ src, title, errorMessage, onLoad }: {
       {error && (
         <div className="he-db-iframe__overlay he-db-iframe__overlay--error">
           <p className="he-db-iframe__error-text">{errorMessage}</p>
-          <Button kind="tertiary" size="sm" renderIcon={Renew} onClick={handleRetry}>재시도</Button>
+          <Button kind="tertiary" renderIcon={Renew} onClick={handleRetry}>재시도</Button>
         </div>
       )}
       <iframe

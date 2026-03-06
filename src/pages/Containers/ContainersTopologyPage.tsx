@@ -68,7 +68,7 @@ export default function ContainersTopologyPage() {
               </span>
             ))}
           </div>
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>새로고침</Button>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>새로고침</Button>
         </div>
       </div>
 

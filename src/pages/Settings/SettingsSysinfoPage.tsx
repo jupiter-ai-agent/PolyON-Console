@@ -82,7 +82,7 @@ function ComponentCard({ comp, health, navigate, category }: { comp: Component; 
           </div>
         </div>
         {st && (
-          <Tag type={st.type} size="sm">{st.label}</Tag>
+          <Tag type={st.type}>{st.label}</Tag>
         )}
       </div>
       <div style={{ borderTop: '1px solid var(--cds-border-subtle)', margin: '0 1.25rem' }} />

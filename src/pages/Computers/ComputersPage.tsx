@@ -106,7 +106,7 @@ export default function ComputersPage() {
               <TableContainer>
                 <TableToolbar {...getToolbarProps()}>
                   <TableToolbarContent>
-                    <TableToolbarSearch placeholder="컴퓨터 검색..." onChange={onInputChange} persistent />
+                    <TableToolbarSearch placeholder="컴퓨터 검색..." onChange={onInputChange}  />
                     <Button kind="ghost" renderIcon={Renew} iconDescription="새로고침" hasIconOnly tooltipPosition="bottom" onClick={loadData} />
                     <Button kind="ghost" renderIcon={Download} iconDescription="CSV 다운로드" hasIconOnly tooltipPosition="bottom" onClick={downloadCSV} />
                   </TableToolbarContent>
@@ -157,7 +157,7 @@ export default function ComputersPage() {
                               if (cell.info.header === 'os') {
                                 return (
                                   <TableCell key={cell.id}>
-                                    {cell.value !== '—' ? <Tag type="blue" size="sm">{cell.value as string}</Tag> : '—'}
+                                    {cell.value !== '—' ? <Tag type="blue">{cell.value as string}</Tag> : '—'}
                                   </TableCell>
                                 );
                               }
@@ -180,7 +180,7 @@ export default function ComputersPage() {
         <div style={{ width: 340, flexShrink: 0, borderLeft: '1px solid var(--cds-border-subtle)', background: 'var(--cds-layer-01)', overflow: 'auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--cds-border-subtle)' }}>
             <span style={{ fontWeight: 600 }}>{selectedComp.name}</span>
-            <Button kind="ghost" size="sm" renderIcon={() => <span style={{ fontSize: '1rem' }}>✕</span>} iconDescription="닫기" hasIconOnly onClick={() => setSelectedComp(null)} />
+            <Button kind="ghost" renderIcon={() => <span style={{ fontSize: '1rem' }}>✕</span>} iconDescription="닫기" hasIconOnly onClick={() => setSelectedComp(null)} />
           </div>
           <div style={{ padding: '1rem' }}>
             <div style={{ textAlign: 'center', padding: '1rem 0 1.5rem', borderBottom: '1px solid var(--cds-border-subtle)', marginBottom: '1rem' }}>

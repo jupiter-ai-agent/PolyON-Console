@@ -40,7 +40,7 @@ export default function DashboardPage() {
         actions={
           <Button
             kind="ghost"
-            size="sm"
+           
             renderIcon={Renew}
             iconDescription="새로고침"
             hasIconOnly

@@ -23,9 +23,9 @@ import { dashboardApi, type Alert } from '../../../api/dashboard';
 
 function levelTag(level?: string) {
   const l = (level || 'info').toLowerCase();
-  if (l === 'critical' || l === 'error') return <Tag type="red" size="sm">{l}</Tag>;
-  if (l === 'warning') return <Tag type="purple" size="sm">{l}</Tag>;
-  return <Tag type="blue" size="sm">{l}</Tag>;
+  if (l === 'critical' || l === 'error') return <Tag type="red">{l}</Tag>;
+  if (l === 'warning') return <Tag type="purple">{l}</Tag>;
+  return <Tag type="blue">{l}</Tag>;
 }
 
 const headers = [
@@ -106,7 +106,7 @@ export function AlertsCard() {
       <DataTable rows={rows} headers={headers}>
         {({ rows: tRows, headers: tHeaders, getHeaderProps, getRowProps, getTableProps }) => (
           <TableContainer>
-            <Table {...getTableProps()} size="sm">
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {tHeaders.map(header => (

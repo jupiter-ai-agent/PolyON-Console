@@ -177,7 +177,7 @@ export default function MailDmarcPage() {
           </div>
 
           {/* 상세 테이블 */}
-          <Table size="sm">
+          <Table>
             <TableHead>
               <TableRow>
                 <TableHeader style={{ width: 160 }}>항목</TableHeader>
@@ -189,7 +189,7 @@ export default function MailDmarcPage() {
               <TableRow>
                 <TableCell style={{ fontWeight: 600 }}>DMARC 정책</TableCell>
                 <TableCell>
-                  <Tag type={result.dmarcPass ? 'green' : 'red'} size="sm">
+                  <Tag type={result.dmarcPass ? 'green' : 'red'}>
                     {result.dmarcPass ? 'pass' : 'fail'}
                   </Tag>
                 </TableCell>
@@ -201,7 +201,7 @@ export default function MailDmarcPage() {
                 <TableRow key={i}>
                   <TableCell style={{ fontWeight: 600 }}>DKIM #{i + 1}</TableCell>
                   <TableCell>
-                    <Tag type={String(dk).includes('pass') ? 'green' : 'red'} size="sm">
+                    <Tag type={String(dk).includes('pass') ? 'green' : 'red'}>
                       {typeof dk === 'object' ? (dk as Record<string, string>).result ?? 'N/A' : String(dk)}
                     </Tag>
                   </TableCell>
@@ -213,7 +213,7 @@ export default function MailDmarcPage() {
               <TableRow>
                 <TableCell style={{ fontWeight: 600 }}>SPF (EHLO)</TableCell>
                 <TableCell>
-                  <Tag type={String(result.spfEhloResult) === 'pass' ? 'green' : 'red'} size="sm">
+                  <Tag type={String(result.spfEhloResult) === 'pass' ? 'green' : 'red'}>
                     {String(result.spfEhloResult ?? 'N/A')}
                   </Tag>
                 </TableCell>
@@ -222,7 +222,7 @@ export default function MailDmarcPage() {
               <TableRow>
                 <TableCell style={{ fontWeight: 600 }}>SPF (MAIL FROM)</TableCell>
                 <TableCell>
-                  <Tag type={String(result.spfMailFromResult) === 'pass' ? 'green' : 'red'} size="sm">
+                  <Tag type={String(result.spfMailFromResult) === 'pass' ? 'green' : 'red'}>
                     {String(result.spfMailFromResult ?? 'N/A')}
                   </Tag>
                 </TableCell>
@@ -231,7 +231,7 @@ export default function MailDmarcPage() {
               <TableRow>
                 <TableCell style={{ fontWeight: 600 }}>IP 역방향 DNS</TableCell>
                 <TableCell>
-                  <Tag type={result.ipRevResult ? 'green' : 'gray'} size="sm">
+                  <Tag type={result.ipRevResult ? 'green' : 'gray'}>
                     {result.ipRevResult ? String(result.ipRevResult) : 'N/A'}
                   </Tag>
                 </TableCell>
@@ -242,7 +242,7 @@ export default function MailDmarcPage() {
               <TableRow>
                 <TableCell style={{ fontWeight: 600 }}>ARC</TableCell>
                 <TableCell>
-                  <Tag type={result.arcResult && String(result.arcResult) !== 'fail' ? 'green' : 'gray'} size="sm">
+                  <Tag type={result.arcResult && String(result.arcResult) !== 'fail' ? 'green' : 'gray'}>
                     {String(result.arcResult ?? 'N/A')}
                   </Tag>
                 </TableCell>

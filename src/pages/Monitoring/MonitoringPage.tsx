@@ -325,7 +325,7 @@ export default function MonitoringPage() {
           <Select
             id="time-range"
             labelText=""
-            size="sm"
+           
             value={timeRange}
             onChange={e => setTimeRange(e.target.value)}
             style={{ width: '140px' }}
@@ -344,7 +344,7 @@ export default function MonitoringPage() {
           selectedIndex={serviceKeys.indexOf(activeService)}
           onChange={({ selectedIndex }) => setActiveService(serviceKeys[selectedIndex])}
         >
-          <TabList aria-label="서비스 탭">
+          <TabList contained aria-label="서비스 탭">
             {serviceKeys.map(key => (
               <Tab key={key}>{services[key].label}</Tab>
             ))}

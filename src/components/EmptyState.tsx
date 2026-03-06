@@ -1,36 +1,38 @@
-// @ts-nocheck
-/**
- * EmptyState — 일관된 빈 상태 UI
- * IBM Cloud 스타일: 아이콘 + 제목 + 설명 + 액션
- */
-import type { ReactNode, ComponentType } from 'react';
-import { Button } from '@carbon/react';
+import type { ComponentType } from 'react';
 
 interface EmptyStateProps {
   icon?: ComponentType<{ size?: number }>;
   title: string;
   description?: string;
-  actionLabel?: string;
-  onAction?: () => void;
-  children?: ReactNode;
+  action?: React.ReactNode;
 }
 
-export function EmptyState({ icon: Icon, title, description, actionLabel, onAction, children }: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
   return (
-    <div className="he-empty-state">
-      {Icon && (
-        <div className="he-empty-state__icon">
-          <Icon size={48} />
-        </div>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '4rem 2rem',
+      color: 'var(--cds-text-secondary)',
+    }}>
+      {Icon && <Icon size={64} />}
+      <h4 style={{ 
+        marginTop: '1rem', 
+        fontSize: '1.125rem', 
+        fontWeight: 600, 
+        color: 'var(--cds-text-primary)' 
+      }}>{title}</h4>
+      {description && (
+        <p style={{ 
+          marginTop: '0.5rem', 
+          fontSize: '0.875rem', 
+          maxWidth: '400px', 
+          textAlign: 'center' 
+        }}>{description}</p>
       )}
-      <h3 className="he-empty-state__title">{title}</h3>
-      {description && <p className="he-empty-state__desc">{description}</p>}
-      {actionLabel && onAction && (
-        <Button kind="tertiary" size="sm" onClick={onAction} style={{ marginTop: '1rem' }}>
-          {actionLabel}
-        </Button>
-      )}
-      {children}
+      {action && <div style={{ marginTop: '1rem' }}>{action}</div>}
     </div>
   );
 }

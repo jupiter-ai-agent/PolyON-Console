@@ -146,7 +146,7 @@ export default function BPMNDecisionDetailPage() {
           </span>
         }
         actions={
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={load}>
+          <Button kind="ghost" renderIcon={Renew} onClick={load}>
             새로고침
           </Button>
         }
@@ -191,7 +191,7 @@ export default function BPMNDecisionDetailPage() {
               ) : parsed && dmnTableHeaders.length > 0 ? (
                 <DataTable rows={dmnTableRows} headers={dmnTableHeaders}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                    <Table {...getTableProps()} size="sm">
+                    <Table {...getTableProps()}>
                       <TableHead>
                         <TableRow>
                           {headers.map(h => (
@@ -233,7 +233,7 @@ export default function BPMNDecisionDetailPage() {
             {/* Tabs */}
             <div style={{ background: '#fff' }}>
               <Tabs>
-                <TabList aria-label="Decision detail tabs">
+                <TabList contained aria-label="Decision detail tabs">
                   <Tab>Decision Instances ({history.length})</Tab>
                   <Tab>Info</Tab>
                 </TabList>
@@ -248,7 +248,7 @@ export default function BPMNDecisionDetailPage() {
                       ) : (
                         <DataTable rows={historyRows} headers={instanceHeaders}>
                           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-                            <Table {...getTableProps()} size="sm">
+                            <Table {...getTableProps()}>
                               <TableHead>
                                 <TableRow>
                                   {headers.map(h => (

@@ -78,13 +78,13 @@ export default function AIAgentsPage() {
                     </div>
                   </div>
                   <div style={{ padding: '0.75rem 1.25rem', borderTop: '1px solid #e0e0e0', background: '#f4f4f4', display: 'flex', gap: '0.5rem' }}>
-                    <Button kind="ghost" size="sm" onClick={() => navigate('/ai/memory')}>
+                    <Button kind="ghost" onClick={() => navigate('/ai/memory')}>
                       Memory
                     </Button>
-                    <Button kind="ghost" size="sm" onClick={() => navigate('/ai/usage')}>
+                    <Button kind="ghost" onClick={() => navigate('/ai/usage')}>
                       Usage
                     </Button>
-                    <Button kind="ghost" size="sm" onClick={() => navigate('/ai/pipeline')}>
+                    <Button kind="ghost" onClick={() => navigate('/ai/pipeline')}>
                       Pipeline
                     </Button>
                   </div>
