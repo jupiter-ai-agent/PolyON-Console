@@ -94,6 +94,7 @@ function logout(): void {
   if (keycloak.authenticated) {
     const logoutUrl = `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/logout`
       + `?client_id=${keycloak.clientId}`
+      + `&id_token_hint=${keycloak.idToken || ''}`
       + `&post_logout_redirect_uri=${encodeURIComponent(origin)}`;
     window.location.replace(logoutUrl);
   } else {
