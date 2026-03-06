@@ -155,7 +155,7 @@ export const moveGroup = (name: string, targetDn: string) =>
   });
 
 // Computers API
-export const listComputers = () => apiFetch<ComputersResponse>('/computers');
+export const listComputers = () => apiFetch<ComputersResponse>('/domain/computers');
 export const domainDCs = () => apiFetch<DomainDCsResponse>('/domain/dcs');
 
 // Photo API
