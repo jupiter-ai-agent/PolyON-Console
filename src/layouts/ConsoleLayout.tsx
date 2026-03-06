@@ -38,6 +38,7 @@ import {
   User,
   RecentlyViewed,
   DataShare,
+  ChevronDown,
 } from '@carbon/icons-react';
 import { useAppStore } from '../store/useAppStore';
 import { apiFetch } from '../api/client';
@@ -589,7 +590,7 @@ export default function ConsoleLayout() {
           <aside className="he-submenu">
             <div className="he-submenu__title">{moduleDef.title}</div>
             <div className="he-submenu__items">
-              {renderSubmenuItems(moduleDef.items ?? [], location.pathname, navigate)}
+              <SubmenuItems items={moduleDef.items ?? []} pathname={location.pathname} navigate={navigate} />
             </div>
           </aside>
         )}
@@ -603,57 +604,94 @@ export default function ConsoleLayout() {
   );
 }
 
+// ── Collapsible group component ──
+function CollapsibleGroup({
+  item,
+  pathname,
+  navigate,
+}: {
+  item: NavItem;
+  pathname: string;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const isGroupActive = item.children?.some(c => c.path && pathname.startsWith(c.path)) ?? false;
+  const [expanded, setExpanded] = useState(isGroupActive);
+
+  return (
+    <div className="he-submenu__group">
+      <button
+        className={`he-submenu__group-title ${isGroupActive ? 'he-submenu__group-title--active' : ''}`}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <span>{item.label}</span>
+        <ChevronDown
+          size={16}
+          className={`he-submenu__group-chevron ${expanded ? 'he-submenu__group-chevron--open' : ''}`}
+        />
+      </button>
+      {expanded && item.children?.map((child, cidx) => {
+        const isActive = child.path ? pathname === child.path || pathname.startsWith(child.path + '/') : false;
+        return (
+          <button
+            key={cidx}
+            className={`he-submenu__link he-submenu__link--child ${isActive ? 'he-submenu__link--active' : ''}`}
+            onClick={() => child.path && navigate(child.path)}
+          >
+            {child.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Render submenu items ──
-function renderSubmenuItems(
-  items: NavItem[],
-  pathname: string,
-  navigate: ReturnType<typeof useNavigate>
-): ReactNode[] {
-  return items.map((item, idx) => {
-    if (item.type === 'divider') {
-      return <div key={`d-${idx}`} className="he-submenu__divider" />;
-    }
-    if (item.type === 'header') {
-      return <div key={`h-${idx}`} className="he-submenu__header">{item.label}</div>;
-    }
-    if (item.type === 'group' && item.children) {
-      const isGroupActive = item.children.some(c => c.path && pathname.startsWith(c.path));
-      return (
-        <div key={`g-${item.label}`} className="he-submenu__group">
-          <div className={`he-submenu__group-title ${isGroupActive ? 'he-submenu__group-title--active' : ''}`}>
-            {item.label}
-          </div>
-          {item.children.map((child, cidx) => {
-            const isActive = child.path ? pathname === child.path || pathname.startsWith(child.path + '/') : false;
-            return (
-              <button
-                key={cidx}
-                className={`he-submenu__link he-submenu__link--child ${isActive ? 'he-submenu__link--active' : ''}`}
-                onClick={() => child.path && navigate(child.path)}
-              >
-                {child.label}
-              </button>
-            );
-          })}
-        </div>
-      );
-    }
-    if (item.path) {
-      const Icon = item.icon;
-      const isActive = item.path === '/'
-        ? pathname === '/'
-        : pathname === item.path || pathname.startsWith(item.path + '/');
-      return (
-        <button
-          key={`l-${item.path}`}
-          className={`he-submenu__link ${isActive ? 'he-submenu__link--active' : ''}`}
-          onClick={() => navigate(item.path!)}
-        >
-          {Icon && <Icon size={16} />}
-          <span>{item.label}</span>
-        </button>
-      );
-    }
-    return null;
-  });
+function SubmenuItems({
+  items,
+  pathname,
+  navigate,
+}: {
+  items: NavItem[];
+  pathname: string;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  return (
+    <>
+      {items.map((item, idx) => {
+        if (item.type === 'divider') {
+          return <div key={`d-${idx}`} className="he-submenu__divider" />;
+        }
+        if (item.type === 'header') {
+          return <div key={`h-${idx}`} className="he-submenu__header">{item.label}</div>;
+        }
+        if (item.type === 'group' && item.children) {
+          return (
+            <CollapsibleGroup
+              key={`g-${item.label}`}
+              item={item}
+              pathname={pathname}
+              navigate={navigate}
+            />
+          );
+        }
+        if (item.path) {
+          const Icon = item.icon;
+          const isActive = item.path === '/'
+            ? pathname === '/'
+            : pathname === item.path || pathname.startsWith(item.path + '/');
+          return (
+            <button
+              key={`l-${item.path}`}
+              className={`he-submenu__link ${isActive ? 'he-submenu__link--active' : ''}`}
+              onClick={() => navigate(item.path!)}
+            >
+              {Icon && <Icon size={16} />}
+              <span>{item.label}</span>
+            </button>
+          );
+        }
+        return null;
+      })}
+    </>
+  );
 }
