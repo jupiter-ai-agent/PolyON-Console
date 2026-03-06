@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import type { ReactNode, ComponentType } from 'react';
 import {
@@ -10,6 +10,8 @@ import {
   SideNavLink,
   SideNavMenu,
   SideNavMenuItem,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
 import {
   Dashboard,
@@ -39,6 +41,7 @@ import {
 } from '@carbon/icons-react';
 import { useAppStore } from '../store/useAppStore';
 import { apiFetch } from '../api/client';
+import { useAuth } from '../auth/useAuth';
 
 // ── Types ──
 interface NavItem {
@@ -55,6 +58,7 @@ interface ModuleDef {
   icon: ComponentType<{ size?: number }>;
   desc?: string;
   section?: string;
+  serviceId: string; // K8s 서비스 식별자 - 메뉴 동적화에 사용
   items: NavItem[] | null;
 }
 
@@ -65,6 +69,7 @@ const MODULES: Record<string, ModuleDef> = {
     desc: '업무 현황 및 카드 보기',
     defaultPath: '/',
     icon: Dashboard,
+    serviceId: 'home',
     items: null,
   },
   apps: {
@@ -72,6 +77,7 @@ const MODULES: Record<string, ModuleDef> = {
     desc: '앱 관리 · SSO',
     defaultPath: '/apps',
     icon: Application,
+    serviceId: 'apps',
     items: [
       { label: '앱 목록', path: '/apps', icon: Application },
       { label: 'SSO 설정', path: '/apps/sso-setup', icon: Key },
@@ -87,6 +93,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'DIRECTORY',
     defaultPath: '/users',
     icon: UserMultiple,
+    serviceId: 'directory',
     items: [
       { label: '사용자 관리', path: '/users', icon: User },
       { label: '그룹 관리', path: '/groups', icon: GroupPresentation },
@@ -102,6 +109,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'DIRECTORY',
     defaultPath: '/tree',
     icon: Tree,
+    serviceId: 'tree-view',
     items: null,
   },
   mail: {
@@ -110,6 +118,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'SERVICES',
     defaultPath: '/mail',
     icon: Email,
+    serviceId: 'mail',
     items: [
       { label: '개요', path: '/mail', icon: Email },
       {
@@ -178,6 +187,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'SERVICES',
     defaultPath: '/chat',
     icon: Chat,
+    serviceId: 'chat',
     items: [
       { label: '개요', path: '/chat', icon: Chat },
       { type: 'divider' },
@@ -194,6 +204,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'SERVICES',
     defaultPath: '/ai',
     icon: Bot,
+    serviceId: 'ai',
     items: [
       { label: '대시보드', path: '/ai', icon: Bot },
       { label: 'Models', path: '/ai/models', icon: Code },
@@ -211,6 +222,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'SERVICES',
     defaultPath: '/automation',
     icon: DataShare,
+    serviceId: 'automation',
     items: [
       { label: '개요', path: '/automation', icon: DataShare },
       { label: '워크플로우', path: '/automation/workflows', icon: Code },
@@ -225,6 +237,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'SERVICES',
     defaultPath: '/bpmn',
     icon: Code,
+    serviceId: 'bpmn',
     items: [
       { label: '개요', path: '/bpmn', icon: Code },
       { type: 'divider' },
@@ -244,6 +257,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'INFRASTRUCTURE',
     defaultPath: '/dns',
     icon: Globe,
+    serviceId: 'networking',
     items: [
       { label: 'DNS', path: '/dns', icon: DnsServices },
       { label: 'Domain Controllers', path: '/dcs', icon: BareMetalServer },
@@ -258,6 +272,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'INFRASTRUCTURE',
     defaultPath: '/containers',
     icon: ContainerSoftware,
+    serviceId: 'containers',
     items: [
       { label: '개요', path: '/containers', icon: ContainerSoftware },
       { label: '토폴로지', path: '/containers/topology', icon: ChartLine },
@@ -270,6 +285,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'INFRASTRUCTURE',
     defaultPath: '/databases/postgresql',
     icon: DataBase,
+    serviceId: 'database',
     items: [
       { label: 'PostgreSQL', path: '/databases/postgresql', icon: DataBase },
       { label: 'Redis', path: '/databases/redis', icon: DataBase },
@@ -282,6 +298,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'INFRASTRUCTURE',
     defaultPath: '/monitoring',
     icon: ChartLine,
+    serviceId: 'monitoring',
     items: [
       { label: '대시보드', path: '/monitoring', icon: ChartLine },
       { type: 'header', label: '경보 및 분석' },
@@ -297,6 +314,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'GOVERNANCE',
     defaultPath: '/security',
     icon: Security,
+    serviceId: 'security',
     items: [
       { label: 'Audit Log', path: '/security', icon: Security },
       { type: 'divider' },
@@ -313,6 +331,7 @@ const MODULES: Record<string, ModuleDef> = {
     section: 'SYSTEM',
     defaultPath: '/settings',
     icon: Settings,
+    serviceId: 'settings',
     items: [
       { label: '일반', path: '/settings', icon: Settings },
       { label: '도메인', path: '/settings/domain', icon: Globe },
@@ -381,8 +400,10 @@ function findModuleForPath(pathname: string): string {
 export default function ConsoleLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { domainInfo, setDomainInfo, username } = useAppStore();
+  const { domainInfo, setDomainInfo, username, installedServices } = useAppStore();
   const [navOpen, setNavOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const auth = useAuth();
 
   const currentModule = findModuleForPath(location.pathname);
   const moduleDef = MODULES[currentModule];
@@ -443,9 +464,76 @@ export default function ConsoleLayout() {
           <span className="he-header-domain">{domainInfo.realm}</span>
         )}
         <div style={{ flex: 1 }} />
-        <div className="he-header-user">
-          <User size={16} />
-          <span>{username || 'admin'}</span>
+        <div className="he-header-user" style={{ position: 'relative' }}>
+          <button 
+            className="he-header-user-btn"
+            onClick={() => setUserMenuOpen(!userMenuOpen)}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '8px',
+              background: 'none',
+              border: 'none',
+              color: 'inherit',
+              cursor: 'pointer',
+              padding: '8px',
+              borderRadius: '4px',
+            }}
+          >
+            <User size={16} />
+            <span>{username || 'admin'}</span>
+          </button>
+          {userMenuOpen && (
+            <>
+              <div 
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  zIndex: 999
+                }}
+                onClick={() => setUserMenuOpen(false)}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  background: 'white',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '4px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  minWidth: '120px',
+                  zIndex: 1000,
+                  marginTop: '4px'
+                }}
+              >
+                <button
+                  onClick={() => {
+                    setUserMenuOpen(false);
+                    auth.logout();
+                  }}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    padding: '8px 16px',
+                    background: 'none',
+                    border: 'none',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    color: '#333'
+                  }}
+                  onMouseOver={(e) => e.target.style.backgroundColor = '#f4f4f4'}
+                  onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                >
+                  로그아웃
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </Header>
 
@@ -460,6 +548,12 @@ export default function ConsoleLayout() {
             {PRIMARY_NAV_ORDER.map((key) => {
               const mod = MODULES[key];
               if (!mod) return null;
+              
+              // 설치되지 않은 서비스는 메뉴에서 제외
+              if (!installedServices.includes(mod.serviceId)) {
+                return null;
+              }
+              
               const Icon = mod.icon;
               const isActive = currentModule === key;
               const showSection = mod.section && mod.section !== lastSection;

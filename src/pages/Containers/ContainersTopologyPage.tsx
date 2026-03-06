@@ -13,7 +13,15 @@ export default function ContainersTopologyPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/containers/topology');
+      const res = await fetch('/api/v1/services/topology');
+      if (!res.ok) {
+        if (res.status === 404) {
+          setError('K8s 서비스 토폴로지 API가 아직 구현되지 않았습니다.');
+          setLoading(false);
+          return;
+        }
+        throw new Error(`HTTP ${res.status}`);
+      }
       const data = await res.json();
       setTopoData(data);
     } catch (e) {
@@ -47,8 +55,8 @@ export default function ContainersTopologyPage() {
     <div style={{ padding: '0 32px 32px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '24px 0 16px' }}>
         <div>
-          <h1 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>컨테이너 토폴로지</h1>
-          <p style={{ fontSize: '13px', color: 'var(--cds-text-secondary)', margin: '4px 0 0' }}>Docker 컨테이너 의존 관계 및 실시간 상태</p>
+          <h1 style={{ fontSize: '20px', fontWeight: 600, margin: 0 }}>서비스 토폴로지</h1>
+          <p style={{ fontSize: '13px', color: 'var(--cds-text-secondary)', margin: '4px 0 0' }}>Kubernetes 서비스 토폴로지 및 의존 관계</p>
         </div>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           {/* Legend */}

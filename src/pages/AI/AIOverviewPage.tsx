@@ -16,6 +16,9 @@ import {
 } from '@carbon/react';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/StatusBadge';
+import { EmptyState } from '../../components/EmptyState';
+import { useAppStore } from '../../store/useAppStore';
+import { Bot } from '@carbon/icons-react';
 import { aiApi } from '../../api/ai';
 import { apiFetch } from '../../api/client';
 import type { Agent } from '../../api/ai';
@@ -28,6 +31,7 @@ interface EngineStatus {
 
 export default function AIOverviewPage() {
   const navigate = useNavigate();
+  const { installedServices } = useAppStore();
 
   const [health,       setHealth]       = useState<string>('unknown');
   const [version,      setVersion]      = useState<string>('—');
@@ -40,6 +44,30 @@ export default function AIOverviewPage() {
   const [memoryStatus, setMemoryStatus] = useState<string>('unknown');
   const [monthlySpend, setMonthlySpend] = useState<string>('$0.00');
   const [loading,      setLoading]      = useState(true);
+
+  // 서비스 설치 여부 확인
+  const isServiceInstalled = installedServices.includes('ai');
+
+  // 미설치 서비스인 경우 EmptyState 표시
+  if (!isServiceInstalled) {
+    return (
+      <>
+        <PageHeader
+          title="AI Platform"
+          description="PolyON AI 플랫폼 — 모델, 에이전트, 메모리 통합 관리"
+        />
+        <div style={{ padding: '2rem 0' }}>
+          <EmptyState
+            icon={Bot}
+            title="이 서비스는 아직 설치되지 않았습니다"
+            description="AI Platform은 현재 설치되지 않았습니다. Applications에서 설치할 수 있습니다."
+            actionLabel="Applications로 이동"
+            onAction={() => navigate('/apps')}
+          />
+        </div>
+      </>
+    );
+  }
 
   useEffect(() => {
     async function load() {

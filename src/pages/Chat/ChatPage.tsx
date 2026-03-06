@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/StatusBadge';
+import { EmptyState } from '../../components/EmptyState';
+import { useAppStore } from '../../store/useAppStore';
+import { Chat } from '@carbon/icons-react';
 import {
   Button, Tag,
   DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell,
@@ -42,12 +45,37 @@ const userHeaders = [
 
 export default function ChatPage() {
   const navigate = useNavigate();
+  const { installedServices } = useAppStore();
   const [status, setStatus] = useState<string>('unknown');
   const [version, setVersion] = useState<string>('—');
   const [teams, setTeams] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // 서비스 설치 여부 확인
+  const isServiceInstalled = installedServices.includes('chat');
+
+  // 미설치 서비스인 경우 EmptyState 표시
+  if (!isServiceInstalled) {
+    return (
+      <>
+        <PageHeader
+          title="Mattermost"
+          description="팀 커뮤니케이션 플랫폼"
+        />
+        <div style={{ padding: '2rem 0' }}>
+          <EmptyState
+            icon={Chat}
+            title="이 서비스는 아직 설치되지 않았습니다"
+            description="Mattermost는 현재 설치되지 않았습니다. Applications에서 설치할 수 있습니다."
+            actionLabel="Applications로 이동"
+            onAction={() => navigate('/apps')}
+          />
+        </div>
+      </>
+    );
+  }
 
   useEffect(() => {
     async function load() {

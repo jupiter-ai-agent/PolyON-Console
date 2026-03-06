@@ -19,6 +19,9 @@ import {
 } from '@carbon/react';
 import { PageHeader } from '../../components/PageHeader';
 import { StatusBadge } from '../../components/StatusBadge';
+import { EmptyState } from '../../components/EmptyState';
+import { useAppStore } from '../../store/useAppStore';
+import { Code } from '@carbon/icons-react';
 
 const BASE = '/api/v1/engines/bpmn';
 
@@ -87,6 +90,7 @@ const processHeaders = [
 
 export default function BPMNPage() {
   const navigate = useNavigate();
+  const { installedServices } = useAppStore();
   const humanTasksRef = useRef<HTMLDivElement>(null);
 
   const [status, setStatus] = useState<string>('unknown');
@@ -97,6 +101,31 @@ export default function BPMNPage() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [deployments, setDeployments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // 서비스 설치 여부 확인
+  const isServiceInstalled = installedServices.includes('bpmn');
+
+  // 미설치 서비스인 경우 EmptyState 표시
+  if (!isServiceInstalled) {
+    return (
+      <>
+        <PageHeader
+          title="BPMN 엔진"
+          description="Operaton — 프로세스 자동화 플랫폼"
+          actions={<StatusBadge status="unknown" />}
+        />
+        <div style={{ padding: '2rem 0' }}>
+          <EmptyState
+            icon={Code}
+            title="이 서비스는 아직 설치되지 않았습니다"
+            description="BPMN 엔진(Operaton)은 현재 설치되지 않았습니다. Applications에서 설치할 수 있습니다."
+            actionLabel="Applications로 이동"
+            onAction={() => navigate('/apps')}
+          />
+        </div>
+      </>
+    );
+  }
 
   // Human tasks assignment stats
   const [assignedToUser, setAssignedToUser] = useState(0);

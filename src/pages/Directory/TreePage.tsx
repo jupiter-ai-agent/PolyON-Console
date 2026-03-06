@@ -128,8 +128,9 @@ export default function TreePage() {
   const [newPw, setNewPw] = useState('');
 
   const showToast = useAppStore((s) => s.showToast);
-  const domainLower = useAppStore((s) => s.domainInfo.realmLower) || 'example.com';
-  const baseDN = useAppStore((s) => s.domainInfo.base_dn) || `DC=${domainLower.split('.').join(',DC=')}`;
+  const domainInfo = useAppStore((s) => s.domainInfo);
+  const domainLower = domainInfo.realmLower || 'local.domain';
+  const baseDN = domainInfo.base_dn || `DC=${domainLower.split('.').join(',DC=')}`;
   const didMount = useRef(false);
 
   const loadAll = useCallback(async () => {

@@ -20,18 +20,48 @@ import {
 } from '@carbon/react';
 import { Activity, Code, DataShare } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
+import { EmptyState } from '../../components/EmptyState';
+import { useAppStore } from '../../store/useAppStore';
 import { apiFetch } from '../../api/client';
 
 const AUTO_BASE = '/engines/automation';
 
 export default function AutomationPage() {
   const navigate = useNavigate();
+  const { installedServices } = useAppStore();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [status, setStatus] = useState<string>('unknown');
   const [stats, setStats] = useState<any>(null);
   const [workflows, setWorkflows] = useState<any[]>([]);
   const [executions, setExecutions] = useState<any[]>([]);
+
+  // 서비스 설치 여부 확인
+  const isServiceInstalled = installedServices.includes('automation');
+
+  // 미설치 서비스인 경우 EmptyState 표시
+  if (!isServiceInstalled) {
+    return (
+      <>
+        <PageHeader
+          title="Automation"
+          description="n8n 워크플로우 자동화 엔진"
+          icon={DataShare}
+          hero
+          heroColor="#005d5d"
+        />
+        <div style={{ padding: '2rem' }}>
+          <EmptyState
+            icon={DataShare}
+            title="이 서비스는 아직 설치되지 않았습니다"
+            description="Automation (n8n)은 현재 설치되지 않았습니다. Applications에서 설치할 수 있습니다."
+            actionLabel="Applications로 이동"
+            onAction={() => navigate('/apps')}
+          />
+        </div>
+      </>
+    );
+  }
 
   useEffect(() => {
     let mounted = true;

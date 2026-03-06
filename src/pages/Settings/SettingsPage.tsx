@@ -80,7 +80,7 @@ export default function SettingsPage() {
               <span><code>{domainInfo?.domain || 'EXAMPLE.COM'}</code></span>
               <span style={{ fontWeight: 500 }}>NetBIOS</span>
               <span><code>{domainInfo?.netbios || 'EXAMPLE'}</code></span>
-              <span style={{ fontWeight: 500 }}>배포 방식</span><span>Docker Compose</span>
+              <span style={{ fontWeight: 500 }}>배포 방식</span><span>Kubernetes</span>
               <span style={{ fontWeight: 500 }}>호스트</span>
               <span><code>{health?.hostname || window.location.hostname}</code></span>
             </div>

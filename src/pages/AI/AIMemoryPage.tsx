@@ -96,9 +96,13 @@ export default function AIMemoryPage() {
 
           <SectionCard title="Configuration">
             <p style={{ margin: '0 0 0.75rem', fontSize: '0.8125rem', color: 'var(--cds-text-secondary)' }}>
-              Configure via environment variables in{' '}
+              Configure via{' '}
               <code style={{ background: '#f4f4f4', padding: '2px 6px', fontSize: '0.75rem' }}>
-                docker-compose.services.yml
+                Kubernetes ConfigMap
+              </code>{' '}
+              or{' '}
+              <code style={{ background: '#f4f4f4', padding: '2px 6px', fontSize: '0.75rem' }}>
+                Secrets
               </code>
             </p>
             <div style={{ padding: '0.75rem 1rem', background: '#f4f4f4', border: '1px solid #e0e0e0', borderLeft: '3px solid #0f62fe' }}>

@@ -1,9 +1,10 @@
 /**
- * PolyON Auth — Keycloak OIDC stub
- * Phase 1: 간단한 stub. Phase 2에서 keycloak-js 연동 예정.
+ * PolyON Auth — Keycloak OIDC 통합
  */
 import { useState, useEffect } from 'react';
 import { setTokenProvider } from '../api/client';
+import { useAppStore } from '../store/useAppStore';
+import keycloak from './keycloak';
 
 export interface AuthState {
   initialized: boolean;
@@ -18,6 +19,7 @@ let _token: string | null = null;
 let _username = '';
 let _initialized = false;
 let _skipAuth = false;
+let _tokenUpdateInterval: number | null = null;
 
 // Token provider registration (for API client)
 setTokenProvider(() => _token);
@@ -44,6 +46,44 @@ async function checkKeycloakRealm(): Promise<boolean> {
   }
 }
 
+function setupTokenRefresh(): void {
+  if (_tokenUpdateInterval) {
+    clearInterval(_tokenUpdateInterval);
+  }
+  
+  _tokenUpdateInterval = setInterval(() => {
+    keycloak.updateToken(30) // 30초 전에 갱신
+      .then((refreshed) => {
+        if (refreshed) {
+          _token = keycloak.token || null;
+          console.log('Token refreshed');
+        }
+      })
+      .catch(() => {
+        console.warn('Token refresh failed');
+        // 갱신 실패 시 로그아웃
+        logout();
+      });
+  }, 60000); // 1분마다 체크
+}
+
+function logout(): void {
+  if (_tokenUpdateInterval) {
+    clearInterval(_tokenUpdateInterval);
+    _tokenUpdateInterval = null;
+  }
+  
+  _token = null;
+  _username = '';
+  useAppStore.getState().setUsername('');
+  
+  if (!_skipAuth) {
+    keycloak.logout({
+      redirectUri: window.location.origin,
+    });
+  }
+}
+
 export async function initAuth(): Promise<AuthState> {
   // Check provisioning
   const provisioned = await checkProvisionState();
@@ -61,13 +101,33 @@ export async function initAuth(): Promise<AuthState> {
     return buildState();
   }
 
-  // TODO: Phase 2 — integrate keycloak-js
-  // For now, mark as authenticated with placeholder
-  _initialized = true;
-  _skipAuth = false;
-  _username = 'admin';
-  _token = null; // will be set by keycloak
+  // Initialize Keycloak with PKCE
+  try {
+    const authenticated = await keycloak.init({
+      onLoad: 'login-required',
+      pkceMethod: 'S256',
+    });
 
+    if (authenticated) {
+      _token = keycloak.token || null;
+      _username = keycloak.tokenParsed?.preferred_username || 'unknown';
+      
+      // Update global store
+      useAppStore.getState().setUsername(_username);
+      
+      // Setup token refresh
+      setupTokenRefresh();
+      
+      console.log('Keycloak authentication successful:', _username);
+    }
+  } catch (error) {
+    console.error('Keycloak initialization failed:', error);
+    _initialized = true;
+    _skipAuth = true; // fallback to skip mode
+    return buildState();
+  }
+
+  _initialized = true;
   return buildState();
 }
 
@@ -78,11 +138,7 @@ function buildState(): AuthState {
     username: _username,
     token: _token,
     skipAuth: _skipAuth,
-    logout: () => {
-      _token = null;
-      _username = '';
-      window.location.href = '/auth/realms/admin/protocol/openid-connect/logout';
-    },
+    logout,
   };
 }
 

@@ -72,10 +72,10 @@ export default function AISettingsPage() {
           {/* LLM Providers */}
           <SectionCard title="LLM Providers">
             <p style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)', margin: '0 0 1rem' }}>
-              Provider API keys are managed in the server's{' '}
-              <code style={{ background: '#f4f4f4', padding: '2px 6px', fontSize: '0.75rem' }}>.env</code>{' '}
-              file or{' '}
-              <code style={{ background: '#f4f4f4', padding: '2px 6px', fontSize: '0.75rem' }}>docker-compose.services.yml</code>.
+              Provider API keys are managed in{' '}
+              <code style={{ background: '#f4f4f4', padding: '2px 6px', fontSize: '0.75rem' }}>Kubernetes Secrets</code>{' '}
+              or{' '}
+              <code style={{ background: '#f4f4f4', padding: '2px 6px', fontSize: '0.75rem' }}>ConfigMap</code>.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
               {PROVIDERS.map(p => (
@@ -101,11 +101,13 @@ export default function AISettingsPage() {
             <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: '#f4f4f4', border: '1px solid #e0e0e0', borderLeft: '3px solid #0f62fe' }}>
               <div style={{ fontSize: '0.8125rem', fontWeight: 500, marginBottom: '0.5rem' }}>Setup Guide</div>
               <pre style={{ margin: 0, fontSize: '0.75rem', fontFamily: "'IBM Plex Mono', monospace", color: 'var(--cds-text-secondary)', whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
-{`ssh cmars@polyon.oplabs.co.kr
-cd ~/.polyon/runtime
-echo "OPENAI_API_KEY=sk-..." >> .env
-# Also add to polyon-ai env in docker-compose.services.yml
-docker compose up -d --force-recreate polyon-ai`}
+{`# Create API key secret
+kubectl create secret generic ai-api-keys \\
+  --from-literal=OPENAI_API_KEY=sk-... \\
+  --namespace default
+
+# Restart AI service
+kubectl rollout restart deployment/polyon-ai`}
               </pre>
             </div>
           </SectionCard>

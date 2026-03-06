@@ -21,7 +21,7 @@ const ACTIONS = [
   { label: 'Applications', desc: '앱 카탈로그 관리', icon: Application, path: '/apps', color: '#161616' },
   { label: '메일 관리', desc: '메일 계정 및 도메인', icon: Email, path: '/mail', color: '#198038' },
   { label: 'AI Platform', desc: 'LLM 모델 및 에이전트', icon: Bot, path: '/ai', color: '#6929c4' },
-  { label: '컨테이너', desc: 'Docker 상태 확인', icon: ContainerSoftware, path: '/containers', color: '#005d5d' },
+  { label: '컨테이너', desc: '서비스 상태 확인', icon: ContainerSoftware, path: '/containers', color: '#005d5d' },
   { label: '모니터링', desc: '알림 및 성능 분석', icon: ChartLine, path: '/monitoring', color: '#b28600' },
   { label: '보안 감사', desc: '감사 로그 확인', icon: Security, path: '/security', color: '#da1e28' },
   { label: '설정', desc: '시스템 구성 변경', icon: Settings, path: '/settings', color: '#525252' },

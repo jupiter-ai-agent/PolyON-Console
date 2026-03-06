@@ -23,6 +23,10 @@ interface AppState {
   navExpanded: boolean;
   toggleNav: () => void;
 
+  // 설치된 서비스 목록 - K8s Pod 기반 동적 메뉴를 위해
+  installedServices: string[];
+  setInstalledServices: (services: string[]) => void;
+
   // Global toast
   toast: { message: string; type: 'info' | 'success' | 'error' | 'warning' } | null;
   showToast: (message: string, type?: 'info' | 'success' | 'error' | 'warning') => void;
@@ -51,6 +55,21 @@ export const useAppStore = create<AppState>((set) => ({
       localStorage.setItem('he-nav-expanded', String(next));
       return { navExpanded: next };
     }),
+
+  // 현재 K8s에 설치된 base 서비스 목록 (향후 /api/v1/platform/services API 연동)
+  installedServices: [
+    'home',
+    'apps', 
+    'directory',
+    'tree-view',
+    'mail',
+    'networking',
+    'database',
+    'monitoring',
+    'security',
+    'settings'
+  ],
+  setInstalledServices: (services) => set({ installedServices: services }),
 
   toast: null,
   showToast: (message, type = 'info') => set({ toast: { message, type } }),
