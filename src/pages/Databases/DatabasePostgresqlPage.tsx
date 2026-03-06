@@ -40,6 +40,9 @@ export default function DatabasePostgresqlPage() {
                 src="/pgweb/"
                 title="pgweb"
                 errorMessage="pgweb에 연결할 수 없습니다. 컨테이너가 실행 중인지 확인하세요."
+                toolName="pgweb"
+                toolDesc="PostgreSQL 웹 기반 쿼리 매니저. SQL 편집기, 테이블 뷰어, 데이터 내보내기를 지원합니다."
+                toolUrl="https://github.com/sosedoff/pgweb"
               />
             </TabPanel>
             <TabPanel>

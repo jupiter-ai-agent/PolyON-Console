@@ -40,6 +40,9 @@ export default function DatabaseRedisPage() {
                 src="/redis/"
                 title="redis-commander"
                 errorMessage="redis-commander에 연결할 수 없습니다. 컨테이너가 실행 중인지 확인하세요."
+                toolName="redis-commander"
+                toolDesc="Redis 웹 기반 관리 도구. 키 탐색, CLI, 실시간 모니터링을 지원합니다."
+                toolUrl="https://github.com/joeferner/redis-commander"
               />
             </TabPanel>
             <TabPanel>

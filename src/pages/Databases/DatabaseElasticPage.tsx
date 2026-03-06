@@ -57,6 +57,9 @@ export default function DatabaseElasticPage() {
                 src="/elasticvue/"
                 title="elasticvue"
                 errorMessage="Elasticvue에 연결할 수 없습니다. 컨테이너가 실행 중인지 확인하세요."
+                toolName="Elasticvue"
+                toolDesc="Elasticsearch 웹 기반 관리 도구. 인덱스 관리, 쿼리 편집기, 클러스터 상태 모니터링을 지원합니다."
+                toolUrl="https://github.com/cars10/elasticvue"
                 onLoad={handleElasticvueLoad}
               />
             </TabPanel>
