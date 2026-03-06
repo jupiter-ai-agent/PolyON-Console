@@ -126,6 +126,7 @@ export async function initAuth(): Promise<AuthState> {
     const authenticated = await keycloak.init({
       onLoad: 'login-required',
       pkceMethod: 'S256',
+      checkLoginIframe: false,   // 3rd party cookie iframe 체크 비활성화 — 자체서명 인증서 환경에서 타임아웃 방지
     });
 
     if (authenticated) {
