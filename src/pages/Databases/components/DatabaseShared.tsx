@@ -2,9 +2,9 @@
 /**
  * Database 페이지 공통 컴포넌트 (IBM Cloud 스타일)
  */
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { Tag, InlineLoading, Button } from '@carbon/react';
-import { Renew, Launch, DataBase } from '@carbon/icons-react';
+import { Renew } from '@carbon/icons-react';
 
 /* ── Status Tag ── */
 export function StatusTag({ status }: { status?: string }) {
@@ -38,102 +38,51 @@ export function GrafanaPanel({ uid, slug, panelId, title }: { uid: string; slug:
   );
 }
 
-/* ── Not Deployed Placeholder ── */
-function NotDeployed({ toolName, toolDesc, toolUrl }: { toolName: string; toolDesc: string; toolUrl?: string }) {
-  return (
-    <div className="he-db-not-deployed">
-      <div className="he-db-not-deployed__icon">
-        <DataBase size={48} />
-      </div>
-      <h3 className="he-db-not-deployed__title">{toolName}</h3>
-      <p className="he-db-not-deployed__desc">{toolDesc}</p>
-      <p className="he-db-not-deployed__hint">
-        이 도구는 아직 배포되지 않았습니다.<br />
-        Operator에서 관리 도구(Phase 4)를 설치하면 자동으로 활성화됩니다.
-      </p>
-      {toolUrl && (
-        <Button kind="tertiary" size="sm" renderIcon={Launch} href={toolUrl} target="_blank">
-          {toolName} 프로젝트 사이트
-        </Button>
-      )}
-    </div>
-  );
-}
-
-/* ── Manager Iframe (pgweb / redis-commander / elasticvue) ── */
-export function ManagerIframe({ src, title, errorMessage, toolName, toolDesc, toolUrl, onLoad }: {
+/* ── Manager Iframe — 직접 임베드 ── */
+export function ManagerIframe({ src, title, errorMessage, onLoad }: {
   src: string;
   title: string;
   errorMessage: string;
-  toolName: string;
-  toolDesc: string;
+  toolName?: string;
+  toolDesc?: string;
   toolUrl?: string;
   onLoad?: (iframeRef: HTMLIFrameElement) => void;
 }) {
-  const [state, setState] = useState<'checking' | 'available' | 'not-deployed' | 'error'>('checking');
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
   const [key, setKey] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // 서비스 가용성 확인: fetch로 응답 체크
-  useEffect(() => {
-    let cancelled = false;
-    const check = async () => {
-      try {
-        const res = await fetch(src, { cache: 'no-cache' });
-        if (cancelled) return;
-        // 502/503/504 = 업스트림(polyon-tools) 미배포
-        if (!res.ok) {
-          setState('not-deployed');
-          return;
-        }
-        const text = await res.text();
-        if (cancelled) return;
-        // SPA fallback이면 index.html 반환 — <div id="root"> 포함
-        if (text.includes('<div id="root">') || text.includes('/assets/index-') || text.includes('ui-react')) {
-          setState('not-deployed');
-        } else {
-          setState('available');
-        }
-      } catch {
-        if (!cancelled) setState('not-deployed');
-      }
-    };
-    setState('checking');
-    check();
-    return () => { cancelled = true; };
-  }, [src, key]);
-
   const handleLoad = () => {
+    setLoaded(true);
+    setError(false);
     if (onLoad && iframeRef.current) onLoad(iframeRef.current);
   };
 
+  const handleError = () => {
+    setLoaded(true);
+    setError(true);
+  };
+
   const handleRetry = () => {
+    setLoaded(false);
+    setError(false);
     setKey(k => k + 1);
   };
 
-  if (state === 'checking') {
-    return (
-      <div className="he-db-iframe">
-        <div className="he-db-iframe__overlay">
-          <InlineLoading description="서비스 확인 중..." />
-        </div>
-      </div>
-    );
-  }
-
-  if (state === 'not-deployed') {
-    return (
-      <div className="he-db-iframe">
-        <NotDeployed toolName={toolName} toolDesc={toolDesc} toolUrl={toolUrl} />
-        <div style={{ position: 'absolute', bottom: '1.5rem', right: '1.5rem' }}>
-          <Button kind="ghost" size="sm" renderIcon={Renew} onClick={handleRetry}>재확인</Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="he-db-iframe">
+      {!loaded && (
+        <div className="he-db-iframe__overlay">
+          <InlineLoading description="로딩 중..." />
+        </div>
+      )}
+      {error && (
+        <div className="he-db-iframe__overlay he-db-iframe__overlay--error">
+          <p className="he-db-iframe__error-text">{errorMessage}</p>
+          <Button kind="tertiary" size="sm" renderIcon={Renew} onClick={handleRetry}>재시도</Button>
+        </div>
+      )}
       <iframe
         key={key}
         ref={iframeRef}
@@ -144,7 +93,7 @@ export function ManagerIframe({ src, title, errorMessage, toolName, toolDesc, to
         allow="clipboard-read; clipboard-write"
         title={title}
         onLoad={handleLoad}
-        onError={() => setState('error')}
+        onError={handleError}
       />
     </div>
   );
