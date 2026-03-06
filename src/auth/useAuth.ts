@@ -89,31 +89,37 @@ function logout(): void {
   _email = '';
   useAppStore.getState().setUsername('');
   
-  // 직접 로그아웃 URL 구성 — keycloak-js 내부 로직 우회
-  const logoutUrl = `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/logout`
-    + `?client_id=${keycloak.clientId}`
-    + `&post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
-  
-  keycloak.clearToken();
-  window.location.href = logoutUrl;
+  if (keycloak.authenticated) {
+    // Keycloak 인증된 상태 — SSO 로그아웃
+    const logoutUrl = `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/logout`
+      + `?client_id=${keycloak.clientId}`
+      + `&post_logout_redirect_uri=${encodeURIComponent(window.location.origin)}`;
+    keycloak.clearToken();
+    window.location.href = logoutUrl;
+  } else {
+    // skipAuth 모드 — Keycloak 미초기화. 세션 클리어 + 강제 Keycloak 로그인으로 이동
+    const loginUrl = `https://auth.cmars.com/realms/admin/protocol/openid-connect/auth`
+      + `?client_id=polyon-console`
+      + `&redirect_uri=${encodeURIComponent(window.location.origin)}`
+      + `&response_type=code`
+      + `&scope=openid`;
+    window.location.href = loginUrl;
+  }
 }
 
 export async function initAuth(): Promise<AuthState> {
-  // Check provisioning
+  // Check provisioning — Operator 미응답 시 provisioned 가정
   const provisioned = await checkProvisionState();
   if (!provisioned) {
+    // Setup 모드 — 인증 없이 Setup UI 표시
     _initialized = true;
     _skipAuth = true;
     return buildState();
   }
 
-  // Check if Keycloak realm exists
-  const realmOk = await checkKeycloakRealm();
-  if (!realmOk) {
-    _initialized = true;
-    _skipAuth = true;
-    return buildState();
-  }
+  // Keycloak realm 체크 건너뜀 — Keycloak 26.x는 /auth prefix 없어서
+  // Console nginx 프록시 경로(/auth/realms/admin)와 불일치. 
+  // keycloak.init()이 직접 auth.cmars.com에 접근하므로 별도 체크 불필요.
 
   // Initialize Keycloak with PKCE
   try {
