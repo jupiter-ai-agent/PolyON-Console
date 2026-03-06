@@ -571,10 +571,12 @@ export default function ConsoleLayout() {
                     <div className="he-nav__icon">
                       <Icon size={20} />
                     </div>
-                    <div className="he-nav__text">
-                      <span className="he-nav__label">{mod.title}</span>
-                      {mod.desc && <span className="he-nav__desc">{mod.desc}</span>}
-                    </div>
+                    <span className="he-nav__label">{mod.title}</span>
+                    {mod.items && (
+                      <svg className="he-nav__chevron" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                        <path d="M11 8L6 13l-.7-.7L9.6 8 5.3 3.7 6 3z" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               );

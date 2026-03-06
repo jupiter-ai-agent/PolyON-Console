@@ -76,7 +76,7 @@ body {
 }
 
 // ══════════════════════════════════════════════════════════════════
-// L1: Global Nav — Overlay (IBM Cloud 스타일)
+// L1: Global Nav — Overlay (IBM Cloud 스타일: White Panel)
 // ══════════════════════════════════════════════════════════════════
 .he-nav {
   position: fixed;
@@ -84,7 +84,7 @@ body {
   top: var(--he-header-h);
   width: var(--he-nav-w);
   height: calc(100vh - var(--he-header-h));
-  background: #262626;
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
@@ -93,11 +93,12 @@ body {
   transform: translateX(-100%);
   transition: transform 0.2s ease;
   box-shadow: none;
+  border-right: 1px solid #e0e0e0;
 }
 
 .he-nav--open {
   transform: translateX(0);
-  box-shadow: 4px 0 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
 // ── Backdrop ──
@@ -107,7 +108,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.25);
   z-index: 99;
 }
 
@@ -122,11 +123,11 @@ body {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.32px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #6f6f6f;
   padding: 16px 16px 4px;
   text-transform: uppercase;
   white-space: nowrap;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid #e0e0e0;
   margin-top: 4px;
 }
 
@@ -139,7 +140,7 @@ body {
   background: none;
   border: none;
   cursor: pointer;
-  color: rgba(255, 255, 255, 0.85);
+  color: #161616;
   font-family: inherit;
   font-size: 0.875rem;
   text-align: left;
@@ -147,14 +148,14 @@ body {
   transition: background 0.1s;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: #e8e8e8;
   }
 
   &--active {
-    background: rgba(255, 255, 255, 0.12);
+    background: #e0e0e0;
     border-left: 3px solid #0f62fe;
     padding-left: 13px;
-    color: #ffffff;
+    color: #161616;
     font-weight: 600;
   }
 }
@@ -166,6 +167,11 @@ body {
   justify-content: center;
   width: 20px;
   height: 20px;
+  color: #525252;
+
+  .he-nav__item--active & {
+    color: #0f62fe;
+  }
 }
 
 .he-nav__text {
@@ -181,9 +187,17 @@ body {
 }
 
 .he-nav__desc {
-  font-size: 0.6875rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.3;
+  display: none; // IBM Cloud 스타일: label만, 설명 텍스트 없음
+}
+
+.he-nav__chevron {
+  margin-left: auto;
+  color: #a8a8a8;
+  flex-shrink: 0;
+
+  .he-nav__item:hover & {
+    color: #525252;
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════
