@@ -85,12 +85,18 @@ function logout(): void {
   
   _token = null;
   _username = '';
+  _displayName = '';
+  _email = '';
   useAppStore.getState().setUsername('');
   
-  if (!_skipAuth) {
+  // Keycloak이 초기화된 경우 SSO 로그아웃
+  if (keycloak.authenticated) {
     keycloak.logout({
       redirectUri: window.location.origin,
     });
+  } else {
+    // Keycloak 없이 skipAuth 모드 — 단순 리로드
+    window.location.href = window.location.origin;
   }
 }
 
