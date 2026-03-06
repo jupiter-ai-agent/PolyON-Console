@@ -87,8 +87,8 @@ export function ManagerIframe({ src, title, errorMessage, toolName, toolDesc, to
         const bodyRes = await fetch(src, { cache: 'no-cache' });
         const text = await bodyRes.text();
         if (cancelled) return;
-        // SPA fallback이면 index.html이 반환되어 "PolyON" 문자열 포함
-        if (text.includes('PolyON') || text.includes('polyon-console')) {
+        // SPA fallback이면 index.html이 반환됨 — <div id="root"> 또는 vite 번들 포함
+        if (text.includes('<div id="root">') || text.includes('/assets/index-') || text.includes('ui-react')) {
           setState('not-deployed');
         } else {
           setState('available');
