@@ -138,7 +138,7 @@ export const dashboardApi = {
   listUsers: () => apiFetch<UserListResponse>('/users'),
   listGroups: () => apiFetch<GroupListResponse>('/groups'),
   listOUs: () => apiFetch<OUListResponse>('/ous'),
-  domainComputers: () => apiFetch<ComputersResponse>('/computers'),
+  domainComputers: () => apiFetch<ComputersResponse>('/domain/computers'),
   domainInfo: () => apiFetch<DomainInfoResponse>('/domain/info'),
 
   systemResources: () => apiFetch<SystemResourcesResponse>('/system/resources'),
