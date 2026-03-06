@@ -79,15 +79,16 @@ export function ManagerIframe({ src, title, errorMessage, toolName, toolDesc, to
     let cancelled = false;
     const check = async () => {
       try {
-        const res = await fetch(src, { method: 'HEAD', cache: 'no-cache' });
+        const res = await fetch(src, { cache: 'no-cache' });
         if (cancelled) return;
-        // nginx SPA fallback은 text/html을 반환. 실제 도구는 다른 content-type이거나
-        // 특정 헤더가 있음. 여기서는 응답의 X-Powered-By 또는 서버 헤더로 판단
-        // 가장 확실한 방법: body를 읽어서 "PolyON" 포함 여부 확인
-        const bodyRes = await fetch(src, { cache: 'no-cache' });
-        const text = await bodyRes.text();
+        // 502/503/504 = 업스트림(polyon-tools) 미배포
+        if (!res.ok) {
+          setState('not-deployed');
+          return;
+        }
+        const text = await res.text();
         if (cancelled) return;
-        // SPA fallback이면 index.html이 반환됨 — <div id="root"> 또는 vite 번들 포함
+        // SPA fallback이면 index.html 반환 — <div id="root"> 포함
         if (text.includes('<div id="root">') || text.includes('/assets/index-') || text.includes('ui-react')) {
           setState('not-deployed');
         } else {
