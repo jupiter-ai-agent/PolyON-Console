@@ -145,9 +145,17 @@ export async function initAuth(): Promise<AuthState> {
     }
   } catch (error) {
     console.error('Keycloak initialization failed:', error);
-    _initialized = true;
-    _skipAuth = true; // fallback to skip mode
-    return buildState();
+    // 재시도: 3초 후 직접 Keycloak 로그인 페이지로 이동
+    console.log('Redirecting to Keycloak login in 3s...');
+    await new Promise(r => setTimeout(r, 3000));
+    const loginUrl = `https://auth.cmars.com/realms/admin/protocol/openid-connect/auth`
+      + `?client_id=polyon-console`
+      + `&redirect_uri=${encodeURIComponent(window.location.origin)}`
+      + `&response_type=code`
+      + `&scope=openid`;
+    window.location.href = loginUrl;
+    // 리다이렉트 대기
+    await new Promise(() => {});
   }
 
   _initialized = true;
