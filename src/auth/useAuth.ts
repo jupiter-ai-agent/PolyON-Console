@@ -10,6 +10,8 @@ export interface AuthState {
   initialized: boolean;
   authenticated: boolean;
   username: string;
+  displayName: string;
+  email: string;
   token: string | null;
   skipAuth: boolean;
   logout: () => void;
@@ -17,6 +19,8 @@ export interface AuthState {
 
 let _token: string | null = null;
 let _username = '';
+let _displayName = '';
+let _email = '';
 let _initialized = false;
 let _skipAuth = false;
 let _tokenUpdateInterval: number | null = null;
@@ -117,6 +121,8 @@ export async function initAuth(): Promise<AuthState> {
     if (authenticated) {
       _token = keycloak.token || null;
       _username = keycloak.tokenParsed?.preferred_username || 'unknown';
+      _displayName = keycloak.tokenParsed?.name || keycloak.tokenParsed?.given_name || '';
+      _email = keycloak.tokenParsed?.email || '';
       
       // Update global store
       useAppStore.getState().setUsername(_username);
@@ -142,6 +148,8 @@ function buildState(): AuthState {
     initialized: _initialized,
     authenticated: _skipAuth || _token !== null,
     username: _username,
+    displayName: _displayName,
+    email: _email,
     token: _token,
     skipAuth: _skipAuth,
     logout,

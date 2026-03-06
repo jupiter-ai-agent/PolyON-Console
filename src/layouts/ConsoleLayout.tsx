@@ -469,69 +469,45 @@ export default function ConsoleLayout() {
           <button 
             className="he-header-user-btn"
             onClick={() => setUserMenuOpen(!userMenuOpen)}
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '8px',
-              background: 'none',
-              border: 'none',
-              color: 'inherit',
-              cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '4px',
-            }}
+            aria-label="사용자 메뉴"
           >
-            <User size={16} />
-            <span>{username || 'admin'}</span>
+            <User size={20} />
           </button>
           {userMenuOpen && (
             <>
               <div 
-                style={{
-                  position: 'fixed',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  zIndex: 999
-                }}
+                style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999 }}
                 onClick={() => setUserMenuOpen(false)}
               />
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  right: 0,
-                  background: 'white',
-                  border: '1px solid #e0e0e0',
-                  borderRadius: '4px',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                  minWidth: '120px',
-                  zIndex: 1000,
-                  marginTop: '4px'
-                }}
-              >
-                <button
-                  onClick={() => {
-                    setUserMenuOpen(false);
-                    auth.logout();
-                  }}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '8px 16px',
-                    background: 'none',
-                    border: 'none',
-                    textAlign: 'left',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    color: '#333'
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#f4f4f4'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
-                >
-                  로그아웃
-                </button>
+              <div className="he-user-panel">
+                {/* 사용자 정보 영역 */}
+                <div className="he-user-panel__header">
+                  <div className="he-user-panel__info">
+                    <div className="he-user-panel__name">{auth.displayName || username || 'Admin'}</div>
+                    {auth.email && <div className="he-user-panel__email">{auth.email}</div>}
+                  </div>
+                  <div className="he-user-panel__avatar">
+                    <User size={32} />
+                  </div>
+                </div>
+                {/* 메뉴 링크 */}
+                <div className="he-user-panel__links">
+                  <button className="he-user-panel__link" onClick={() => { setUserMenuOpen(false); navigate('/settings/account'); }}>
+                    프로파일
+                  </button>
+                  <button className="he-user-panel__link" onClick={() => { setUserMenuOpen(false); navigate('/settings/credentials'); }}>
+                    자격 증명
+                  </button>
+                  <button className="he-user-panel__link" onClick={() => { setUserMenuOpen(false); navigate('/settings'); }}>
+                    설정
+                  </button>
+                </div>
+                {/* 로그아웃 */}
+                <div className="he-user-panel__footer">
+                  <button className="he-user-panel__logout" onClick={() => { setUserMenuOpen(false); auth.logout(); }}>
+                    로그아웃 →
+                  </button>
+                </div>
               </div>
             </>
           )}

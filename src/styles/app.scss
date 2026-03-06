@@ -69,10 +69,117 @@ body {
 .he-header-user {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 1rem;
+  padding: 0;
   color: rgba(255, 255, 255, 0.85);
-  font-size: 0.875rem;
+}
+
+.he-header-user-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background-color: #353535;
+  }
+}
+
+// IBM Cloud 스타일 사용자 패널
+.he-user-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  background: #262626;
+  color: #f4f4f4;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #393939;
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #f4f4f4;
+    margin-bottom: 2px;
+  }
+
+  &__email {
+    font-size: 0.75rem;
+    color: #a8a8a8;
+  }
+
+  &__avatar {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a8a8a8;
+    flex-shrink: 0;
+  }
+
+  &__links {
+    padding: 8px 0;
+  }
+
+  &__link {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    color: #78a9ff;
+    font-family: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background-color: #353535;
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid #393939;
+    padding: 8px 0;
+  }
+
+  &__logout {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: #f4f4f4;
+    font-family: inherit;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.15s;
+
+    &:hover {
+      background-color: #353535;
+    }
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════
