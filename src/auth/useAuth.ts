@@ -26,20 +26,26 @@ setTokenProvider(() => _token);
 
 async function checkProvisionState(): Promise<boolean> {
   try {
-    const res = await fetch('/api/sentinel/state');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    const res = await fetch('/api/sentinel/state', { signal: controller.signal });
+    clearTimeout(timeout);
     if (res.ok) {
       const status = (await res.json()) as Record<string, unknown>;
       return status['provisioned'] === true || status['state'] === 'running';
     }
   } catch {
-    // ignore
+    // ignore — Operator unreachable = assume provisioned
   }
-  return false;
+  return true; // Default to provisioned (skip setup mode)
 }
 
 async function checkKeycloakRealm(): Promise<boolean> {
   try {
-    const res = await fetch('/auth/realms/admin');
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch('/auth/realms/admin', { signal: controller.signal });
+    clearTimeout(timeout);
     return res.ok;
   } catch {
     return false;
