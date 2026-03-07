@@ -15,7 +15,7 @@ export function DynamicModuleRouter() {
   const moduleMatch = useMemo(() => {
     const pathname = location.pathname;
 
-    for (const module of moduleNav) {
+    for (const module of (moduleNav || [])) {
       // 각 모듈의 routes 확인
       for (const route of module.routes || []) {
         // 정확한 경로 매치

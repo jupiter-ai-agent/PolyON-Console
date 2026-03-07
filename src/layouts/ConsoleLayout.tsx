@@ -345,7 +345,7 @@ function findModuleForPath(pathname: string): string {
   }
   // Module nav 검색
   const { moduleNav } = useAppStore.getState();
-  for (const mod of moduleNav) {
+  for (const mod of (moduleNav || [])) {
     if (mod.defaultPath === pathname) return mod.id;
     for (const item of (mod.items || [])) {
       if (item.path && pathname.startsWith(item.path)) return mod.id;
@@ -365,7 +365,7 @@ export default function ConsoleLayout() {
 
   const currentModule = findModuleForPath(location.pathname);
   const foundationDef = FOUNDATION_MODULES[currentModule];
-  const moduleDef = moduleNav.find(m => m.id === currentModule);
+  const moduleDef = (moduleNav || []).find(m => m.id === currentModule);
   
   const hasSubmenu = foundationDef?.items != null || (moduleDef?.items?.length ?? 0) > 0;
   const submenuTitle = foundationDef?.title || moduleDef?.title || '';
@@ -526,7 +526,7 @@ export default function ConsoleLayout() {
             })}
 
             {/* Module 메뉴 (API에서 로드) */}
-            {moduleNav.length > 0 && (
+            {(moduleNav || []).length > 0 && (
               <>
                 {Object.entries(groupBySection(moduleNav)).map(([section, mods]) => (
                   <div key={section}>
