@@ -76,12 +76,13 @@ export default function InstallProgressModal({ open, comp, imageUrl, onClose, on
       if (result?.module?.id) modId = result.module.id;
       setModuleId(modId);
     } catch (e: any) {
-      if (e.status === 409) {
-        // 이미 등록됨 — 정상 진행
+      const msg = e?.message || '';
+      // 409 Conflict = 이미 등록됨 → 정상 진행
+      if (msg.includes('이미 등록') || msg.includes('409') || msg.includes('MODULE_EXISTS')) {
         setModuleId(modId);
       } else {
-        updateStep(0, 'error', `매니페스트 추출 실패: ${e.message || '알 수 없는 오류'}`);
-        setError(e.message || '모듈 분석 실패');
+        updateStep(0, 'error', `매니페스트 추출 실패: ${msg || '알 수 없는 오류'}`);
+        setError(msg || '모듈 분석 실패');
         return;
       }
     }

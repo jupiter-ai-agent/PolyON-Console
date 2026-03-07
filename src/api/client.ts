@@ -36,9 +36,12 @@ export async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> 
 
   if (!res.ok) {
     const err = data as Record<string, unknown>;
-    throw new Error(
+    const apiError: any = new Error(
       (err['detail'] as string) || (err['error'] as string) || `API ${res.status}`
     );
+    apiError.status = res.status;
+    apiError.code = err['code'] as string;
+    throw apiError;
   }
 
   return data;
