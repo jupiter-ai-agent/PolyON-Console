@@ -6,7 +6,7 @@
 import type { ReactNode, ComponentType } from 'react';
 
 interface PageHeaderProps {
-  title: string;
+  title: ReactNode;
   description?: string;
   actions?: ReactNode;
   /** 선택적 아이콘 (Carbon icon component) */

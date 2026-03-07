@@ -226,8 +226,8 @@ export default function ChatPage() {
   return (
     <>
       <PageHeader
-        title="Chat (Mattermost)"
-        description={`팀 커뮤니케이션 플랫폼${version !== '—' ? ` — v${version}` : ''}`}
+        title={<>Chat (Mattermost){version !== '—' && <Tag type="cool-gray" size="sm" style={{ marginLeft: '8px', verticalAlign: 'middle' }}>v{version}</Tag>}</>}
+        description="팀 커뮤니케이션 플랫폼"
         actions={
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <StatusBadge status={status} />
