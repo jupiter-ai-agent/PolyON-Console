@@ -68,26 +68,13 @@ export default function InstallProgressModal({ open, comp, imageUrl, onClose, on
     setDone(false);
     setCurrentStep(0);
 
-    // Step 0: 모듈 분석 (register)
-    updateStep(0, 'active', '이미지 Pull 및 매니페스트 추출 중...');
-    let modId = comp.id;
-    try {
-      const result = await modulesApi.register(imageUrl);
-      if (result?.module?.id) modId = result.module.id;
-      setModuleId(modId);
-    } catch (e: any) {
-      const msg = e?.message || '';
-      // 409 Conflict = 이미 등록됨 → 정상 진행
-      if (msg.includes('이미 등록') || msg.includes('409') || msg.includes('MODULE_EXISTS')) {
-        setModuleId(modId);
-      } else {
-        updateStep(0, 'error', `매니페스트 추출 실패: ${msg || '알 수 없는 오류'}`);
-        setError(msg || '모듈 분석 실패');
-        return;
-      }
-    }
+    // Step 0: 모듈 분석 (catalog 모듈은 Core가 자동 등록하므로 register 생략)
+    updateStep(0, 'active', '모듈 구성 확인 중...');
+    const modId = comp.id;
+    setModuleId(modId);
+    await sleep(300);
     if (abortRef.current) return;
-    updateStep(0, 'complete', '모듈 매니페스트 분석 완료');
+    updateStep(0, 'complete', '모듈 구성 확인 완료');
 
     // Step 1: DB + Step 2: Deploy (install API가 한번에 처리)
     setCurrentStep(1);
