@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastProvider } from './components/ToastNotification';
 import ConsoleLayout from './layouts/ConsoleLayout';
 import SetupLayout from './layouts/SetupLayout';
+import ModuleGuard from './components/ModuleGuard';
 
 // Dynamic module router
 const DynamicModuleRouter = lazy(() => import('./components/DynamicModuleRouter').then(m => ({ default: m.DynamicModuleRouter })));
@@ -256,12 +257,12 @@ export default function App() {
             <Route path="/databases/redis" element={<DatabaseRedisPage />} />
             <Route path="/databases/elasticsearch" element={<DatabaseElasticPage />} />
 
-            {/* Chat (Mattermost) */}
-            <Route path="/chat" element={<ChatPage />} />
-            <Route path="/chat/teams" element={<ChatTeamsPage />} />
-            <Route path="/chat/channels" element={<ChatChannelsPage />} />
-            <Route path="/chat/users" element={<ChatUsersPage />} />
-            <Route path="/chat/settings" element={<ChatSettingsPage />} />
+            {/* Chat (Mattermost) — ModuleGuard로 설치 여부 확인 */}
+            <Route path="/chat" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatPage /></ModuleGuard>} />
+            <Route path="/chat/teams" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatTeamsPage /></ModuleGuard>} />
+            <Route path="/chat/channels" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatChannelsPage /></ModuleGuard>} />
+            <Route path="/chat/users" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatUsersPage /></ModuleGuard>} />
+            <Route path="/chat/settings" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatSettingsPage /></ModuleGuard>} />
 
             {/* BPMN */}
             <Route path="/bpmn" element={<BPMNPage />} />
