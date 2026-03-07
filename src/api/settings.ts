@@ -47,6 +47,7 @@ export const settingsApi = {
 
   // ── System Health / Info ─────────────────────────────────────────────────────
   getSystemHealth: () => apiFetch<{ hostname?: string }>('/system/health'),
+  getSystemVersion: () => apiFetch<{ core_version: string; console_version?: string }>('/system/version'),
   getSystemComponents: () =>
     apiFetch<{
       components: Array<{ id: string; name: string; description: string; version?: string; icon?: string; accent?: string; status?: string; category?: string }>;

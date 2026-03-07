@@ -242,19 +242,17 @@ function ComponentCard({
   );
 }
 
-function StatusSummary({ grouped, healthMap }: { 
+function StatusSummaryInline({ grouped, healthMap }: { 
   grouped: Record<string, Component[]>; 
   healthMap: Record<string, HealthStatus> 
 }) {
   const allComponents = Object.values(grouped).flat();
   const total = allComponents.length;
   
-  // 상태별 카운트 계산
   const statusCounts = allComponents.reduce((acc, comp) => {
     const effectiveStatus = healthMap[comp.id]?.status || comp.status || 'planned';
     const normalizedStatus = STATUS_STYLES[effectiveStatus] ? effectiveStatus : 'planned';
     
-    // Active 계열 상태들을 통합
     if (['active', 'up', 'running', 'healthy', 'deployed'].includes(normalizedStatus)) {
       acc.active = (acc.active || 0) + 1;
     } else if (normalizedStatus === 'planned') {
@@ -267,29 +265,27 @@ function StatusSummary({ grouped, healthMap }: {
   }, {} as Record<string, number>);
 
   return (
-    <Tile style={{ marginBottom: '1.5rem', padding: '1rem' }}>
-      <div style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <span style={{ fontWeight: 600 }}>전체 {total}개</span>
-        {statusCounts.active && (
-          <>
-            <span>|</span>
-            <Tag type="green">Active {statusCounts.active}</Tag>
-          </>
-        )}
-        {statusCounts.planned && (
-          <>
-            <span>|</span>
-            <Tag type="gray">Planned {statusCounts.planned}</Tag>
-          </>
-        )}
-        {statusCounts.others && (
-          <>
-            <span>|</span>
-            <Tag type="red">기타 {statusCounts.others}</Tag>
-          </>
-        )}
-      </div>
-    </Tile>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+      <span style={{ fontWeight: 600 }}>전체 {total}개</span>
+      {statusCounts.active && (
+        <>
+          <span>|</span>
+          <Tag type="green">Active {statusCounts.active}</Tag>
+        </>
+      )}
+      {statusCounts.planned && (
+        <>
+          <span>|</span>
+          <Tag type="gray">Planned {statusCounts.planned}</Tag>
+        </>
+      )}
+      {statusCounts.others && (
+        <>
+          <span>|</span>
+          <Tag type="red">기타 {statusCounts.others}</Tag>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -346,6 +342,7 @@ export default function SettingsSysinfoPage() {
   const [healthMap, setHealthMap] = useState<Record<string, HealthStatus>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [versionInfo, setVersionInfo] = useState<{ core_version: string; console_version?: string } | null>(null);
   
   // Modal states
   const [uninstallModal, setUninstallModal] = useState<UninstallModalState>({ open: false });
@@ -364,6 +361,14 @@ export default function SettingsSysinfoPage() {
         g[cat].push(comp);
       }
       setGrouped(g);
+
+      // Version info
+      try {
+        const ver = await settingsApi.getSystemVersion();
+        setVersionInfo(ver);
+      } catch (err) {
+        console.warn('Failed to load version info:', err);
+      }
 
       // Health - Keycloak 직접 호출 제거, settingsApi.getEnginesStatus()만 사용
       const hm: Record<string, HealthStatus> = {};
@@ -477,8 +482,22 @@ export default function SettingsSysinfoPage() {
         </Tile>
       ) : (
         <div style={{ marginTop: '1.5rem' }}>
-          {/* 상단 요약 통계 */}
-          <StatusSummary grouped={grouped} healthMap={healthMap} />
+          {/* 상단 요약 통계 + 버전 정보 */}
+          <Tile style={{ marginBottom: '1.5rem', padding: '1rem' }}>
+            <div style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+              <StatusSummaryInline grouped={grouped} healthMap={healthMap} />
+              {versionInfo && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <Tag type="blue">
+                    Core {versionInfo.core_version}
+                  </Tag>
+                  <Tag type="teal">
+                    Console {__CONSOLE_VERSION__}
+                  </Tag>
+                </div>
+              )}
+            </div>
+          </Tile>
 
           {orderedCats.map(cat => {
             const meta = CATEGORY_LABELS[cat] || { title: cat, desc: '' };

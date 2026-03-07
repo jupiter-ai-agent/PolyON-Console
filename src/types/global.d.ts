@@ -4,6 +4,8 @@
 
 import type { ComponentType } from 'react';
 
+declare const __CONSOLE_VERSION__: string;
+
 declare global {
   interface Window {
     __POLYON__: {
