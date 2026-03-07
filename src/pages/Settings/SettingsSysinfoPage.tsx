@@ -75,9 +75,12 @@ function ComponentCard({ comp, health, navigate, category, onInstall, onUninstal
   const [buttonLoading, setButtonLoading] = useState(false);
 
   // 버튼을 표시할 카테고리인지 확인
+  // Foundation 모듈은 삭제 불가 (stalwart=Mail은 engine 카테고리지만 Foundation)
+  const FOUNDATION_IDS = ['stalwart', 'postgresql', 'redis', 'opensearch', 'rustfs', 'traefik', 'polyon-dc', 'keycloak', 'polyon-core', 'polyon-console'];
+  const isFoundation = FOUNDATION_IDS.includes(comp.id);
   const isModuleCategory = ['engine', 'ai', 'process'].includes(category || '');
   const isMonitoringWithModules = category === 'monitoring' && ['prometheus', 'grafana'].includes(comp.id);
-  const showButtons = isModuleCategory || isMonitoringWithModules;
+  const showButtons = !isFoundation && (isModuleCategory || isMonitoringWithModules);
 
   // 버튼 결정: comp.status(DB 원본)을 기준으로 판단 — health는 실시간 상태 표시용
   const compStatus = comp.status || 'planned';
