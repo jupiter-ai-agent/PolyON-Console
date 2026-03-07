@@ -249,13 +249,14 @@ export default function SettingsSysinfoPage() {
     loadData();
   }, []);
 
-  // 이미지 URL 생성 (containerName에서 polyon- 제거)
-  const generateImageUrl = (comp: Component): string => {
-    const containerName = comp.id; // containerName 대신 id 사용
-    const imageName = containerName.startsWith('polyon-') 
-      ? containerName.substring(7) 
-      : containerName;
-    return `jupitertriangles/polyon-${imageName}:v1.0.0`;
+  // 이미지 URL 생성 (container_name 기반)
+  const generateImageUrl = (comp: any): string => {
+    const cname = comp.container_name || comp.id;
+    // container_name이 이미 polyon- prefix → 그대로 사용
+    if (cname.startsWith('polyon-')) {
+      return `jupitertriangles/${cname}:v1.0.0`;
+    }
+    return `jupitertriangles/polyon-${cname}:v1.0.0`;
   };
 
   // 설치 플로우
@@ -263,17 +264,20 @@ export default function SettingsSysinfoPage() {
     try {
       const imageUrl = generateImageUrl(comp);
       
-      // 1. 이미지 등록 (409 에러는 무시)
+      // 1. 이미지 등록 → 반환된 module ID 사용
+      let moduleId = comp.id;
       try {
-        await modulesApi.register(imageUrl);
+        const result = await modulesApi.register(imageUrl);
+        if (result?.module?.id) moduleId = result.module.id;
       } catch (e: any) {
         if (e.status !== 409) {
           throw e;
         }
+        // 409면 이미 등록됨 — comp.id로 시도
       }
       
       // 2. 모듈 설치
-      await modulesApi.install(comp.id);
+      await modulesApi.install(moduleId);
       
       // 3. 로컬 상태 업데이트
       setHealthMap(prev => ({
