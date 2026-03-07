@@ -20,6 +20,7 @@ import { settingsApi } from '../../api/settings';
 import { modulesApi } from '../../api/modules';
 import { useAppStore } from '../../store/useAppStore';
 import InstallProgressModal from '../../components/InstallProgressModal';
+import UninstallProgressModal from '../../components/UninstallProgressModal';
 
 interface Component {
   id: string;
@@ -276,30 +277,14 @@ export default function SettingsSysinfoPage() {
     loadData(); // 전체 새로고침
   };
 
-  // 삭제 플로우
+  // 삭제 플로우 → 프로그레스 모달 오픈
   const handleUninstall = (comp: Component) => {
     setUninstallModal({ open: true, component: comp });
   };
 
-  const confirmUninstall = async () => {
-    const comp = uninstallModal.component;
-    if (!comp) return;
-    
-    try {
-      await modulesApi.uninstall(comp.id);
-      
-      // 로컬 상태 업데이트
-      setHealthMap(prev => ({
-        ...prev,
-        [comp.id]: { status: 'planned' }
-      }));
-      
-      showToast(`${comp.name} 삭제 완료`, 'success');
-    } catch (e) {
-      showToast(`${comp.name} 삭제 실패: ${(e as Error).message}`, 'error');
-    } finally {
-      setUninstallModal({ open: false });
-    }
+  const handleUninstallComplete = () => {
+    setUninstallModal({ open: false });
+    loadData();
   };
 
   // 3rd-party 모듈 등록
@@ -392,27 +377,13 @@ export default function SettingsSysinfoPage() {
         </div>
       )}
 
-      {/* 삭제 확인 모달 */}
-      <ComposedModal
+      {/* 삭제 프로그레스 모달 */}
+      <UninstallProgressModal
         open={uninstallModal.open}
+        comp={uninstallModal.component || null}
         onClose={() => setUninstallModal({ open: false })}
-        size="sm"
-      >
-        <ModalHeader>
-          <h3>모듈 삭제 확인</h3>
-        </ModalHeader>
-        <ModalBody>
-          <p>정말 {uninstallModal.component?.name}을(를) 삭제하시겠습니까?</p>
-        </ModalBody>
-        <ModalFooter>
-          <Button kind="secondary" onClick={() => setUninstallModal({ open: false })}>
-            취소
-          </Button>
-          <Button kind="danger" onClick={confirmUninstall}>
-            삭제
-          </Button>
-        </ModalFooter>
-      </ComposedModal>
+        onComplete={handleUninstallComplete}
+      />
 
       {/* 모듈 등록 모달 */}
       <ComposedModal
