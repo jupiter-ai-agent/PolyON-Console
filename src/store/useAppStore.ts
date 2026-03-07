@@ -27,6 +27,7 @@ interface AppState {
   // Module navigation
   moduleNav: ModuleNavInfo[];
   setModuleNav: (nav: ModuleNavInfo[]) => void;
+  refreshModuleNav: () => void;
   moduleNavLoaded: boolean;
 
   // Global toast
@@ -61,6 +62,7 @@ export const useAppStore = create<AppState>((set) => ({
   moduleNav: [],
   moduleNavLoaded: false,
   setModuleNav: (nav) => set({ moduleNav: nav, moduleNavLoaded: true }),
+  refreshModuleNav: () => set({ moduleNavLoaded: false }),
 
   toast: null,
   showToast: (message, type = 'info') => set({ toast: { message, type } }),

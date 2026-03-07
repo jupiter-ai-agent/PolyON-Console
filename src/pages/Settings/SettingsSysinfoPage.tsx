@@ -337,7 +337,7 @@ function ThirdPartySection({ onRegister }: { onRegister: () => void }) {
 
 export default function SettingsSysinfoPage() {
   const navigate = useNavigate();
-  const { showToast } = useAppStore();
+  const { showToast, refreshModuleNav } = useAppStore();
   const [grouped, setGrouped] = useState<Record<string, Component[]>>({});
   const [healthMap, setHealthMap] = useState<Record<string, HealthStatus>>({});
   const [loading, setLoading] = useState(true);
@@ -415,6 +415,9 @@ export default function SettingsSysinfoPage() {
       [moduleId]: { status: 'active' }
     }));
     
+    // 메뉴 갱신
+    refreshModuleNav();
+    
     // 즉시 데이터 로드 후 1초 뒤 한번 더 (K8s 상태 반영 시간)
     loadData();
     setTimeout(() => {
@@ -429,6 +432,9 @@ export default function SettingsSysinfoPage() {
 
   const handleUninstallComplete = () => {
     setUninstallModal({ open: false });
+    
+    // 메뉴 갱신
+    refreshModuleNav();
     
     // 즉시 데이터 로드 후 1초 뒤 한번 더 (K8s 상태 반영 시간)
     loadData();
