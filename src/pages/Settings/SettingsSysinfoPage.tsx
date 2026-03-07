@@ -1,9 +1,24 @@
 // @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tile, Tag, SkeletonText, InlineNotification } from '@carbon/react';
+import { 
+  Tile, 
+  Tag, 
+  SkeletonText, 
+  InlineNotification,
+  Button,
+  InlineLoading,
+  ComposedModal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  TextInput
+} from '@carbon/react';
+import { Add, TrashCan, Download } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
 import { settingsApi } from '../../api/settings';
+import { modulesApi } from '../../api/modules';
+import { useAppStore } from '../../store/useAppStore';
 
 interface Component {
   id: string;
@@ -34,20 +49,58 @@ const STATUS_STYLES: Record<string, { label: string; type: 'green' | 'red' | 'ye
 
 const CATEGORY_LABELS: Record<string, { title: string; desc: string }> = {
   core:       { title: '코어',      desc: 'PolyON 플랫폼 자체 구성 요소' },
-  engine:     { title: '앱 엔진',   desc: '사원이 사용하는 업무 서비스' },
-  process:    { title: '프로세스',  desc: '비즈니스 프로세스 및 업무 자동화' },
-  ai:         { title: 'AI',        desc: 'AI 에이전트 및 지능 레이어' },
+  engine:     { title: '앱 엔진',   desc: '사원이 사용하는 업무 서비스 — 모듈 설치/삭제 가능' },
+  process:    { title: '프로세스',  desc: '비즈니스 프로세스 및 업무 자동화 — 모듈 설치/삭제 가능' },
+  ai:         { title: 'AI',        desc: 'AI 에이전트 및 지능 레이어 — 모듈 설치/삭제 가능' },
   infra:      { title: '인프라',    desc: '데이터베이스, 스토리지, 네트워크' },
   monitoring: { title: '모니터링', desc: '관측 및 대시보드' },
 };
 
-const DISPLAY_ORDER = ['engine', 'ai', 'process', 'core', 'infra', 'monitoring'];
+const DISPLAY_ORDER = ['core', 'infra', 'engine', 'ai', 'process', 'monitoring'];
 
-function ComponentCard({ comp, health, navigate, category }: { comp: Component; health?: HealthStatus; navigate?: ReturnType<typeof useNavigate>; category?: string }) {
+function ComponentCard({ comp, health, navigate, category, onInstall, onUninstall }: { 
+  comp: Component; 
+  health?: HealthStatus; 
+  navigate?: ReturnType<typeof useNavigate>; 
+  category?: string;
+  onInstall?: (comp: Component) => void;
+  onUninstall?: (comp: Component) => void;
+}) {
   const accent = comp.accent || '#393939';
   const st = health ? STATUS_STYLES[health.status] || STATUS_STYLES.planned : null;
   const isClickable = category === 'core' && !!navigate;
   const [hovered, setHovered] = useState(false);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+  // 버튼을 표시할 카테고리인지 확인
+  const isModuleCategory = ['engine', 'ai', 'process'].includes(category || '');
+  const isMonitoringWithModules = category === 'monitoring' && ['prometheus', 'grafana'].includes(comp.id);
+  const showButtons = isModuleCategory || isMonitoringWithModules;
+
+  // 상태에 따른 버튼 타입 결정
+  const showInstallButton = showButtons && st && st.label === 'Planned';
+  const showUninstallButton = showButtons && st && (st.label === 'Active' || st.label === 'Healthy');
+  const showLoading = buttonLoading || (st && (st.label === 'Installing' || st.label === 'Uninstalling'));
+
+  const handleInstall = async () => {
+    if (!onInstall || buttonLoading) return;
+    setButtonLoading(true);
+    try {
+      await onInstall(comp);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
+
+  const handleUninstall = async () => {
+    if (!onUninstall || buttonLoading) return;
+    setButtonLoading(true);
+    try {
+      await onUninstall(comp);
+    } finally {
+      setButtonLoading(false);
+    }
+  };
 
   return (
     <div
@@ -64,7 +117,15 @@ function ComponentCard({ comp, health, navigate, category }: { comp: Component; 
         cursor: isClickable ? 'pointer' : 'default',
         transition: 'box-shadow 0.15s ease',
       }}>
-      <div style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+      <div 
+        style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}
+        onClick={(e) => {
+          // 버튼 영역 클릭 시 네비게이션 방지
+          if (showButtons && e.target !== e.currentTarget) {
+            e.stopPropagation();
+          }
+        }}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <div style={{
             width: 36, height: 36,
@@ -86,11 +147,48 @@ function ComponentCard({ comp, health, navigate, category }: { comp: Component; 
         )}
       </div>
       <div style={{ borderTop: '1px solid var(--cds-border-subtle)', margin: '0 1.25rem' }} />
-      <div style={{ padding: '0.625rem 1.25rem 0.875rem', fontSize: '0.75rem' }}>
-        <span style={{ color: 'var(--cds-text-helper)', fontWeight: 500 }}>버전</span>
-        <span style={{ marginLeft: '0.75rem', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
-          {health?.version || comp.version || '—'}
-        </span>
+      <div style={{ 
+        padding: '0.625rem 1.25rem 0.875rem', 
+        fontSize: '0.75rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <div>
+          <span style={{ color: 'var(--cds-text-helper)', fontWeight: 500 }}>버전</span>
+          <span style={{ marginLeft: '0.75rem', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
+            {health?.version || comp.version || '—'}
+          </span>
+        </div>
+        {showLoading && (
+          <InlineLoading style={{ marginLeft: '0.5rem' }} />
+        )}
+        {showInstallButton && (
+          <Button
+            kind="primary"
+            size="sm"
+            renderIcon={Download}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleInstall();
+            }}
+          >
+            설치
+          </Button>
+        )}
+        {showUninstallButton && (
+          <Button
+            kind="danger--ghost"
+            size="sm"
+            renderIcon={TrashCan}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleUninstall();
+            }}
+          >
+            삭제
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -98,43 +196,137 @@ function ComponentCard({ comp, health, navigate, category }: { comp: Component; 
 
 export default function SettingsSysinfoPage() {
   const navigate = useNavigate();
+  const { showToast } = useAppStore();
   const [grouped, setGrouped] = useState<Record<string, Component[]>>({});
   const [healthMap, setHealthMap] = useState<Record<string, HealthStatus>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  // Modal states
+  const [uninstallModal, setUninstallModal] = useState<{ open: boolean; component?: Component }>({ open: false });
+  const [registerModal, setRegisterModal] = useState(false);
+  const [registerImageUrl, setRegisterImageUrl] = useState('');
+  const [registerError, setRegisterError] = useState('');
+
+  const loadData = async () => {
+    try {
+      const data = await settingsApi.getSystemComponents();
+      const g: Record<string, Component[]> = {};
+      for (const comp of data.components) {
+        const cat = comp.category || 'core';
+        if (!g[cat]) g[cat] = [];
+        g[cat].push(comp);
+      }
+      setGrouped(g);
+
+      // Health
+      const hm: Record<string, HealthStatus> = {};
+      try {
+        const keycloakRes = await fetch('/auth/realms/master');
+        hm['keycloak'] = { status: keycloakRes.ok ? 'healthy' : 'down' };
+      } catch { hm['keycloak'] = { status: 'down' }; }
+      try {
+        const eng = await settingsApi.getEnginesStatus();
+        for (const [k, v] of Object.entries(eng.engines || {})) {
+          hm[k] = v;
+        }
+      } catch { /**/ }
+      setHealthMap(hm);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const data = await settingsApi.getSystemComponents();
-        const g: Record<string, Component[]> = {};
-        for (const comp of data.components) {
-          const cat = comp.category || 'core';
-          if (!g[cat]) g[cat] = [];
-          g[cat].push(comp);
-        }
-        setGrouped(g);
-
-        // Health
-        const hm: Record<string, HealthStatus> = {};
-        try {
-          const keycloakRes = await fetch('/auth/realms/master');
-          hm['keycloak'] = { status: keycloakRes.ok ? 'healthy' : 'down' };
-        } catch { hm['keycloak'] = { status: 'down' }; }
-        try {
-          const eng = await settingsApi.getEnginesStatus();
-          for (const [k, v] of Object.entries(eng.engines || {})) {
-            hm[k] = v;
-          }
-        } catch { /**/ }
-        setHealthMap(hm);
-      } catch (e) {
-        setError((e as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    })();
+    loadData();
   }, []);
+
+  // 이미지 URL 생성 (containerName에서 polyon- 제거)
+  const generateImageUrl = (comp: Component): string => {
+    const containerName = comp.id; // containerName 대신 id 사용
+    const imageName = containerName.startsWith('polyon-') 
+      ? containerName.substring(7) 
+      : containerName;
+    return `jupitertriangles/polyon-${imageName}:v1.0.0`;
+  };
+
+  // 설치 플로우
+  const handleInstall = async (comp: Component) => {
+    try {
+      const imageUrl = generateImageUrl(comp);
+      
+      // 1. 이미지 등록 (409 에러는 무시)
+      try {
+        await modulesApi.register(imageUrl);
+      } catch (e: any) {
+        if (e.status !== 409) {
+          throw e;
+        }
+      }
+      
+      // 2. 모듈 설치
+      await modulesApi.install(comp.id);
+      
+      // 3. 로컬 상태 업데이트
+      setHealthMap(prev => ({
+        ...prev,
+        [comp.id]: { status: 'active' }
+      }));
+      
+      showToast(`${comp.name} 설치 완료`, 'success');
+    } catch (e) {
+      showToast(`${comp.name} 설치 실패: ${(e as Error).message}`, 'error');
+    }
+  };
+
+  // 삭제 플로우
+  const handleUninstall = (comp: Component) => {
+    setUninstallModal({ open: true, component: comp });
+  };
+
+  const confirmUninstall = async () => {
+    const comp = uninstallModal.component;
+    if (!comp) return;
+    
+    try {
+      await modulesApi.uninstall(comp.id);
+      
+      // 로컬 상태 업데이트
+      setHealthMap(prev => ({
+        ...prev,
+        [comp.id]: { status: 'planned' }
+      }));
+      
+      showToast(`${comp.name} 삭제 완료`, 'success');
+    } catch (e) {
+      showToast(`${comp.name} 삭제 실패: ${(e as Error).message}`, 'error');
+    } finally {
+      setUninstallModal({ open: false });
+    }
+  };
+
+  // 3rd-party 모듈 등록
+  const handleRegisterModule = async () => {
+    if (!registerImageUrl.trim()) {
+      setRegisterError('이미지 URL을 입력해주세요.');
+      return;
+    }
+    
+    try {
+      await modulesApi.register(registerImageUrl);
+      setRegisterModal(false);
+      setRegisterImageUrl('');
+      setRegisterError('');
+      showToast('모듈 등록 완료', 'success');
+      
+      // 페이지 리프레시
+      await loadData();
+    } catch (e) {
+      setRegisterError((e as Error).message);
+    }
+  };
 
   const orderedCats = [
     ...DISPLAY_ORDER.filter(c => grouped[c]),
@@ -169,14 +361,117 @@ export default function SettingsSysinfoPage() {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
                   {items.map(comp => (
-                    <ComponentCard key={comp.id} comp={comp} health={healthMap[comp.id]} navigate={navigate} category={cat} />
+                    <ComponentCard 
+                      key={comp.id} 
+                      comp={comp} 
+                      health={healthMap[comp.id]} 
+                      navigate={navigate} 
+                      category={cat}
+                      onInstall={handleInstall}
+                      onUninstall={handleUninstall}
+                    />
                   ))}
                 </div>
               </div>
             );
           })}
+          
+          {/* 서드파티 모듈 섹션 */}
+          <div style={{ marginBottom: '2rem' }}>
+            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>서드파티 모듈</h4>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.6875rem', color: 'var(--cds-text-helper)' }}>
+                  PP 규격을 준수하는 Docker 이미지로 모듈을 추가합니다
+                </p>
+              </div>
+              <Button
+                kind="tertiary"
+                renderIcon={Add}
+                onClick={() => setRegisterModal(true)}
+              >
+                모듈 등록
+              </Button>
+            </div>
+          </div>
         </div>
       )}
+
+      {/* 삭제 확인 모달 */}
+      <ComposedModal
+        open={uninstallModal.open}
+        onClose={() => setUninstallModal({ open: false })}
+        size="sm"
+      >
+        <ModalHeader>
+          <h3>모듈 삭제 확인</h3>
+        </ModalHeader>
+        <ModalBody>
+          <p>정말 {uninstallModal.component?.name}을(를) 삭제하시겠습니까?</p>
+        </ModalBody>
+        <ModalFooter>
+          <Button kind="secondary" onClick={() => setUninstallModal({ open: false })}>
+            취소
+          </Button>
+          <Button kind="danger" onClick={confirmUninstall}>
+            삭제
+          </Button>
+        </ModalFooter>
+      </ComposedModal>
+
+      {/* 모듈 등록 모달 */}
+      <ComposedModal
+        open={registerModal}
+        onClose={() => {
+          setRegisterModal(false);
+          setRegisterImageUrl('');
+          setRegisterError('');
+        }}
+        size="sm"
+      >
+        <ModalHeader>
+          <h3>서드파티 모듈 등록</h3>
+        </ModalHeader>
+        <ModalBody>
+          <TextInput
+            id="image-url"
+            labelText="이미지 URL"
+            placeholder="jupitertriangles/polyon-chat:v1.0.0"
+            value={registerImageUrl}
+            onChange={(e) => {
+              setRegisterImageUrl(e.target.value);
+              setRegisterError('');
+            }}
+            invalid={!!registerError}
+            invalidText={registerError}
+            style={{ marginBottom: '1rem' }}
+          />
+          {registerError && (
+            <InlineNotification
+              kind="error"
+              title="등록 실패"
+              subtitle={registerError}
+              hideCloseButton
+              style={{ marginTop: '1rem' }}
+            />
+          )}
+        </ModalBody>
+        <ModalFooter>
+          <Button 
+            kind="secondary" 
+            onClick={() => {
+              setRegisterModal(false);
+              setRegisterImageUrl('');
+              setRegisterError('');
+            }}
+          >
+            취소
+          </Button>
+          <Button kind="primary" onClick={handleRegisterModule}>
+            등록
+          </Button>
+        </ModalFooter>
+      </ComposedModal>
     </>
   );
 }
