@@ -67,7 +67,9 @@ function ComponentCard({ comp, health, navigate, category, onInstall, onUninstal
   onUninstall?: (comp: Component) => void;
 }) {
   const accent = comp.accent || '#393939';
-  const st = health ? STATUS_STYLES[health.status] || STATUS_STYLES.planned : null;
+  // 상태 결정: health API 결과 우선, 없으면 comp.status(DB 원본) 사용
+  const effectiveStatus = health?.status || comp.status || 'planned';
+  const st = STATUS_STYLES[effectiveStatus] || STATUS_STYLES.planned;
   const isClickable = category === 'core' && !!navigate;
   const [hovered, setHovered] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
@@ -77,10 +79,11 @@ function ComponentCard({ comp, health, navigate, category, onInstall, onUninstal
   const isMonitoringWithModules = category === 'monitoring' && ['prometheus', 'grafana'].includes(comp.id);
   const showButtons = isModuleCategory || isMonitoringWithModules;
 
-  // 상태에 따른 버튼 타입 결정
-  const showInstallButton = showButtons && st && st.label === 'Planned';
-  const showUninstallButton = showButtons && st && (st.label === 'Active' || st.label === 'Healthy');
-  const showLoading = buttonLoading || (st && (st.label === 'Installing' || st.label === 'Uninstalling'));
+  // 버튼 결정: comp.status(DB 원본)을 기준으로 판단 — health는 실시간 상태 표시용
+  const compStatus = comp.status || 'planned';
+  const showInstallButton = showButtons && compStatus === 'planned';
+  const showUninstallButton = showButtons && compStatus === 'active';
+  const showLoading = buttonLoading || compStatus === 'installing' || compStatus === 'uninstalling';
 
   const handleInstall = async () => {
     if (!onInstall || buttonLoading) return;
