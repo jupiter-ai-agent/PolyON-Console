@@ -32,28 +32,15 @@ async function checkProvisionState(): Promise<boolean> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
-    const res = await fetch('/api/sentinel/state', { signal: controller.signal });
+    const res = await fetch('/api/v1/system/health', { signal: controller.signal });
     clearTimeout(timeout);
     if (res.ok) {
-      const status = (await res.json()) as Record<string, unknown>;
-      return status['provisioned'] === true || status['state'] === 'running';
+      return true; // Core가 응답하면 프로비저닝 완료
     }
   } catch {
     // ignore — Operator unreachable = assume provisioned
   }
   return true; // Default to provisioned (skip setup mode)
-}
-
-async function checkKeycloakRealm(): Promise<boolean> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-    const res = await fetch('/auth/realms/admin', { signal: controller.signal });
-    clearTimeout(timeout);
-    return res.ok;
-  } catch {
-    return false;
-  }
 }
 
 function setupTokenRefresh(): void {
