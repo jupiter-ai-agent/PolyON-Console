@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -31,6 +30,8 @@ interface Component {
   accent?: string;
   status?: string;
   category?: string;
+  container_name?: string;
+  engine?: string;
 }
 
 interface HealthStatus {
@@ -38,45 +39,74 @@ interface HealthStatus {
   version?: string;
 }
 
-const STATUS_STYLES: Record<string, { label: string; type: 'green' | 'red' | 'yellow' | 'gray' }> = {
-  healthy:  { label: 'Healthy',  type: 'green' },
-  active:   { label: 'Active',   type: 'green' },
-  degraded: { label: 'Degraded', type: 'yellow' },
-  down:     { label: 'Down',     type: 'red' },
-  stopped:  { label: 'Stopped',  type: 'red' },
-  planned:  { label: 'Planned',  type: 'gray' },
+interface StatusStyle {
+  label: string;
+  type: 'green' | 'red' | 'warm-gray' | 'gray' | 'blue';
+}
+
+interface InstallModalState {
+  open: boolean;
+  comp: Component | null;
+  imageUrl: string;
+}
+
+interface UninstallModalState {
+  open: boolean;
+  component?: Component;
+}
+
+const STATUS_STYLES: Record<string, StatusStyle> = {
+  healthy: { label: 'Healthy', type: 'green' },
+  active: { label: 'Active', type: 'green' },
+  up: { label: 'Active', type: 'green' }, // K8s에서 올라오는 값
+  running: { label: 'Active', type: 'green' }, // K8s에서 올라오는 값
+  degraded: { label: 'Degraded', type: 'warm-gray' },
+  down: { label: 'Down', type: 'red' },
+  stopped: { label: 'Stopped', type: 'red' },
+  planned: { label: 'Planned', type: 'gray' },
   disabled: { label: 'Disabled', type: 'red' },
   deployed: { label: 'Deployed', type: 'green' },
+  installing: { label: 'Installing', type: 'blue' },
+  uninstalling: { label: 'Uninstalling', type: 'blue' },
 };
 
 const CATEGORY_LABELS: Record<string, { title: string; desc: string }> = {
-  core:       { title: '코어',      desc: 'PolyON 플랫폼 자체 구성 요소' },
-  engine:     { title: '앱 엔진',   desc: '사원이 사용하는 업무 서비스 — 모듈 설치/삭제 가능' },
-  process:    { title: '프로세스',  desc: '비즈니스 프로세스 및 업무 자동화 — 모듈 설치/삭제 가능' },
-  ai:         { title: 'AI',        desc: 'AI 에이전트 및 지능 레이어 — 모듈 설치/삭제 가능' },
-  infra:      { title: '인프라',    desc: '데이터베이스, 스토리지, 네트워크' },
+  core: { title: '코어', desc: 'PolyON 플랫폼 자체 구성 요소' },
+  engine: { title: '앱 엔진', desc: '사원이 사용하는 업무 서비스 — 모듈 설치/삭제 가능' },
+  process: { title: '프로세스', desc: '비즈니스 프로세스 및 업무 자동화 — 모듈 설치/삭제 가능' },
+  ai: { title: 'AI', desc: 'AI 에이전트 및 지능 레이어 — 모듈 설치/삭제 가능' },
+  infra: { title: '인프라', desc: '데이터베이스, 스토리지, 네트워크' },
   monitoring: { title: '모니터링', desc: '관측 및 대시보드' },
 };
 
 const DISPLAY_ORDER = ['core', 'infra', 'engine', 'ai', 'process', 'monitoring'];
 
-function ComponentCard({ comp, health, navigate, category, onInstall, onUninstall }: { 
-  comp: Component; 
-  health?: HealthStatus; 
-  navigate?: ReturnType<typeof useNavigate>; 
+interface ComponentCardProps {
+  comp: Component;
+  health?: HealthStatus;
+  navigate?: ReturnType<typeof useNavigate>;
   category?: string;
   onInstall?: (comp: Component) => void;
   onUninstall?: (comp: Component) => void;
-}) {
+  isUninstalling?: boolean;
+}
+
+function ComponentCard({ 
+  comp, 
+  health, 
+  navigate, 
+  category, 
+  onInstall, 
+  onUninstall,
+  isUninstalling = false
+}: ComponentCardProps) {
   const accent = comp.accent || '#393939';
   // 상태 결정: health API 결과 우선, 없으면 comp.status(DB 원본) 사용
   const effectiveStatus = health?.status || comp.status || 'planned';
   const st = STATUS_STYLES[effectiveStatus] || STATUS_STYLES.planned;
   const isClickable = category === 'core' && !!navigate;
   const [hovered, setHovered] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
-
-  // 버튼을 표시할 카테고리인지 확인
+  
   // Foundation 모듈은 삭제 불가 (stalwart=Mail은 engine 카테고리지만 Foundation)
   const FOUNDATION_IDS = ['stalwart', 'postgresql', 'redis', 'opensearch', 'rustfs', 'traefik', 'polyon-dc', 'keycloak', 'polyon-core', 'polyon-console'];
   const isFoundation = FOUNDATION_IDS.includes(comp.id);
@@ -86,44 +116,35 @@ function ComponentCard({ comp, health, navigate, category, onInstall, onUninstal
 
   // 버튼 결정: comp.status(DB 원본)을 기준으로 판단 — health는 실시간 상태 표시용
   const compStatus = comp.status || 'planned';
-  const showInstallButton = showButtons && compStatus === 'planned';
+  
+  // 설치 가능 조건: planned 상태 + container_name이 있어야 함
+  const canInstall = compStatus === 'planned' && !!comp.container_name;
+  const showInstallButton = showButtons && canInstall;
   const showUninstallButton = showButtons && compStatus === 'active';
-  const showLoading = buttonLoading || compStatus === 'installing' || compStatus === 'uninstalling';
+  const showPreparingMessage = showButtons && compStatus === 'planned' && !comp.container_name;
+  
+  // 삭제 중일 때 버튼 비활성화
+  const isButtonDisabled = isUninstalling || compStatus === 'installing' || compStatus === 'uninstalling';
 
-  const handleInstall = async () => {
-    if (!onInstall || buttonLoading) return;
-    setButtonLoading(true);
-    try {
-      await onInstall(comp);
-    } finally {
-      setButtonLoading(false);
-    }
-  };
-
-  const handleUninstall = async () => {
-    if (!onUninstall || buttonLoading) return;
-    setButtonLoading(true);
-    try {
-      await onUninstall(comp);
-    } finally {
-      setButtonLoading(false);
-    }
-  };
+  // Planned 상태인 경우 투명도 적용
+  const cardOpacity = compStatus === 'planned' ? 0.65 : 1;
 
   return (
     <div
-      onClick={isClickable ? () => navigate(`/settings/sysinfo/${comp.id}`) : undefined}
+      onClick={isClickable ? () => navigate?.(`/settings/sysinfo/${comp.id}`) : undefined}
       onMouseEnter={isClickable ? () => setHovered(true) : undefined}
       onMouseLeave={isClickable ? () => setHovered(false) : undefined}
       style={{
         background: '#ffffff',
         border: '1px solid var(--cds-border-subtle)',
         borderLeft: `4px solid ${accent}`,
+        borderRadius: '8px',
         display: 'flex',
         flexDirection: 'column',
         boxShadow: hovered ? '0 4px 12px rgba(0,0,0,.16)' : '0 1px 3px rgba(0,0,0,.08)',
         cursor: isClickable ? 'pointer' : 'default',
         transition: 'box-shadow 0.15s ease',
+        opacity: cardOpacity,
       }}>
       <div 
         style={{ padding: '1rem 1.25rem', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}
@@ -136,12 +157,16 @@ function ComponentCard({ comp, health, navigate, category, onInstall, onUninstal
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
           <div style={{
-            width: 36, height: 36,
+            width: 36, 
+            height: 36,
             background: accent + '20',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
             fontSize: '1.125rem',
             color: accent,
-            fontWeight: 700,
+            fontWeight: 600,
+            borderRadius: '8px',
           }}>
             {comp.name.charAt(0)}
           </div>
@@ -167,37 +192,149 @@ function ComponentCard({ comp, health, navigate, category, onInstall, onUninstal
           <span style={{ marginLeft: '0.75rem', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
             {health?.version || comp.version || '—'}
           </span>
+          {comp.engine && (
+            <>
+              <span style={{ color: 'var(--cds-text-helper)', fontWeight: 500, marginLeft: '1rem' }}>엔진</span>
+              <span style={{ marginLeft: '0.5rem', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
+                {comp.engine}
+              </span>
+            </>
+          )}
         </div>
-        {showLoading && (
-          <InlineLoading style={{ marginLeft: '0.5rem' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          {isButtonDisabled && (
+            <InlineLoading />
+          )}
+          {showPreparingMessage && (
+            <span style={{ fontSize: '0.75rem', color: 'var(--cds-text-helper)' }}>준비 중</span>
+          )}
+          {showInstallButton && (
+            <Button
+              kind="primary"
+              size="sm"
+              renderIcon={Download}
+              disabled={isButtonDisabled}
+              onClick={(e) => {
+                e.stopPropagation();
+                onInstall?.(comp);
+              }}
+            >
+              설치
+            </Button>
+          )}
+          {showUninstallButton && (
+            <Button
+              kind="danger--ghost"
+              size="sm"
+              renderIcon={TrashCan}
+              disabled={isButtonDisabled}
+              onClick={(e) => {
+                e.stopPropagation();
+                onUninstall?.(comp);
+              }}
+            >
+              삭제
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatusSummary({ grouped, healthMap }: { 
+  grouped: Record<string, Component[]>; 
+  healthMap: Record<string, HealthStatus> 
+}) {
+  const allComponents = Object.values(grouped).flat();
+  const total = allComponents.length;
+  
+  // 상태별 카운트 계산
+  const statusCounts = allComponents.reduce((acc, comp) => {
+    const effectiveStatus = healthMap[comp.id]?.status || comp.status || 'planned';
+    const normalizedStatus = STATUS_STYLES[effectiveStatus] ? effectiveStatus : 'planned';
+    
+    // Active 계열 상태들을 통합
+    if (['active', 'up', 'running', 'healthy', 'deployed'].includes(normalizedStatus)) {
+      acc.active = (acc.active || 0) + 1;
+    } else if (normalizedStatus === 'planned') {
+      acc.planned = (acc.planned || 0) + 1;
+    } else {
+      acc.others = (acc.others || 0) + 1;
+    }
+    
+    return acc;
+  }, {} as Record<string, number>);
+
+  return (
+    <Tile style={{ marginBottom: '1.5rem', padding: '1rem' }}>
+      <div style={{ fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <span style={{ fontWeight: 600 }}>전체 {total}개</span>
+        {statusCounts.active && (
+          <>
+            <span>|</span>
+            <Tag type="green">Active {statusCounts.active}</Tag>
+          </>
         )}
-        {showInstallButton && (
-          <Button
-            kind="primary"
-            size="sm"
-            renderIcon={Download}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleInstall();
-            }}
-          >
-            설치
-          </Button>
+        {statusCounts.planned && (
+          <>
+            <span>|</span>
+            <Tag type="gray">Planned {statusCounts.planned}</Tag>
+          </>
         )}
-        {showUninstallButton && (
-          <Button
-            kind="danger--ghost"
-            size="sm"
-            renderIcon={TrashCan}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleUninstall();
-            }}
-          >
-            삭제
-          </Button>
+        {statusCounts.others && (
+          <>
+            <span>|</span>
+            <Tag type="red">기타 {statusCounts.others}</Tag>
+          </>
         )}
       </div>
+    </Tile>
+  );
+}
+
+function ThirdPartySection({ onRegister }: { onRegister: () => void }) {
+  // TODO: 실제 서드파티 모듈 목록이 있을 때 여기에 표시
+  const thirdPartyModules: Component[] = [];
+
+  return (
+    <div style={{ marginBottom: '2rem' }}>
+      <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>서드파티 모듈</h4>
+          <p style={{ margin: '0.25rem 0 0', fontSize: '0.6875rem', color: 'var(--cds-text-helper)' }}>
+            PP 규격 Docker 이미지로 모듈을 추가합니다. 이미지에 <code>/polyon-module/module.yaml</code> 포함 필요
+          </p>
+        </div>
+        <Button
+          kind="tertiary"
+          renderIcon={Add}
+          onClick={onRegister}
+        >
+          모듈 등록
+        </Button>
+      </div>
+      
+      {thirdPartyModules.length === 0 && (
+        <Tile style={{ textAlign: 'center', padding: '2rem', color: 'var(--cds-text-helper)' }}>
+          <div style={{ fontSize: '0.875rem' }}>등록된 서드파티 모듈이 없습니다</div>
+          <div style={{ fontSize: '0.75rem', marginTop: '0.5rem' }}>
+            PP 규격을 준수하는 Docker 이미지를 등록하여 사용할 수 있습니다
+          </div>
+        </Tile>
+      )}
+      
+      {thirdPartyModules.length > 0 && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+          {thirdPartyModules.map(comp => (
+            <ComponentCard 
+              key={comp.id} 
+              comp={comp} 
+              category="third-party"
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -211,8 +348,8 @@ export default function SettingsSysinfoPage() {
   const [error, setError] = useState('');
   
   // Modal states
-  const [uninstallModal, setUninstallModal] = useState<{ open: boolean; component?: Component }>({ open: false });
-  const [installModal, setInstallModal] = useState<{ open: boolean; comp: any; imageUrl: string }>({ open: false, comp: null, imageUrl: '' });
+  const [uninstallModal, setUninstallModal] = useState<UninstallModalState>({ open: false });
+  const [installModal, setInstallModal] = useState<InstallModalState>({ open: false, comp: null, imageUrl: '' });
   const [registerModal, setRegisterModal] = useState(false);
   const [registerImageUrl, setRegisterImageUrl] = useState('');
   const [registerError, setRegisterError] = useState('');
@@ -228,18 +365,16 @@ export default function SettingsSysinfoPage() {
       }
       setGrouped(g);
 
-      // Health
+      // Health - Keycloak 직접 호출 제거, settingsApi.getEnginesStatus()만 사용
       const hm: Record<string, HealthStatus> = {};
-      try {
-        const keycloakRes = await fetch('/auth/realms/master');
-        hm['keycloak'] = { status: keycloakRes.ok ? 'healthy' : 'down' };
-      } catch { hm['keycloak'] = { status: 'down' }; }
       try {
         const eng = await settingsApi.getEnginesStatus();
         for (const [k, v] of Object.entries(eng.engines || {})) {
-          hm[k] = v;
+          hm[k] = v as HealthStatus;
         }
-      } catch { /**/ }
+      } catch (err) {
+        console.warn('Failed to load engines status:', err);
+      }
       setHealthMap(hm);
     } catch (e) {
       setError((e as Error).message);
@@ -253,7 +388,7 @@ export default function SettingsSysinfoPage() {
   }, []);
 
   // 이미지 URL 생성 (container_name 기반)
-  const generateImageUrl = (comp: any): string => {
+  const generateImageUrl = (comp: Component): string => {
     const cname = comp.container_name || comp.id;
     // container_name이 이미 polyon- prefix → 그대로 사용
     if (cname.startsWith('polyon-')) {
@@ -274,7 +409,12 @@ export default function SettingsSysinfoPage() {
       ...prev,
       [moduleId]: { status: 'active' }
     }));
-    loadData(); // 전체 새로고침
+    
+    // 즉시 데이터 로드 후 1초 뒤 한번 더 (K8s 상태 반영 시간)
+    loadData();
+    setTimeout(() => {
+      loadData();
+    }, 1000);
   };
 
   // 삭제 플로우 → 프로그레스 모달 오픈
@@ -284,7 +424,12 @@ export default function SettingsSysinfoPage() {
 
   const handleUninstallComplete = () => {
     setUninstallModal({ open: false });
+    
+    // 즉시 데이터 로드 후 1초 뒤 한번 더 (K8s 상태 반영 시간)
     loadData();
+    setTimeout(() => {
+      loadData();
+    }, 1000);
   };
 
   // 3rd-party 모듈 등록
@@ -326,10 +471,15 @@ export default function SettingsSysinfoPage() {
 
       {loading ? (
         <Tile style={{ marginTop: '1.5rem' }}>
-          <SkeletonText paragraph lines={6} />
+          <SkeletonText paragraph />
+          <SkeletonText paragraph />
+          <SkeletonText paragraph />
         </Tile>
       ) : (
         <div style={{ marginTop: '1.5rem' }}>
+          {/* 상단 요약 통계 */}
+          <StatusSummary grouped={grouped} healthMap={healthMap} />
+
           {orderedCats.map(cat => {
             const meta = CATEGORY_LABELS[cat] || { title: cat, desc: '' };
             const items = grouped[cat] || [];
@@ -349,6 +499,7 @@ export default function SettingsSysinfoPage() {
                       category={cat}
                       onInstall={handleInstall}
                       onUninstall={handleUninstall}
+                      isUninstalling={uninstallModal.open && uninstallModal.component?.id === comp.id}
                     />
                   ))}
                 </div>
@@ -357,23 +508,7 @@ export default function SettingsSysinfoPage() {
           })}
           
           {/* 서드파티 모듈 섹션 */}
-          <div style={{ marginBottom: '2rem' }}>
-            <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>서드파티 모듈</h4>
-                <p style={{ margin: '0.25rem 0 0', fontSize: '0.6875rem', color: 'var(--cds-text-helper)' }}>
-                  PP 규격을 준수하는 Docker 이미지로 모듈을 추가합니다
-                </p>
-              </div>
-              <Button
-                kind="tertiary"
-                renderIcon={Add}
-                onClick={() => setRegisterModal(true)}
-              >
-                모듈 등록
-              </Button>
-            </div>
-          </div>
+          <ThirdPartySection onRegister={() => setRegisterModal(true)} />
         </div>
       )}
 
