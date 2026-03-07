@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { ModuleNavInfo } from '../api/modules';
 
 interface DomainInfo {
   realm: string;
@@ -23,9 +24,10 @@ interface AppState {
   navExpanded: boolean;
   toggleNav: () => void;
 
-  // 설치된 서비스 목록 - K8s Pod 기반 동적 메뉴를 위해
-  installedServices: string[];
-  setInstalledServices: (services: string[]) => void;
+  // Module navigation
+  moduleNav: ModuleNavInfo[];
+  setModuleNav: (nav: ModuleNavInfo[]) => void;
+  moduleNavLoaded: boolean;
 
   // Global toast
   toast: { message: string; type: 'info' | 'success' | 'error' | 'warning' } | null;
@@ -56,20 +58,9 @@ export const useAppStore = create<AppState>((set) => ({
       return { navExpanded: next };
     }),
 
-  // 현재 K8s에 설치된 base 서비스 목록 (향후 /api/v1/platform/services API 연동)
-  installedServices: [
-    'home',
-    'apps', 
-    'directory',
-    'tree-view',
-    'mail',
-    'networking',
-    'database',
-    'monitoring',
-    'security',
-    'settings'
-  ],
-  setInstalledServices: (services) => set({ installedServices: services }),
+  moduleNav: [],
+  moduleNavLoaded: false,
+  setModuleNav: (nav) => set({ moduleNav: nav, moduleNavLoaded: true }),
 
   toast: null,
   showToast: (message, type = 'info') => set({ toast: { message, type } }),

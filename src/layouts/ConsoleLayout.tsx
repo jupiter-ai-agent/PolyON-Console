@@ -43,6 +43,8 @@ import {
 import { useAppStore } from '../store/useAppStore';
 import { apiFetch } from '../api/client';
 import { useAuth } from '../auth/useAuth';
+import { modulesApi, ModuleNavInfo } from '../api/modules';
+import * as CarbonIcons from '@carbon/icons-react';
 
 // ── Types ──
 interface NavItem {
@@ -63,8 +65,8 @@ interface ModuleDef {
   items: NavItem[] | null;
 }
 
-// ── Module definitions ──
-const MODULES: Record<string, ModuleDef> = {
+// ── Foundation module definitions (항상 표시) ──
+const FOUNDATION_MODULES: Record<string, ModuleDef> = {
   home: {
     title: 'Dashboard',
     desc: '업무 현황 및 카드 보기',
@@ -182,76 +184,6 @@ const MODULES: Record<string, ModuleDef> = {
       },
     ],
   },
-  chat: {
-    title: 'Mattermost',
-    desc: '채팅 서버 관리',
-    section: 'SERVICES',
-    defaultPath: '/chat',
-    icon: Chat,
-    serviceId: 'chat',
-    items: [
-      { label: '개요', path: '/chat', icon: Chat },
-      { type: 'divider' },
-      { label: '팀 관리', path: '/chat/teams', icon: UserMultiple },
-      { label: '채널 관리', path: '/chat/channels', icon: Chat },
-      { label: '사용자 관리', path: '/chat/users', icon: User },
-      { type: 'divider' },
-      { label: '서버 설정', path: '/chat/settings', icon: Settings },
-    ],
-  },
-  ai: {
-    title: 'AI Platform',
-    desc: 'LLM · 에이전트 · 메모리',
-    section: 'SERVICES',
-    defaultPath: '/ai',
-    icon: Bot,
-    serviceId: 'ai',
-    items: [
-      { label: '대시보드', path: '/ai', icon: Bot },
-      { label: 'Models', path: '/ai/models', icon: Code },
-      { label: 'Agents', path: '/ai/agents', icon: Bot },
-      { label: 'Memory', path: '/ai/memory', icon: DataBase },
-      { label: 'API Keys', path: '/ai/keys', icon: Key },
-      { label: 'Usage', path: '/ai/usage', icon: ChartLine },
-      { type: 'divider' },
-      { label: 'Settings', path: '/ai/settings', icon: Settings },
-    ],
-  },
-  automation: {
-    title: 'Automation',
-    desc: 'n8n 워크플로우 자동화',
-    section: 'SERVICES',
-    defaultPath: '/automation',
-    icon: DataShare,
-    serviceId: 'automation',
-    items: [
-      { label: '개요', path: '/automation', icon: DataShare },
-      { label: '워크플로우', path: '/automation/workflows', icon: Code },
-      { label: '실행 이력', path: '/automation/executions', icon: Activity },
-      { type: 'divider' },
-      { label: '설정', path: '/automation/settings', icon: Settings },
-    ],
-  },
-  bpmn: {
-    title: 'BPMN',
-    desc: '워크플로우 엔진',
-    section: 'SERVICES',
-    defaultPath: '/bpmn',
-    icon: Code,
-    serviceId: 'bpmn',
-    items: [
-      { label: '개요', path: '/bpmn', icon: Code },
-      { type: 'divider' },
-      { label: '프로세스 정의', path: '/bpmn/processes', icon: Code },
-      { label: '실행 중 인스턴스', path: '/bpmn/instances', icon: Activity },
-      { label: '태스크', path: '/bpmn/tasks', icon: Activity },
-      { type: 'divider' },
-      { label: '히스토리', path: '/bpmn/history', icon: ChartLine },
-      { label: '인시던트', path: '/bpmn/incidents', icon: Security },
-      { label: '배포 관리', path: '/bpmn/deployments' },
-      { label: '의사결정 (DMN)', path: '/bpmn/decisions' },
-    ],
-  },
   networking: {
     title: 'Networking',
     desc: 'DNS · DC · VPN · Firewall',
@@ -354,8 +286,8 @@ const MODULES: Record<string, ModuleDef> = {
   },
 };
 
-// ── Menu order: Dashboard → Applications → sections ──
-const PRIMARY_NAV_ORDER = [
+// ── Foundation menu order (항상 표시) ──
+const FOUNDATION_NAV_ORDER = [
   'home',
   'apps',
   // DIRECTORY
@@ -363,35 +295,60 @@ const PRIMARY_NAV_ORDER = [
   'tree-view',
   // SERVICES
   'mail',
-  'chat',
-  'ai',
-  'automation',
-  'bpmn',
   // INFRASTRUCTURE
   'networking',
   'containers',
   'database',
-  'monitoring',
+  'monitoring',  // monitoring은 Foundation 유지 (시스템 모니터링은 기본)
   // GOVERNANCE
   'security',
   // SYSTEM
   'settings',
 ];
 
+// ── Icon mapping function ──
+function getIconComponent(iconName: string): ComponentType<{ size?: number }> {
+  const icon = (CarbonIcons as any)[iconName];
+  return icon || CarbonIcons.Application;  // fallback
+}
+
+// ── Group modules by section ──
+function groupBySection(modules: ModuleNavInfo[]): Record<string, ModuleNavInfo[]> {
+  const groups: Record<string, ModuleNavInfo[]> = {};
+  for (const mod of modules) {
+    const section = mod.section || 'SERVICES';
+    if (!groups[section]) groups[section] = [];
+    groups[section].push(mod);
+  }
+  // 섹션 내 sortOrder 정렬
+  for (const section of Object.keys(groups)) {
+    groups[section].sort((a, b) => a.sortOrder - b.sortOrder);
+  }
+  return groups;
+}
+
 // ── Find module for path ──
 function findModuleForPath(pathname: string): string {
-  for (const [key, mod] of Object.entries(MODULES)) {
+  // Foundation 먼저 검색
+  for (const [key, mod] of Object.entries(FOUNDATION_MODULES)) {
     if (mod.defaultPath === pathname) return key;
-  }
-  for (const [key, mod] of Object.entries(MODULES)) {
-    if (!mod.items) continue;
-    for (const item of mod.items) {
-      if (item.path && item.path !== '/' && pathname.startsWith(item.path)) return key;
-      if (item.children) {
-        for (const child of item.children) {
-          if (child.path && pathname.startsWith(child.path)) return key;
+    if (mod.items) {
+      for (const item of mod.items) {
+        if (item.path && item.path !== '/' && pathname.startsWith(item.path)) return key;
+        if (item.children) {
+          for (const child of item.children) {
+            if (child.path && pathname.startsWith(child.path)) return key;
+          }
         }
       }
+    }
+  }
+  // Module nav 검색
+  const { moduleNav } = useAppStore.getState();
+  for (const mod of moduleNav) {
+    if (mod.defaultPath === pathname) return mod.id;
+    for (const item of (mod.items || [])) {
+      if (item.path && pathname.startsWith(item.path)) return mod.id;
     }
   }
   return 'home';
@@ -401,14 +358,18 @@ function findModuleForPath(pathname: string): string {
 export default function ConsoleLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { domainInfo, setDomainInfo, username, installedServices } = useAppStore();
+  const { domainInfo, setDomainInfo, username, moduleNav, setModuleNav, moduleNavLoaded } = useAppStore();
   const [navOpen, setNavOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const auth = useAuth();
 
   const currentModule = findModuleForPath(location.pathname);
-  const moduleDef = MODULES[currentModule];
-  const hasSubmenu = moduleDef?.items !== null && moduleDef?.items !== undefined;
+  const foundationDef = FOUNDATION_MODULES[currentModule];
+  const moduleDef = moduleNav.find(m => m.id === currentModule);
+  
+  const hasSubmenu = foundationDef?.items != null || (moduleDef?.items?.length ?? 0) > 0;
+  const submenuTitle = foundationDef?.title || moduleDef?.title || '';
+  const submenuItems = foundationDef?.items || moduleDef?.items || [];
 
   useEffect(() => {
     apiFetch<{ realm?: string; base_dn?: string }>('/domain/info')
@@ -422,6 +383,15 @@ export default function ConsoleLayout() {
       })
       .catch(() => {});
   }, [setDomainInfo]);
+
+  // Module nav 로드
+  useEffect(() => {
+    if (!moduleNavLoaded) {
+      modulesApi.getNav()
+        .then(data => setModuleNav(data.modules))
+        .catch(() => setModuleNav([]));  // API 실패해도 Foundation은 표시
+    }
+  }, [moduleNavLoaded, setModuleNav]);
 
   const handleNavItemClick = useCallback((path: string) => {
     setNavOpen(false);
@@ -522,14 +492,10 @@ export default function ConsoleLayout() {
         )}
         <nav className={`he-nav ${navOpen ? 'he-nav--open' : ''}`}>
           <div className="he-nav__items">
-            {PRIMARY_NAV_ORDER.map((key) => {
-              const mod = MODULES[key];
+            {/* Foundation 메뉴 (항상 표시) */}
+            {FOUNDATION_NAV_ORDER.map((key) => {
+              const mod = FOUNDATION_MODULES[key];
               if (!mod) return null;
-              
-              // 설치되지 않은 서비스는 메뉴에서 제외
-              if (!installedServices.includes(mod.serviceId)) {
-                return null;
-              }
               
               const Icon = mod.icon;
               const isActive = currentModule === key;
@@ -558,15 +524,45 @@ export default function ConsoleLayout() {
                 </div>
               );
             })}
+
+            {/* Module 메뉴 (API에서 로드) */}
+            {moduleNav.length > 0 && (
+              <>
+                {Object.entries(groupBySection(moduleNav)).map(([section, mods]) => (
+                  <div key={section}>
+                    <div className="he-nav__section">{section}</div>
+                    {mods.map(mod => {
+                      const Icon = getIconComponent(mod.icon);
+                      const isActive = currentModule === mod.id;
+                      return (
+                        <button
+                          key={mod.id}
+                          className={`he-nav__item ${isActive ? 'he-nav__item--active' : ''}`}
+                          onClick={() => handleNavItemClick(mod.defaultPath)}
+                        >
+                          <div className="he-nav__icon"><Icon size={20} /></div>
+                          <span className="he-nav__label">{mod.title}</span>
+                          {mod.items?.length > 0 && (
+                            <svg className="he-nav__chevron" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                              <path d="M11 8L6 13l-.7-.7L9.6 8 5.3 3.7 6 3z" />
+                            </svg>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </nav>
 
         {/* L2: Page Nav — Persistent */}
         {hasSubmenu && (
           <aside className="he-submenu">
-            <div className="he-submenu__title">{moduleDef.title}</div>
+            <div className="he-submenu__title">{submenuTitle}</div>
             <div className="he-submenu__items">
-              <SubmenuItems items={moduleDef.items ?? []} pathname={location.pathname} navigate={navigate} />
+              <SubmenuItems items={submenuItems} pathname={location.pathname} navigate={navigate} />
             </div>
           </aside>
         )}

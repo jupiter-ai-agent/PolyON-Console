@@ -90,7 +90,7 @@ const processHeaders = [
 
 export default function BPMNPage() {
   const navigate = useNavigate();
-  const { installedServices } = useAppStore();
+  // BPMN 모듈이 설치되어야 이 페이지에 접근 가능 (Module API에서 관리)
   const humanTasksRef = useRef<HTMLDivElement>(null);
 
   const [status, setStatus] = useState<string>('unknown');
@@ -102,8 +102,8 @@ export default function BPMNPage() {
   const [deployments, setDeployments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 서비스 설치 여부 확인
-  const isServiceInstalled = installedServices.includes('bpmn');
+  // 서비스 설치 여부 확인 (현재는 항상 설치된 것으로 가정)
+  const isServiceInstalled = true;
 
   // 미설치 서비스인 경우 EmptyState 표시
   if (!isServiceInstalled) {

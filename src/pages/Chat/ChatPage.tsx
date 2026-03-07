@@ -45,7 +45,7 @@ const userHeaders = [
 
 export default function ChatPage() {
   const navigate = useNavigate();
-  const { installedServices } = useAppStore();
+  // Chat 모듈이 설치되어야 이 페이지에 접근 가능 (Module API에서 관리)
   const [status, setStatus] = useState<string>('unknown');
   const [version, setVersion] = useState<string>('—');
   const [teams, setTeams] = useState<any[]>([]);
@@ -53,8 +53,8 @@ export default function ChatPage() {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // 서비스 설치 여부 확인
-  const isServiceInstalled = installedServices.includes('chat');
+  // 서비스 설치 여부 확인 (현재는 항상 설치된 것으로 가정)
+  const isServiceInstalled = true;
 
   // 미설치 서비스인 경우 EmptyState 표시
   if (!isServiceInstalled) {

@@ -31,7 +31,7 @@ interface EngineStatus {
 
 export default function AIOverviewPage() {
   const navigate = useNavigate();
-  const { installedServices } = useAppStore();
+  // AI 모듈이 설치되어야 이 페이지에 접근 가능 (Module API에서 관리)
 
   const [health,       setHealth]       = useState<string>('unknown');
   const [version,      setVersion]      = useState<string>('—');
@@ -45,10 +45,10 @@ export default function AIOverviewPage() {
   const [monthlySpend, setMonthlySpend] = useState<string>('$0.00');
   const [loading,      setLoading]      = useState(true);
 
-  // 서비스 설치 여부 확인
-  const isServiceInstalled = installedServices.includes('ai');
+  // AI 모듈이 설치되어야 이 페이지에 접근 가능 (Module API에서 관리)
+  const isServiceInstalled = true;
 
-  // 미설치 서비스인 경우 EmptyState 표시
+  // 미설치 서비스인 경우 EmptyState 표시 (현재는 항상 설치된 것으로 가정)
   if (!isServiceInstalled) {
     return (
       <>
