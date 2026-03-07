@@ -19,6 +19,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { settingsApi } from '../../api/settings';
 import { modulesApi } from '../../api/modules';
 import { useAppStore } from '../../store/useAppStore';
+import InstallProgressModal from '../../components/InstallProgressModal';
 
 interface Component {
   id: string;
@@ -210,6 +211,7 @@ export default function SettingsSysinfoPage() {
   
   // Modal states
   const [uninstallModal, setUninstallModal] = useState<{ open: boolean; component?: Component }>({ open: false });
+  const [installModal, setInstallModal] = useState<{ open: boolean; comp: any; imageUrl: string }>({ open: false, comp: null, imageUrl: '' });
   const [registerModal, setRegisterModal] = useState(false);
   const [registerImageUrl, setRegisterImageUrl] = useState('');
   const [registerError, setRegisterError] = useState('');
@@ -259,36 +261,19 @@ export default function SettingsSysinfoPage() {
     return `jupitertriangles/polyon-${cname}:v1.0.0`;
   };
 
-  // 설치 플로우
-  const handleInstall = async (comp: Component) => {
-    try {
-      const imageUrl = generateImageUrl(comp);
-      
-      // 1. 이미지 등록 → 반환된 module ID 사용
-      let moduleId = comp.id;
-      try {
-        const result = await modulesApi.register(imageUrl);
-        if (result?.module?.id) moduleId = result.module.id;
-      } catch (e: any) {
-        if (e.status !== 409) {
-          throw e;
-        }
-        // 409면 이미 등록됨 — comp.id로 시도
-      }
-      
-      // 2. 모듈 설치
-      await modulesApi.install(moduleId);
-      
-      // 3. 로컬 상태 업데이트
-      setHealthMap(prev => ({
-        ...prev,
-        [comp.id]: { status: 'active' }
-      }));
-      
-      showToast(`${comp.name} 설치 완료`, 'success');
-    } catch (e) {
-      showToast(`${comp.name} 설치 실패: ${(e as Error).message}`, 'error');
-    }
+  // 설치 플로우 → 프로그레스 모달 오픈
+  const handleInstall = (comp: Component) => {
+    const imageUrl = generateImageUrl(comp);
+    setInstallModal({ open: true, comp, imageUrl });
+  };
+
+  const handleInstallComplete = (moduleId: string) => {
+    setInstallModal({ open: false, comp: null, imageUrl: '' });
+    setHealthMap(prev => ({
+      ...prev,
+      [moduleId]: { status: 'active' }
+    }));
+    loadData(); // 전체 새로고침
   };
 
   // 삭제 플로우
@@ -482,6 +467,15 @@ export default function SettingsSysinfoPage() {
           </Button>
         </ModalFooter>
       </ComposedModal>
+
+      {/* 설치 프로그레스 모달 */}
+      <InstallProgressModal
+        open={installModal.open}
+        comp={installModal.comp}
+        imageUrl={installModal.imageUrl}
+        onClose={() => setInstallModal({ open: false, comp: null, imageUrl: '' })}
+        onComplete={handleInstallComplete}
+      />
     </>
   );
 }
