@@ -1,9 +1,35 @@
-import { StrictMode, useState, useEffect } from 'react';
+import React, { StrictMode, useState, useEffect } from 'react';
+import * as ReactDOM from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
+import * as ReactRouterDOM from 'react-router-dom';
+import * as CarbonReact from '@carbon/react';
+import * as CarbonIcons from '@carbon/icons-react';
 import { Loading } from '@carbon/react';
+import { apiFetch } from './api/client';
+import { useAuth } from './auth/useAuth';
+import { PageHeader } from './components/PageHeader';
 import { initAuth } from './auth/useAuth';
 import './styles/app.scss';
 import App from './App';
+
+// ── PolyON SDK 글로벌 노출 ─────────────────────────────────────────────────────
+window.__POLYON__ = {
+  React,
+  ReactDOM,
+  ReactRouterDOM,
+  CarbonReact,
+  CarbonIcons,
+  sdk: {
+    apiFetch,
+    useAuth,
+    PageHeader,
+  },
+  version: {
+    sdk: '1.0.0',
+    react: React.version,
+    carbon: '1.102.0',
+  },
+};
 
 function AppLoader() {
   const [authReady, setAuthReady] = useState(false);

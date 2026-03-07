@@ -4,6 +4,9 @@ import { ToastProvider } from './components/ToastNotification';
 import ConsoleLayout from './layouts/ConsoleLayout';
 import SetupLayout from './layouts/SetupLayout';
 
+// Dynamic module router
+const DynamicModuleRouter = lazy(() => import('./components/DynamicModuleRouter').then(m => ({ default: m.DynamicModuleRouter })));
+
 // ── Lazy imports ──────────────────────────────────────────────────────────────
 const DashboardPage = lazy(() => import('./pages/Dashboard/DashboardPage'));
 
@@ -294,8 +297,8 @@ export default function App() {
             <Route path="/settings/sysinfo/keycloak" element={<CoreAuthDetailPage />} />
             <Route path="/settings/sysinfo/opa" element={<CorePolicyDetailPage />} />
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* Fallback — Dynamic module router */}
+            <Route path="*" element={<DynamicModuleRouter />} />
           </Route>
         </Routes>
       </Suspense>
