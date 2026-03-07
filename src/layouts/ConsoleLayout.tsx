@@ -430,6 +430,7 @@ export default function ConsoleLayout() {
             style={{ objectFit: 'contain' }}
           />
           <span style={{ color: '#FF7F11', fontSize: '1rem', fontWeight: 600 }}>PolyON</span>
+          <span style={{ color: '#8d8d8d', fontSize: '0.625rem', fontWeight: 400, marginLeft: '4px', opacity: 0.7 }}>v1.9.0</span>
         </a>
         {domainInfo.realm && (
           <span className="he-header-domain">{domainInfo.realm}</span>
