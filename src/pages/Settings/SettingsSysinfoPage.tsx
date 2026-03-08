@@ -48,6 +48,13 @@ interface InstallModalState {
   open: boolean;
   comp: Component | null;
   imageUrl: string;
+  subdomain: string;
+}
+
+interface SubdomainDialogState {
+  open: boolean;
+  comp: Component | null;
+  value: string;
 }
 
 interface UninstallModalState {
@@ -346,7 +353,8 @@ export default function SettingsSysinfoPage() {
   
   // Modal states
   const [uninstallModal, setUninstallModal] = useState<UninstallModalState>({ open: false });
-  const [installModal, setInstallModal] = useState<InstallModalState>({ open: false, comp: null, imageUrl: '' });
+  const [installModal, setInstallModal] = useState<InstallModalState>({ open: false, comp: null, imageUrl: '', subdomain: '' });
+  const [subdomainDialog, setSubdomainDialog] = useState<SubdomainDialogState>({ open: false, comp: null, value: '' });
   const [registerModal, setRegisterModal] = useState(false);
   const [registerImageUrl, setRegisterImageUrl] = useState('');
   const [registerError, setRegisterError] = useState('');
@@ -402,14 +410,24 @@ export default function SettingsSysinfoPage() {
     return `jupitertriangles/polyon-${cname}:v1.0.0`;
   };
 
-  // 설치 플로우 → 프로그레스 모달 오픈
+  // 설치 플로우 → 서브도메인 입력 다이얼로그 → 프로그레스 모달
   const handleInstall = (comp: Component) => {
+    // Default subdomain from module ID
+    const defaultSub = comp.id.replace(/[^a-z0-9-]/g, '');
+    setSubdomainDialog({ open: true, comp, value: defaultSub });
+  };
+
+  const handleSubdomainConfirm = () => {
+    const comp = subdomainDialog.comp;
+    if (!comp) return;
     const imageUrl = generateImageUrl(comp);
-    setInstallModal({ open: true, comp, imageUrl });
+    const subdomain = subdomainDialog.value.trim().toLowerCase();
+    setSubdomainDialog({ open: false, comp: null, value: '' });
+    setInstallModal({ open: true, comp, imageUrl, subdomain });
   };
 
   const handleInstallComplete = (moduleId: string) => {
-    setInstallModal({ open: false, comp: null, imageUrl: '' });
+    setInstallModal({ open: false, comp: null, imageUrl: '', subdomain: '' });
     setHealthMap(prev => ({
       ...prev,
       [moduleId]: { status: 'active' }
@@ -599,12 +617,39 @@ export default function SettingsSysinfoPage() {
         </ModalFooter>
       </ComposedModal>
 
+      {/* 서브도메인 입력 다이얼로그 */}
+      <ComposedModal
+        open={subdomainDialog.open}
+        onClose={() => setSubdomainDialog({ open: false, comp: null, value: '' })}
+        size="xs"
+      >
+        <ModalHeader title={`${subdomainDialog.comp?.name || '모듈'} 서브도메인 설정`} label="Module Installation" />
+        <ModalBody>
+          <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '1rem' }}>
+            이 모듈에 접근할 서브도메인을 입력하세요.
+          </p>
+          <TextInput
+            id="subdomain-input"
+            labelText="서브도메인"
+            placeholder="chat"
+            value={subdomainDialog.value}
+            onChange={(e: any) => setSubdomainDialog(prev => ({ ...prev, value: e.target.value }))}
+            helperText={subdomainDialog.value ? `https://${subdomainDialog.value.toLowerCase()}.${window.location.hostname.split('.').slice(1).join('.') || 'cmars.com'}` : ''}
+          />
+        </ModalBody>
+        <ModalFooter>
+          <Button kind="secondary" onClick={() => setSubdomainDialog({ open: false, comp: null, value: '' })}>취소</Button>
+          <Button kind="primary" onClick={handleSubdomainConfirm} disabled={!subdomainDialog.value.trim()}>설치</Button>
+        </ModalFooter>
+      </ComposedModal>
+
       {/* 설치 프로그레스 모달 */}
       <InstallProgressModal
         open={installModal.open}
         comp={installModal.comp}
         imageUrl={installModal.imageUrl}
-        onClose={() => setInstallModal({ open: false, comp: null, imageUrl: '' })}
+        subdomain={installModal.subdomain}
+        onClose={() => setInstallModal({ open: false, comp: null, imageUrl: '', subdomain: '' })}
         onComplete={handleInstallComplete}
       />
     </>

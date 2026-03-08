@@ -35,6 +35,7 @@ interface Props {
   open: boolean;
   comp: { id: string; name: string; container_name?: string } | null;
   imageUrl: string;
+  subdomain?: string;
   onClose: () => void;
   onComplete: (moduleId: string) => void;
 }
@@ -46,7 +47,7 @@ const INITIAL_STEPS: Omit<Step, 'status'>[] = [
   { id: 'health', label: '상태 확인', detail: '서비스 기동 확인 중...' },
 ];
 
-export default function InstallProgressModal({ open, comp, imageUrl, onClose, onComplete }: Props) {
+export default function InstallProgressModal({ open, comp, imageUrl, subdomain, onClose, onComplete }: Props) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [currentStep, setCurrentStep] = useState(-1);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +90,7 @@ export default function InstallProgressModal({ open, comp, imageUrl, onClose, on
     updateStep(2, 'active');
 
     try {
-      await modulesApi.install(modId);
+      await modulesApi.install(modId, subdomain);
     } catch (e: any) {
       updateStep(2, 'error', `배포 실패: ${e.message || '알 수 없는 오류'}`);
       setError(e.message || '서비스 배포 실패');
