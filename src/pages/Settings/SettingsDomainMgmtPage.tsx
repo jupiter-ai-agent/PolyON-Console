@@ -239,7 +239,7 @@ export default function SettingsDomainMgmtPage() {
           {loadingCfg ? (
             <SkeletonText paragraph lines={3} />
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
               <TextInput
                 id="baseDomain"
                 labelText="기본 도메인"
@@ -251,6 +251,12 @@ export default function SettingsDomainMgmtPage() {
                 labelText="콘솔 도메인"
                 value={consoleDomain}
                 onChange={e => setConsoleDomain(e.target.value)}
+              />
+              <TextInput
+                id="portalDomain"
+                labelText="포털 도메인"
+                value={portalDomain}
+                onChange={e => setPortalDomain(e.target.value)}
               />
             </div>
           )}
