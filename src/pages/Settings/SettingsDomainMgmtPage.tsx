@@ -38,8 +38,8 @@ const FOUNDATION_IDS = new Set([
   'sso', 'mail', 'search', 'portal', 'notification',
 ]);
 
-// 설치된 앱만 표시하기 위한 활성 상태
-const ACTIVE_STATUSES = new Set(['active', 'requires-setup', 'installed']);
+// 표시 제외 상태 (coming-soon만 제외)
+const HIDDEN_STATUSES = new Set(['coming-soon']);
 
 export default function SettingsDomainMgmtPage() {
   const [cfg, setCfg] = useState<ServiceDomainSettings>({});
@@ -81,10 +81,10 @@ export default function SettingsDomainMgmtPage() {
     try {
       const data = await settingsApi.listApps();
       const list = Array.isArray(data) ? data : (data as { apps?: AppEntry[] }).apps || [];
-      // 설치된 앱만 필터 (Foundation active + installed modules)
+      // coming-soon 제외, backend_url 있는 앱만
       const installed = list.filter(a =>
         (a.backend_url || a.backendUrl) &&
-        ACTIVE_STATUSES.has(a.base_status || a.baseStatus || '')
+        !HIDDEN_STATUSES.has(a.base_status || a.baseStatus || '')
       );
       setApps(installed);
       const subs: Record<string, string> = {};
