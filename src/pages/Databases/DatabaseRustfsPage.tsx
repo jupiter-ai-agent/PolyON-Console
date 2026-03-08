@@ -3,7 +3,11 @@ import { useState, useEffect } from 'react';
 import {
   Tag,
   InlineLoading,
-  Button,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
   DataTable,
   Table,
   TableHead,
@@ -11,30 +15,11 @@ import {
   TableHeader,
   TableBody,
   TableCell,
-  Tile,
-  InlineNotification,
 } from '@carbon/react';
-import { Renew, ObjectStorage } from '@carbon/icons-react';
 import { StatusTag, InfoRow } from './components/DatabaseShared';
 
-interface BucketInfo {
-  name: string;
-  createdAt: string;
-  objects: number;
-  size_bytes: number;
-}
-
-interface RustFSStats {
-  status: string;
-  total_buckets: number;
-  total_objects: number;
-  total_size_bytes: number;
-  buckets: BucketInfo[];
-  error?: string;
-}
-
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 B';
+  if (!bytes || bytes === 0) return '0 B';
   const units = ['B', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(1024));
   return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
@@ -43,31 +28,22 @@ function formatBytes(bytes: number): string {
 function formatDate(iso: string): string {
   if (!iso) return '-';
   const d = new Date(iso);
+  if (d.getFullYear() <= 1970) return '-';
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
 export default function DatabaseRustfsPage() {
-  const [data, setData] = useState<RustFSStats | null>(null);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const fetchStats = async () => {
     setLoading(true);
-    setError('');
     try {
       const res = await fetch('/api/v1/databases/rustfs/stats');
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      setData(json);
-    } catch (e: any) {
-      setError(e.message || 'RustFS 연결 실패');
-    }
+      if (res.ok) setData(await res.json());
+    } catch {}
     setLoading(false);
   };
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
 
   const bucketHeaders = [
     { key: 'name', header: '버킷 이름' },
@@ -79,7 +55,7 @@ export default function DatabaseRustfsPage() {
   const bucketRows = (data?.buckets || []).map((b, i) => ({
     id: String(i),
     name: b.name,
-    objects: b.objects.toLocaleString(),
+    objects: String(b.objects ?? 0),
     size: formatBytes(b.size_bytes),
     createdAt: formatDate(b.createdAt),
   }));
@@ -91,123 +67,78 @@ export default function DatabaseRustfsPage() {
           <h2 className="he-db-page__title">RustFS</h2>
           <Tag type="purple">Object Storage</Tag>
         </div>
-        <p className="he-db-page__desc">S3-compatible 오브젝트 스토리지 — 버킷 현황 및 모니터링</p>
+        <p className="he-db-page__desc">S3-compatible 오브젝트 스토리지 모니터링</p>
       </div>
 
       <div className="he-db-page__body">
-        {/* Status Overview */}
-        <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-            <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>서비스 상태</h4>
-            <Button
-              kind="ghost"
-              size="sm"
-              renderIcon={Renew}
-              onClick={fetchStats}
-              disabled={loading}
-            >
-              새로고침
-            </Button>
-          </div>
+        <Tabs onChange={({ selectedIndex }) => { if (selectedIndex === 0) fetchStats(); if (selectedIndex === 1) fetchStats(); }}>
+          <TabList contained aria-label="RustFS 탭">
+            <Tab>Status</Tab>
+            <Tab>Buckets</Tab>
+          </TabList>
+          <TabPanels>
+            {/* Status Tab */}
+            <TabPanel>
+              <div className="he-db-status">
+                {loading ? (
+                  <InlineLoading description="로딩 중..." />
+                ) : data ? (
+                  <div className="he-db-card">
+                    <div className="he-db-card__header">
+                      <span className="he-db-card__name">RustFS</span>
+                      <StatusTag status={data.status === 'ok' ? 'up' : data.status} />
+                    </div>
+                    <InfoRow label="버전" value="1.0.0-alpha.85" />
+                    <InfoRow label="엔드포인트" value="polyon-rustfs:9000" />
+                    <InfoRow label="총 버킷" value={data.total_buckets} />
+                    <InfoRow label="총 객체 수" value={(data.total_objects ?? 0).toLocaleString()} />
+                    <InfoRow label="총 사용량" value={formatBytes(data.total_size_bytes)} />
+                  </div>
+                ) : (
+                  <p style={{ color: 'var(--cds-text-helper)' }}>Status 탭을 클릭하면 정보를 로드합니다.</p>
+                )}
+              </div>
+            </TabPanel>
 
-          {loading && <InlineLoading description="로딩 중..." />}
-
-          {error && (
-            <InlineNotification
-              kind="error"
-              title="연결 실패"
-              subtitle={error}
-              lowContrast
-              hideCloseButton
-            />
-          )}
-
-          {data && !error && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-              <Tile style={{ padding: '1.25rem' }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.32px', color: 'var(--cds-text-helper)' }}>
-                  상태
-                </div>
-                <div style={{ marginTop: '0.5rem' }}>
-                  <StatusTag status={data.status === 'ok' ? 'up' : data.status} />
-                </div>
-              </Tile>
-
-              <Tile style={{ padding: '1.25rem' }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.32px', color: 'var(--cds-text-helper)' }}>
-                  버킷
-                </div>
-                <div style={{ fontSize: '2rem', fontWeight: 300, marginTop: '0.5rem' }}>
-                  {data.total_buckets}
-                </div>
-              </Tile>
-
-              <Tile style={{ padding: '1.25rem' }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.32px', color: 'var(--cds-text-helper)' }}>
-                  총 객체 수
-                </div>
-                <div style={{ fontSize: '2rem', fontWeight: 300, marginTop: '0.5rem' }}>
-                  {data.total_objects.toLocaleString()}
-                </div>
-              </Tile>
-
-              <Tile style={{ padding: '1.25rem' }}>
-                <div style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.32px', color: 'var(--cds-text-helper)' }}>
-                  총 사용량
-                </div>
-                <div style={{ fontSize: '2rem', fontWeight: 300, marginTop: '0.5rem' }}>
-                  {formatBytes(data.total_size_bytes)}
-                </div>
-              </Tile>
-            </div>
-          )}
-        </div>
-
-        {/* Bucket Table */}
-        {data && data.buckets && data.buckets.length > 0 && (
-          <div>
-            <h4 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '1rem' }}>버킷 목록</h4>
-            <DataTable rows={bucketRows} headers={bucketHeaders} isSortable>
-              {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-                <Table {...getTableProps()} size="lg">
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader {...getHeaderProps({ header })} key={header.key}>
-                          {header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow {...getRowProps({ row })} key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
-                            {cell.info.header === 'name' ? (
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <ObjectStorage size={16} />
-                                <strong>{cell.value}</strong>
-                              </span>
-                            ) : (
-                              cell.value
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </div>
-        )}
-
-        {data && data.buckets && data.buckets.length === 0 && (
-          <Tile style={{ padding: '2rem', textAlign: 'center', color: 'var(--cds-text-helper)' }}>
-            버킷이 없습니다. 모듈 설치 시 자동으로 생성됩니다.
-          </Tile>
-        )}
+            {/* Buckets Tab */}
+            <TabPanel>
+              <div className="he-db-status">
+                {loading ? (
+                  <InlineLoading description="로딩 중..." />
+                ) : data && bucketRows.length > 0 ? (
+                  <DataTable rows={bucketRows} headers={bucketHeaders} isSortable>
+                    {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+                      <Table {...getTableProps()} size="lg">
+                        <TableHead>
+                          <TableRow>
+                            {headers.map((header) => (
+                              <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                                {header.header}
+                              </TableHeader>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {rows.map((row) => (
+                            <TableRow {...getRowProps({ row })} key={row.id}>
+                              {row.cells.map((cell) => (
+                                <TableCell key={cell.id}>{cell.value}</TableCell>
+                              ))}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    )}
+                  </DataTable>
+                ) : data ? (
+                  <p style={{ color: 'var(--cds-text-helper)', padding: '1rem 0' }}>버킷이 없습니다.</p>
+                ) : (
+                  <p style={{ color: 'var(--cds-text-helper)' }}>Buckets 탭을 클릭하면 정보를 로드합니다.</p>
+                )}
+              </div>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </div>
     </div>
   );
