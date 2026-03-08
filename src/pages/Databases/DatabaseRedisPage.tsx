@@ -1,11 +1,50 @@
 // @ts-nocheck
 import { useState } from 'react';
-import { Tag, InlineLoading, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
-import { StatusTag, InfoRow, GrafanaPanel, ManagerIframe } from './components/DatabaseShared';
+import { InlineLoading, Tabs, TabList, Tab, TabPanels, TabPanel, Tile } from '@carbon/react';
+import { GrafanaPanel, ManagerIframe } from './components/DatabaseShared';
+import {
+  DataBase,
+  Time,
+  Meter,
+  Connect,
+  Folder,
+  Activity,
+  CheckmarkFilled,
+  ErrorFilled,
+  WarningFilled,
+} from '@carbon/icons-react';
+import { PageHeader } from '../../components/PageHeader';
+
+// ── 통계 카드 ──────────────────────────────────────────────────────────────
+
+function StatCard({
+  label,
+  value,
+  icon,
+  loading,
+}: {
+  label: string;
+  value: string | number | React.ReactNode;
+  icon?: React.ReactNode;
+  loading?: boolean;
+}) {
+  return (
+    <Tile style={{ minHeight: 80, display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--cds-text-secondary)', fontWeight: 600, letterSpacing: '0.32px', textTransform: 'uppercase' }}>
+        {icon}
+        {label}
+      </div>
+      <div style={{ fontSize: 28, fontWeight: 300 }}>
+        {loading ? <InlineLoading description="" style={{ display: 'inline-flex' }} /> : value}
+      </div>
+    </Tile>
+  );
+}
 
 export default function DatabaseRedisPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const fetchStatus = async () => {
     setLoading(true);
@@ -18,18 +57,22 @@ export default function DatabaseRedisPage() {
 
   const rd = data?.redis || {};
 
-  return (
-    <div className="he-db-page">
-      <div className="he-db-page__header">
-        <div className="he-db-page__title-row">
-          <h2 className="he-db-page__title">Redis</h2>
-          <Tag type="blue">Cache</Tag>
-        </div>
-        <p className="he-db-page__desc">redis-commander 매니저 및 서비스 상태 모니터링</p>
-      </div>
+  const statusNode = (() => {
+    if (!data) return <InlineLoading description="" />;
+    const status = rd.status;
+    if (status === 'up' || status === 'online') return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><CheckmarkFilled size={16} style={{ color: 'var(--cds-support-success)' }} /> 온라인</span>;
+    if (status === 'down' || status === 'offline') return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><ErrorFilled size={16} style={{ color: 'var(--cds-support-error)' }} /> 오프라인</span>;
+    return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><WarningFilled size={16} style={{ color: 'var(--cds-support-warning)' }} /> 불명</span>;
+  })();
 
-      <div className="he-db-page__body">
-        <Tabs onChange={({ selectedIndex }) => { if (selectedIndex === 1) fetchStatus(); }}>
+  return (
+    <>
+      <PageHeader
+        title="Redis"
+        description="redis-commander 매니저 및 서비스 상태 모니터링"
+      />
+      <div style={{ padding: '0 0 24px' }}>
+        <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => { setSelectedTab(selectedIndex); if (selectedIndex === 1) fetchStatus(); }}>
           <TabList contained aria-label="Redis 탭">
             <Tab>Manager</Tab>
             <Tab>Status</Tab>
@@ -46,38 +89,48 @@ export default function DatabaseRedisPage() {
               />
             </TabPanel>
             <TabPanel>
-              <div className="he-db-status">
-                {loading ? (
-                  <InlineLoading description="로딩 중..." />
-                ) : (
-                  <>
-                    <div className="he-db-card">
-                      <div className="he-db-card__header">
-                        <span className="he-db-card__name">Redis</span>
-                        <StatusTag status={rd.status} />
-                      </div>
-                      <InfoRow label="버전" value={rd.version} />
-                      <InfoRow label="Uptime" value={rd.uptime_human} />
-                      <InfoRow label="메모리 사용" value={rd.memory_used} />
-                      <InfoRow label="메모리 최대" value={rd.memory_peak} />
-                      <InfoRow label="클라이언트" value={rd.connected_clients} />
-                      <InfoRow label="키 개수" value={rd.total_keys} />
-                    </div>
+              <div>
+                {/* 통계 카드 */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+                  <StatCard label="상태" value={statusNode} icon={<DataBase size={16} />} />
+                  <StatCard label="버전" value={rd.version ?? '—'} icon={<Activity size={16} />} loading={loading} />
+                  <StatCard label="Uptime" value={rd.uptime_human ?? '—'} icon={<Time size={16} />} loading={loading} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+                  <StatCard label="메모리 사용" value={rd.memory_used ?? '—'} icon={<Meter size={16} />} loading={loading} />
+                  <StatCard label="클라이언트" value={rd.connected_clients ?? '—'} icon={<Connect size={16} />} loading={loading} />
+                  <StatCard label="키 개수" value={rd.total_keys ?? '—'} icon={<Folder size={16} />} loading={loading} />
+                </div>
 
-                    <div className="he-db-metrics">
-                      <h4 className="he-db-metrics__title">Redis 메트릭</h4>
-                      <div className="he-db-metrics__grid">
-                        <GrafanaPanel uid="polyon-redis" slug="polyon-redis" panelId={10} title="Memory Usage" />
-                        <GrafanaPanel uid="polyon-redis" slug="polyon-redis" panelId={11} title="Commands / sec" />
-                      </div>
+                {/* 메모리 상세 정보 */}
+                {rd.memory_peak && (
+                  <Tile style={{ marginBottom: 24 }}>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 12 }}>메모리 상세</h3>
+                    <div style={{ fontSize: 12, color: 'var(--cds-text-secondary)' }}>
+                      최대 사용량: {rd.memory_peak}
                     </div>
-                  </>
+                  </Tile>
+                )}
+
+                {/* Redis 메트릭 */}
+                {data && (
+                  <div>
+                    <h3 style={{ fontSize: 14, fontWeight: 600, marginBottom: 16 }}>Redis 메트릭</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 16 }}>
+                      <GrafanaPanel uid="polyon-redis" slug="polyon-redis" panelId={10} title="Memory Usage" />
+                      <GrafanaPanel uid="polyon-redis" slug="polyon-redis" panelId={11} title="Commands / sec" />
+                    </div>
+                  </div>
+                )}
+
+                {!data && !loading && (
+                  <p style={{ color: 'var(--cds-text-helper)' }}>Status 탭을 클릭하면 정보를 로드합니다.</p>
                 )}
               </div>
             </TabPanel>
           </TabPanels>
         </Tabs>
       </div>
-    </div>
+    </>
   );
 }

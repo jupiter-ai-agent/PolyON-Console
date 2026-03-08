@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import {
-  Tag,
   InlineLoading,
   Tabs,
   TabList,
@@ -15,8 +14,21 @@ import {
   TableHeader,
   TableBody,
   TableCell,
+  Tile,
+  Tag,
 } from '@carbon/react';
-import { StatusTag, InfoRow } from './components/DatabaseShared';
+import {
+  ObjectStorage,
+  DataBase,
+  Meter,
+  Folder,
+  Document,
+  Folder as StorageIcon,
+  CheckmarkFilled,
+  ErrorFilled,
+  WarningFilled,
+} from '@carbon/icons-react';
+import { PageHeader } from '../../components/PageHeader';
 
 function formatBytes(bytes: number): string {
   if (!bytes || bytes === 0) return '0 B';
@@ -32,9 +44,36 @@ function formatDate(iso: string): string {
   return d.toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
+// ── 통계 카드 ──────────────────────────────────────────────────────────────
+
+function StatCard({
+  label,
+  value,
+  icon,
+  loading,
+}: {
+  label: string;
+  value: string | number | React.ReactNode;
+  icon?: React.ReactNode;
+  loading?: boolean;
+}) {
+  return (
+    <Tile style={{ minHeight: 80, display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--cds-text-secondary)', fontWeight: 600, letterSpacing: '0.32px', textTransform: 'uppercase' }}>
+        {icon}
+        {label}
+      </div>
+      <div style={{ fontSize: 28, fontWeight: 300 }}>
+        {loading ? <InlineLoading description="" style={{ display: 'inline-flex' }} /> : value}
+      </div>
+    </Tile>
+  );
+}
+
 export default function DatabaseRustfsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const fetchStats = async () => {
     setLoading(true);
@@ -60,18 +99,22 @@ export default function DatabaseRustfsPage() {
     createdAt: formatDate(b.createdAt),
   }));
 
-  return (
-    <div className="he-db-page">
-      <div className="he-db-page__header">
-        <div className="he-db-page__title-row">
-          <h2 className="he-db-page__title">RustFS</h2>
-          <Tag type="purple">Object Storage</Tag>
-        </div>
-        <p className="he-db-page__desc">S3-compatible 오브젝트 스토리지 모니터링</p>
-      </div>
+  const statusNode = (() => {
+    if (!data) return <InlineLoading description="" />;
+    const status = data.status;
+    if (status === 'ok') return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><CheckmarkFilled size={16} style={{ color: 'var(--cds-support-success)' }} /> 온라인</span>;
+    if (status === 'error') return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><ErrorFilled size={16} style={{ color: 'var(--cds-support-error)' }} /> 오프라인</span>;
+    return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}><WarningFilled size={16} style={{ color: 'var(--cds-support-warning)' }} /> 불명</span>;
+  })();
 
-      <div className="he-db-page__body">
-        <Tabs onChange={({ selectedIndex }) => { if (selectedIndex === 0) fetchStats(); if (selectedIndex === 1) fetchStats(); }}>
+  return (
+    <>
+      <PageHeader
+        title="RustFS"
+        description="S3-compatible 오브젝트 스토리지 모니터링"
+      />
+      <div style={{ padding: '0 0 24px' }}>
+        <Tabs selectedIndex={selectedTab} onChange={({ selectedIndex }) => { setSelectedTab(selectedIndex); if (selectedIndex === 0 || selectedIndex === 1) fetchStats(); }}>
           <TabList contained aria-label="RustFS 탭">
             <Tab>Status</Tab>
             <Tab>Buckets</Tab>
@@ -79,22 +122,20 @@ export default function DatabaseRustfsPage() {
           <TabPanels>
             {/* Status Tab */}
             <TabPanel>
-              <div className="he-db-status">
-                {loading ? (
-                  <InlineLoading description="로딩 중..." />
-                ) : data ? (
-                  <div className="he-db-card">
-                    <div className="he-db-card__header">
-                      <span className="he-db-card__name">RustFS</span>
-                      <StatusTag status={data.status === 'ok' ? 'up' : data.status} />
-                    </div>
-                    <InfoRow label="버전" value="1.0.0-alpha.85" />
-                    <InfoRow label="엔드포인트" value="polyon-rustfs:9000" />
-                    <InfoRow label="총 버킷" value={data.total_buckets} />
-                    <InfoRow label="총 객체 수" value={(data.total_objects ?? 0).toLocaleString()} />
-                    <InfoRow label="총 사용량" value={formatBytes(data.total_size_bytes)} />
-                  </div>
-                ) : (
+              <div>
+                {/* 통계 카드 */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 16 }}>
+                  <StatCard label="상태" value={statusNode} icon={<DataBase size={16} />} />
+                  <StatCard label="버전" value="1.0.0-alpha.85" icon={<ObjectStorage size={16} />} />
+                  <StatCard label="엔드포인트" value="polyon-rustfs:9000" icon={<StorageIcon size={16} />} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+                  <StatCard label="총 버킷" value={data?.total_buckets ?? '—'} icon={<Folder size={16} />} loading={loading} />
+                  <StatCard label="총 객체 수" value={data ? (data.total_objects ?? 0).toLocaleString() : '—'} icon={<Document size={16} />} loading={loading} />
+                  <StatCard label="총 사용량" value={data ? formatBytes(data.total_size_bytes) : '—'} icon={<Meter size={16} />} loading={loading} />
+                </div>
+
+                {!data && !loading && (
                   <p style={{ color: 'var(--cds-text-helper)' }}>Status 탭을 클릭하면 정보를 로드합니다.</p>
                 )}
               </div>
@@ -102,7 +143,7 @@ export default function DatabaseRustfsPage() {
 
             {/* Buckets Tab */}
             <TabPanel>
-              <div className="he-db-status">
+              <div>
                 {loading ? (
                   <InlineLoading description="로딩 중..." />
                 ) : data && bucketRows.length > 0 ? (
@@ -140,6 +181,6 @@ export default function DatabaseRustfsPage() {
           </TabPanels>
         </Tabs>
       </div>
-    </div>
+    </>
   );
 }
