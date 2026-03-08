@@ -59,6 +59,7 @@ interface AccessDialogState {
   comp: Component | null;
   mode: 'url' | 'subdomain';
   subdomain: string;
+  slug?: string;
 }
 
 interface UninstallModalState {
@@ -416,8 +417,11 @@ export default function SettingsSysinfoPage() {
 
   // 설치 플로우 → 접근 방식 선택 다이얼로그 → 프로그레스 모달
   const handleInstall = (comp: Component) => {
-    const defaultSub = comp.id.replace(/[^a-z0-9-]/g, '');
-    setAccessDialog({ open: true, comp, mode: 'url', subdomain: defaultSub });
+    // 서비스 slug: container_name에서 polyon- 제거, 없으면 name 소문자
+    const slug = comp.container_name
+      ? comp.container_name.replace(/^polyon-/, '')
+      : comp.name?.toLowerCase().replace(/[^a-z0-9-]/g, '') || comp.id;
+    setAccessDialog({ open: true, comp, mode: 'url', subdomain: slug, slug });
   };
 
   const handleAccessConfirm = () => {
@@ -427,7 +431,7 @@ export default function SettingsSysinfoPage() {
     // URL 패턴: subdomain 빈 값 → Core가 PathPrefix Ingress 생성
     // 서브도메인: subdomain 값 전달 → Core가 Host Ingress 생성
     const subdomain = accessDialog.mode === 'subdomain' ? accessDialog.subdomain.trim().toLowerCase() : '';
-    const pathPrefix = accessDialog.mode === 'url' ? `/${comp.id}` : '';
+    const pathPrefix = accessDialog.mode === 'url' ? `/${accessDialog.slug || comp.id}` : '';
     setAccessDialog({ open: false, comp: null, mode: 'url', subdomain: '' });
     setInstallModal({ open: true, comp, imageUrl, subdomain, pathPrefix });
   };
@@ -645,7 +649,7 @@ export default function SettingsSysinfoPage() {
             <RadioButton
               id="mode-url"
               value="url"
-              labelText={`URL 패턴 — portal.${window.location.hostname.split('.').slice(1).join('.') || 'cmars.com'}/${accessDialog.comp?.id || 'app'}`}
+              labelText={`URL 패턴 — portal.${window.location.hostname.split('.').slice(1).join('.') || 'cmars.com'}/${accessDialog.slug || 'app'}`}
             />
             <RadioButton
               id="mode-subdomain"
