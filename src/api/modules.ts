@@ -32,11 +32,15 @@ export const modulesApi = {
       body: JSON.stringify({ image }),
     }),
 
-  install: (id: string, subdomain?: string) =>
-    apiFetch<any>(`/modules/${id}/install`, {
+  install: (id: string, subdomain?: string, pathPrefix?: string) => {
+    const body: any = {};
+    if (subdomain) body.subdomain = subdomain;
+    if (pathPrefix) body.path_prefix = pathPrefix;
+    return apiFetch<any>(`/modules/${id}/install`, {
       method: 'POST',
-      ...(subdomain ? { body: JSON.stringify({ subdomain }) } : {}),
-    }),
+      ...(Object.keys(body).length ? { body: JSON.stringify(body) } : {}),
+    });
+  },
 
   uninstall: (id: string, dataPolicy = 'ask') =>
     apiFetch<any>(`/modules/${id}/uninstall`, {

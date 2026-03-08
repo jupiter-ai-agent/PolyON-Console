@@ -11,7 +11,9 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  TextInput
+  TextInput,
+  RadioButtonGroup,
+  RadioButton
 } from '@carbon/react';
 import { Add, TrashCan, Download } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
@@ -49,12 +51,14 @@ interface InstallModalState {
   comp: Component | null;
   imageUrl: string;
   subdomain: string;
+  pathPrefix?: string;
 }
 
-interface SubdomainDialogState {
+interface AccessDialogState {
   open: boolean;
   comp: Component | null;
-  value: string;
+  mode: 'url' | 'subdomain';
+  subdomain: string;
 }
 
 interface UninstallModalState {
@@ -354,7 +358,7 @@ export default function SettingsSysinfoPage() {
   // Modal states
   const [uninstallModal, setUninstallModal] = useState<UninstallModalState>({ open: false });
   const [installModal, setInstallModal] = useState<InstallModalState>({ open: false, comp: null, imageUrl: '', subdomain: '' });
-  const [subdomainDialog, setSubdomainDialog] = useState<SubdomainDialogState>({ open: false, comp: null, value: '' });
+  const [accessDialog, setAccessDialog] = useState<AccessDialogState>({ open: false, comp: null, mode: 'url', subdomain: '' });
   const [registerModal, setRegisterModal] = useState(false);
   const [registerImageUrl, setRegisterImageUrl] = useState('');
   const [registerError, setRegisterError] = useState('');
@@ -410,20 +414,22 @@ export default function SettingsSysinfoPage() {
     return `jupitertriangles/polyon-${cname}:v1.0.0`;
   };
 
-  // 설치 플로우 → 서브도메인 입력 다이얼로그 → 프로그레스 모달
+  // 설치 플로우 → 접근 방식 선택 다이얼로그 → 프로그레스 모달
   const handleInstall = (comp: Component) => {
-    // Default subdomain from module ID
     const defaultSub = comp.id.replace(/[^a-z0-9-]/g, '');
-    setSubdomainDialog({ open: true, comp, value: defaultSub });
+    setAccessDialog({ open: true, comp, mode: 'url', subdomain: defaultSub });
   };
 
-  const handleSubdomainConfirm = () => {
-    const comp = subdomainDialog.comp;
+  const handleAccessConfirm = () => {
+    const comp = accessDialog.comp;
     if (!comp) return;
     const imageUrl = generateImageUrl(comp);
-    const subdomain = subdomainDialog.value.trim().toLowerCase();
-    setSubdomainDialog({ open: false, comp: null, value: '' });
-    setInstallModal({ open: true, comp, imageUrl, subdomain });
+    // URL 패턴: subdomain 빈 값 → Core가 PathPrefix Ingress 생성
+    // 서브도메인: subdomain 값 전달 → Core가 Host Ingress 생성
+    const subdomain = accessDialog.mode === 'subdomain' ? accessDialog.subdomain.trim().toLowerCase() : '';
+    const pathPrefix = accessDialog.mode === 'url' ? `/${comp.id}` : '';
+    setAccessDialog({ open: false, comp: null, mode: 'url', subdomain: '' });
+    setInstallModal({ open: true, comp, imageUrl, subdomain, pathPrefix });
   };
 
   const handleInstallComplete = (moduleId: string) => {
@@ -617,29 +623,59 @@ export default function SettingsSysinfoPage() {
         </ModalFooter>
       </ComposedModal>
 
-      {/* 서브도메인 입력 다이얼로그 */}
+      {/* 접근 방식 선택 다이얼로그 */}
       <ComposedModal
-        open={subdomainDialog.open}
-        onClose={() => setSubdomainDialog({ open: false, comp: null, value: '' })}
-        size="xs"
+        open={accessDialog.open}
+        onClose={() => setAccessDialog({ open: false, comp: null, mode: 'url', subdomain: '' })}
+        size="sm"
       >
-        <ModalHeader title={`${subdomainDialog.comp?.name || '모듈'} 서브도메인 설정`} label="Module Installation" />
+        <ModalHeader title={`${accessDialog.comp?.name || '모듈'} 설치`} label="접근 방식 설정" />
         <ModalBody>
-          <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '1rem' }}>
-            이 모듈에 접근할 서브도메인을 입력하세요.
+          <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', marginBottom: '1.5rem' }}>
+            서비스에 접근할 방식을 선택하세요.
           </p>
-          <TextInput
-            id="subdomain-input"
-            labelText="서브도메인"
-            placeholder="chat"
-            value={subdomainDialog.value}
-            onChange={(e: any) => setSubdomainDialog(prev => ({ ...prev, value: e.target.value }))}
-            helperText={subdomainDialog.value ? `https://${subdomainDialog.value.toLowerCase()}.${window.location.hostname.split('.').slice(1).join('.') || 'cmars.com'}` : ''}
-          />
+
+          <RadioButtonGroup
+            legendText="접근 방식"
+            name="access-mode"
+            valueSelected={accessDialog.mode}
+            onChange={(val: string) => setAccessDialog(prev => ({ ...prev, mode: val as 'url' | 'subdomain' }))}
+            orientation="vertical"
+          >
+            <RadioButton
+              id="mode-url"
+              value="url"
+              labelText={`URL 패턴 — portal.${window.location.hostname.split('.').slice(1).join('.') || 'cmars.com'}/${accessDialog.comp?.id || 'app'}`}
+            />
+            <RadioButton
+              id="mode-subdomain"
+              value="subdomain"
+              labelText="서브도메인 — 별도 도메인으로 서비스"
+            />
+          </RadioButtonGroup>
+
+          {accessDialog.mode === 'subdomain' && (
+            <div style={{ marginTop: '1rem' }}>
+              <TextInput
+                id="subdomain-input"
+                labelText="서브도메인"
+                placeholder="chat"
+                value={accessDialog.subdomain}
+                onChange={(e: any) => setAccessDialog(prev => ({ ...prev, subdomain: e.target.value }))}
+                helperText={accessDialog.subdomain ? `https://${accessDialog.subdomain.toLowerCase()}.${window.location.hostname.split('.').slice(1).join('.') || 'cmars.com'}` : ''}
+              />
+            </div>
+          )}
         </ModalBody>
         <ModalFooter>
-          <Button kind="secondary" onClick={() => setSubdomainDialog({ open: false, comp: null, value: '' })}>취소</Button>
-          <Button kind="primary" onClick={handleSubdomainConfirm} disabled={!subdomainDialog.value.trim()}>설치</Button>
+          <Button kind="secondary" onClick={() => setAccessDialog({ open: false, comp: null, mode: 'url', subdomain: '' })}>취소</Button>
+          <Button
+            kind="primary"
+            onClick={handleAccessConfirm}
+            disabled={accessDialog.mode === 'subdomain' && !accessDialog.subdomain.trim()}
+          >
+            설치
+          </Button>
         </ModalFooter>
       </ComposedModal>
 
@@ -649,6 +685,7 @@ export default function SettingsSysinfoPage() {
         comp={installModal.comp}
         imageUrl={installModal.imageUrl}
         subdomain={installModal.subdomain}
+        pathPrefix={installModal.pathPrefix}
         onClose={() => setInstallModal({ open: false, comp: null, imageUrl: '', subdomain: '' })}
         onComplete={handleInstallComplete}
       />
