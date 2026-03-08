@@ -163,9 +163,12 @@ export default function SettingsDomainMgmtPage() {
   ];
 
   const appRows = apps.map(app => {
-    const currentDomain = app.subdomain && baseDomain
-      ? `${app.subdomain}.${baseDomain}`
-      : app.subdomain || '';
+    const portalHost = portalDomain || `portal.${baseDomain}`;
+    const currentDomain = app.accessMode === 'url' && app.pathPrefix
+      ? `${portalHost}${app.pathPrefix}`
+      : app.subdomain && baseDomain
+        ? `${app.subdomain}.${baseDomain}`
+        : app.subdomain || '';
     const st = appStatus[app.id];
     const locked = isFoundation(app.id);
 
