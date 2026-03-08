@@ -98,6 +98,7 @@ const ContainersResourcesPage = lazy(() => import('./pages/Containers/Containers
 const DatabasePostgresqlPage = lazy(() => import('./pages/Databases/DatabasePostgresqlPage'));
 const DatabaseRedisPage = lazy(() => import('./pages/Databases/DatabaseRedisPage'));
 const DatabaseElasticPage = lazy(() => import('./pages/Databases/DatabaseElasticPage'));
+const DatabaseRustfsPage = lazy(() => import('./pages/Databases/DatabaseRustfsPage'));
 
 // Chat
 const ChatPage = lazy(() => import('./pages/Chat/ChatPage'));
@@ -268,6 +269,7 @@ export default function App() {
             <Route path="/databases/postgresql" element={<DatabasePostgresqlPage />} />
             <Route path="/databases/redis" element={<DatabaseRedisPage />} />
             <Route path="/databases/elasticsearch" element={<DatabaseElasticPage />} />
+            <Route path="/databases/rustfs" element={<DatabaseRustfsPage />} />
 
             {/* Chat (Mattermost) — ModuleGuard로 설치 여부 확인 */}
             <Route path="/chat" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatPage /></ModuleGuard>} />

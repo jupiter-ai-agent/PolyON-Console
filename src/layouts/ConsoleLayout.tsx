@@ -223,6 +223,7 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
       { label: 'PostgreSQL', path: '/databases/postgresql', icon: DataBase },
       { label: 'Redis', path: '/databases/redis', icon: DataBase },
       { label: 'Elasticsearch', path: '/databases/elasticsearch', icon: DataBase },
+      { label: 'RustFS', path: '/databases/rustfs', icon: DataBase },
     ],
   },
   monitoring: {
