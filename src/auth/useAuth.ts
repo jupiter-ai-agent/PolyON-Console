@@ -1,10 +1,10 @@
 /**
- * PolyON Auth — Keycloak OIDC 통합
+ * PolyON Auth — Keycloak OIDC 통합 (런타임 설정, 인증 실패 시 차단)
  */
 import { useState, useEffect } from 'react';
 import { setTokenProvider } from '../api/client';
 import { useAppStore } from '../store/useAppStore';
-import keycloak from './keycloak';
+import { initKeycloak, getKeycloak } from './keycloak';
 
 export interface AuthState {
   initialized: boolean;
@@ -14,6 +14,7 @@ export interface AuthState {
   email: string;
   token: string | null;
   skipAuth: boolean;
+  error: string | null;
   logout: () => void;
 }
 
@@ -22,46 +23,32 @@ let _username = '';
 let _displayName = '';
 let _email = '';
 let _initialized = false;
-let _skipAuth = false;
+let _error: string | null = null;
 let _tokenUpdateInterval: number | null = null;
 
 // Token provider registration (for API client)
 setTokenProvider(() => _token);
 
-async function checkProvisionState(): Promise<boolean> {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000); // 5s timeout
-    const res = await fetch('/api/v1/system/health', { signal: controller.signal });
-    clearTimeout(timeout);
-    if (res.ok) {
-      return true; // Core가 응답하면 프로비저닝 완료
-    }
-  } catch {
-    // ignore — Operator unreachable = assume provisioned
-  }
-  return true; // Default to provisioned (skip setup mode)
-}
-
 function setupTokenRefresh(): void {
   if (_tokenUpdateInterval) {
     clearInterval(_tokenUpdateInterval);
   }
-  
+
   _tokenUpdateInterval = setInterval(() => {
-    keycloak.updateToken(30) // 30초 전에 갱신
+    const kc = getKeycloak();
+    if (!kc) return;
+
+    kc.updateToken(30)
       .then((refreshed) => {
         if (refreshed) {
-          _token = keycloak.token || null;
-          console.log('Token refreshed');
+          _token = kc.token || null;
         }
       })
       .catch(() => {
-        console.warn('Token refresh failed');
-        // 갱신 실패 시 로그아웃
+        console.warn('Token refresh failed — logging out');
         logout();
       });
-  }, 60000); // 1분마다 체크
+  }, 60000);
 }
 
 function logout(): void {
@@ -69,19 +56,20 @@ function logout(): void {
     clearInterval(_tokenUpdateInterval);
     _tokenUpdateInterval = null;
   }
-  
+
   _token = null;
   _username = '';
   _displayName = '';
   _email = '';
   useAppStore.getState().setUsername('');
-  
-  // 즉시 페이지 이동 — React re-render에 의한 취소 방지
+
+  const kc = getKeycloak();
   const origin = window.location.origin;
-  if (keycloak.authenticated) {
-    const logoutUrl = `${keycloak.authServerUrl}/realms/${keycloak.realm}/protocol/openid-connect/logout`
-      + `?client_id=${keycloak.clientId}`
-      + `&id_token_hint=${keycloak.idToken || ''}`
+
+  if (kc?.authenticated) {
+    const logoutUrl = `${kc.authServerUrl}/realms/${kc.realm}/protocol/openid-connect/logout`
+      + `?client_id=${kc.clientId}`
+      + `&id_token_hint=${kc.idToken || ''}`
       + `&post_logout_redirect_uri=${encodeURIComponent(origin)}`;
     window.location.replace(logoutUrl);
   } else {
@@ -90,69 +78,56 @@ function logout(): void {
 }
 
 export async function initAuth(): Promise<AuthState> {
-  // Check provisioning — Operator 미응답 시 provisioned 가정
-  const provisioned = await checkProvisionState();
-  if (!provisioned) {
-    // Setup 모드 — 인증 없이 Setup UI 표시
+  // 1. Core API에서 Keycloak 설정 조회
+  let kc;
+  try {
+    kc = await initKeycloak();
+  } catch (err) {
+    console.error('Keycloak 설정 로드 실패:', err);
     _initialized = true;
-    _skipAuth = true;
+    _error = err instanceof Error ? err.message : 'Keycloak 설정을 불러올 수 없습니다';
     return buildState();
   }
 
-  // Keycloak realm 체크 건너뜀 — Keycloak 26.x는 /auth prefix 없어서
-  // Console nginx 프록시 경로(/auth/realms/admin)와 불일치. 
-  // keycloak.init()이 직접 auth.cmars.com에 접근하므로 별도 체크 불필요.
-
-  // Initialize Keycloak with PKCE
+  // 2. Keycloak OIDC PKCE 인증
   try {
-    const authenticated = await keycloak.init({
+    const authenticated = await kc.init({
       onLoad: 'login-required',
       pkceMethod: 'S256',
-      checkLoginIframe: false,   // 3rd party cookie iframe 체크 비활성화 — 자체서명 인증서 환경에서 타임아웃 방지
+      checkLoginIframe: false,
     });
 
     if (authenticated) {
-      _token = keycloak.token || null;
-      _username = keycloak.tokenParsed?.preferred_username || 'unknown';
-      _displayName = keycloak.tokenParsed?.name || keycloak.tokenParsed?.given_name || '';
-      _email = keycloak.tokenParsed?.email || '';
-      
-      // Update global store
+      _token = kc.token || null;
+      _username = kc.tokenParsed?.preferred_username || 'unknown';
+      _displayName = kc.tokenParsed?.name || kc.tokenParsed?.given_name || '';
+      _email = kc.tokenParsed?.email || '';
+
       useAppStore.getState().setUsername(_username);
-      
-      // Setup token refresh
       setupTokenRefresh();
-      
-      console.log('Keycloak authentication successful:', _username);
     }
-  } catch (error) {
-    console.error('Keycloak initialization failed:', error);
-    // 재시도: 3초 후 직접 Keycloak 로그인 페이지로 이동
-    console.log('Redirecting to Keycloak login in 3s...');
-    await new Promise(r => setTimeout(r, 3000));
-    const loginUrl = `https://auth.cmars.com/realms/admin/protocol/openid-connect/auth`
-      + `?client_id=polyon-console`
-      + `&redirect_uri=${encodeURIComponent(window.location.origin)}`
-      + `&response_type=code`
-      + `&scope=openid`;
-    window.location.href = loginUrl;
-    // 리다이렉트 대기
-    await new Promise(() => {});
+  } catch (err) {
+    console.error('Keycloak 인증 실패:', err);
+    _initialized = true;
+    _error = 'Keycloak 인증 서버에 연결할 수 없습니다. 네트워크 및 인증서를 확인하세요.';
+    return buildState();
   }
 
   _initialized = true;
+  _error = null;
   return buildState();
 }
 
 function buildState(): AuthState {
   return {
     initialized: _initialized,
-    authenticated: _skipAuth || _token !== null,
+    authenticated: _token !== null,
     username: _username,
     displayName: _displayName,
     email: _email,
     token: _token,
-    skipAuth: _skipAuth,
+    skipAuth: false,
+    error: _error,
     logout,
   };
 }
