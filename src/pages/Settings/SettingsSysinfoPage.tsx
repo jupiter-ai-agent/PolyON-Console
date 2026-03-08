@@ -417,10 +417,14 @@ export default function SettingsSysinfoPage() {
 
   // 설치 플로우 → 접근 방식 선택 다이얼로그 → 프로그레스 모달
   const handleInstall = (comp: Component) => {
-    // 서비스 slug: container_name에서 polyon- 제거, 없으면 name 소문자
-    const slug = comp.container_name
-      ? comp.container_name.replace(/^polyon-/, '')
-      : comp.name?.toLowerCase().replace(/[^a-z0-9-]/g, '') || comp.id;
+    // 서비스 slug: polyon_apps의 id가 서비스명 (chat, drive, wiki)
+    // catalog의 module id (mattermost, nextcloud, affine)와 다름
+    const SERVICE_SLUG: Record<string, string> = {
+      mattermost: 'chat',
+      nextcloud: 'drive',
+      affine: 'wiki',
+    };
+    const slug = SERVICE_SLUG[comp.id] || comp.id;
     setAccessDialog({ open: true, comp, mode: 'url', subdomain: slug, slug });
   };
 
