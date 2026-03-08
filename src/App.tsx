@@ -106,6 +106,18 @@ const ChatChannelsPage = lazy(() => import('./pages/Chat/ChatChannelsPage'));
 const ChatUsersPage = lazy(() => import('./pages/Chat/ChatUsersPage'));
 const ChatSettingsPage = lazy(() => import('./pages/Chat/ChatSettingsPage'));
 
+// Drive (Nextcloud)
+const DriveOverviewPage = lazy(() => import('./pages/Drive/DrivePage'));
+const DriveFoldersPage = lazy(() => import('./pages/Drive/DriveFoldersPage'));
+const DriveUsersPage = lazy(() => import('./pages/Drive/DriveUsersPage'));
+const DriveSettingsPage = lazy(() => import('./pages/Drive/DriveSettingsPage'));
+
+// Wiki (AFFiNE)
+const WikiOverviewPage = lazy(() => import('./pages/Wiki/WikiPage'));
+const WikiWorkspacesPage = lazy(() => import('./pages/Wiki/WikiWorkspacesPage'));
+const WikiUsersPage = lazy(() => import('./pages/Wiki/WikiUsersPage'));
+const WikiSettingsPage = lazy(() => import('./pages/Wiki/WikiSettingsPage'));
+
 // BPMN
 const BPMNPage = lazy(() => import('./pages/BPMN/BPMNPage'));
 const BPMNProcessesPage = lazy(() => import('./pages/BPMN/BPMNProcessesPage'));
@@ -263,6 +275,18 @@ export default function App() {
             <Route path="/chat/channels" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatChannelsPage /></ModuleGuard>} />
             <Route path="/chat/users" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatUsersPage /></ModuleGuard>} />
             <Route path="/chat/settings" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatSettingsPage /></ModuleGuard>} />
+
+            {/* Drive (Nextcloud) */}
+            <Route path="/drive" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveOverviewPage /></ModuleGuard>} />
+            <Route path="/drive/folders" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveFoldersPage /></ModuleGuard>} />
+            <Route path="/drive/users" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveUsersPage /></ModuleGuard>} />
+            <Route path="/drive/settings" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveSettingsPage /></ModuleGuard>} />
+
+            {/* Wiki (AFFiNE) */}
+            <Route path="/wiki" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiOverviewPage /></ModuleGuard>} />
+            <Route path="/wiki/workspaces" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiWorkspacesPage /></ModuleGuard>} />
+            <Route path="/wiki/users" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiUsersPage /></ModuleGuard>} />
+            <Route path="/wiki/settings" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiSettingsPage /></ModuleGuard>} />
 
             {/* BPMN */}
             <Route path="/bpmn" element={<BPMNPage />} />
