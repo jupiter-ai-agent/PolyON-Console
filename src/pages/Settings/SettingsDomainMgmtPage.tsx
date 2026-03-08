@@ -33,6 +33,14 @@ const STEP_STYLE: Record<string, { type: 'green' | 'red' | 'yellow' | 'gray'; la
   pending: { type: 'yellow', label: '대기' },
 };
 
+// Foundation 서비스 — 편집/삭제 불가
+const FOUNDATION_IDS = new Set([
+  'sso', 'mail', 'search', 'portal', 'notification',
+]);
+
+// 설치된 앱만 표시하기 위한 활성 상태
+const ACTIVE_STATUSES = new Set(['active', 'requires-setup', 'installed']);
+
 export default function SettingsDomainMgmtPage() {
   const [cfg, setCfg] = useState<ServiceDomainSettings>({});
   const [apps, setApps] = useState<AppEntry[]>([]);
@@ -73,10 +81,14 @@ export default function SettingsDomainMgmtPage() {
     try {
       const data = await settingsApi.listApps();
       const list = Array.isArray(data) ? data : (data as { apps?: AppEntry[] }).apps || [];
-      const filtered = list.filter(a => a.backend_url || a.backendUrl);
-      setApps(filtered);
+      // 설치된 앱만 필터 (Foundation active + installed modules)
+      const installed = list.filter(a =>
+        (a.backend_url || a.backendUrl) &&
+        ACTIVE_STATUSES.has(a.base_status || a.baseStatus || '')
+      );
+      setApps(installed);
       const subs: Record<string, string> = {};
-      filtered.forEach(a => { subs[a.id] = a.subdomain || ''; });
+      installed.forEach(a => { subs[a.id] = a.subdomain || ''; });
       setAppSubdomains(subs);
     } catch { /**/ }
     finally { setLoadingApps(false); }
@@ -142,11 +154,13 @@ export default function SettingsDomainMgmtPage() {
     }
   }
 
-  // Build DataTable rows for apps
+  const isFoundation = (id: string) => FOUNDATION_IDS.has(id);
+
+  // Build DataTable rows — no internal URLs, Foundation locked
   const appHeaders = [
-    { key: 'appName',    header: '앱' },
-    { key: 'domain',     header: '현재 도메인' },
-    { key: 'subdomainInput', header: '서브도메인 설정' },
+    { key: 'appName', header: '서비스' },
+    { key: 'domain', header: '현재 도메인' },
+    { key: 'subdomainInput', header: '서브도메인' },
   ];
 
   const appRows = apps.map(app => {
@@ -154,23 +168,24 @@ export default function SettingsDomainMgmtPage() {
       ? `${app.subdomain}.${baseDomain}`
       : app.subdomain || '';
     const st = appStatus[app.id];
+    const locked = isFoundation(app.id);
 
     return {
       id: app.id,
       appName: (
-        <div>
-          <div style={{ fontSize: '0.875rem', fontWeight: 500 }}>{app.name || app.id}</div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--cds-text-helper)', marginTop: 2, fontFamily: "'IBM Plex Mono', monospace" }}>
-            {app.backendUrl || app.backend_url}
-          </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <span style={{ fontSize: '0.875rem', fontWeight: 500 }}>{app.name || app.id}</span>
+          {locked && <Tag type="blue" size="sm">Foundation</Tag>}
         </div>
       ),
-      domain: app.subdomain ? (
+      domain: currentDomain ? (
         <code style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '0.8125rem' }}>{currentDomain}</code>
       ) : (
         <span style={{ fontSize: '0.8125rem', color: 'var(--cds-text-placeholder)' }}>미설정</span>
       ),
-      subdomainInput: (
+      subdomainInput: locked ? (
+        <span style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)' }}>시스템 관리</span>
+      ) : (
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <TextInput
@@ -182,9 +197,9 @@ export default function SettingsDomainMgmtPage() {
               style={{ width: 160 }}
               hideLabel
             />
-            <Button kind="primary"  onClick={() => setAppDomain(app)}>설정</Button>
+            <Button kind="primary" size="sm" onClick={() => setAppDomain(app)}>설정</Button>
             {app.subdomain && (
-              <Button kind="ghost" onClick={() => removeAppDomain(app)} style={{ color: 'var(--cds-support-error)' }}>제거</Button>
+              <Button kind="ghost" size="sm" onClick={() => removeAppDomain(app)} style={{ color: 'var(--cds-support-error)' }}>제거</Button>
             )}
           </div>
           {st && (
@@ -201,7 +216,7 @@ export default function SettingsDomainMgmtPage() {
     <>
       <PageHeader
         title="도메인 관리"
-        description="기본 도메인 및 앱별 서브도메인 매핑 설정"
+        description="기본 도메인 및 서비스별 서브도메인 설정"
       />
 
       {error && (
@@ -214,7 +229,7 @@ export default function SettingsDomainMgmtPage() {
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div>
               <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600 }}>기본 도메인 설정</h4>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>플랫폼 서비스 도메인 기본값</p>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>Operator 설치 시 설정된 도메인</p>
             </div>
             <Button kind="primary" onClick={saveDomainSettings} disabled={saving}>
               {saving ? '저장 중...' : '저장'}
@@ -227,22 +242,19 @@ export default function SettingsDomainMgmtPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
               <TextInput
                 id="baseDomain"
-                labelText="기본 도메인 (base_domain)"
-                placeholder="example.com"
+                labelText="기본 도메인"
                 value={baseDomain}
                 onChange={e => setBaseDomain(e.target.value)}
               />
               <TextInput
                 id="consoleDomain"
-                labelText="콘솔 도메인 (console_domain)"
-                placeholder="console.example.com"
+                labelText="콘솔 도메인"
                 value={consoleDomain}
                 onChange={e => setConsoleDomain(e.target.value)}
               />
               <TextInput
                 id="portalDomain"
-                labelText="포털 도메인 (portal_domain)"
-                placeholder="portal.example.com"
+                labelText="포털 도메인"
                 value={portalDomain}
                 onChange={e => setPortalDomain(e.target.value)}
               />
@@ -268,12 +280,12 @@ export default function SettingsDomainMgmtPage() {
           )}
         </Tile>
 
-        {/* App Domain Mappings */}
+        {/* Service Domain Mappings */}
         <Tile>
           <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem' }}>
             <div>
-              <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600 }}>앱별 서브도메인 매핑</h4>
-              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>backend_url이 등록된 앱의 외부 접근 도메인 설정</p>
+              <h4 style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600 }}>서비스 도메인 매핑</h4>
+              <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)' }}>설치된 서비스의 외부 접근 도메인</p>
             </div>
             <Button kind="ghost" renderIcon={Renew} onClick={loadApps} disabled={loadingApps}>
               새로고침
@@ -284,11 +296,8 @@ export default function SettingsDomainMgmtPage() {
             <SkeletonText paragraph lines={3} />
           ) : apps.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center' }}>
-              <p style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--cds-text-primary)', margin: '0 0 0.5rem' }}>
-                backend_url이 등록된 앱이 없습니다
-              </p>
-              <p style={{ fontSize: '0.8125rem', color: 'var(--cds-text-secondary)', margin: 0 }}>
-                앱 관리에서 backend_url을 등록하면 여기에 표시됩니다.
+              <p style={{ fontSize: '0.875rem', color: 'var(--cds-text-secondary)', margin: 0 }}>
+                설치된 서비스가 없습니다
               </p>
             </div>
           ) : (
