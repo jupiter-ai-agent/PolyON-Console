@@ -493,44 +493,85 @@ export default function ConsoleLayout() {
         )}
         <nav className={`he-nav ${navOpen ? 'he-nav--open' : ''}`}>
           <div className="he-nav__items">
-            {/* Foundation 메뉴 (항상 표시) */}
-            {FOUNDATION_NAV_ORDER.map((key) => {
-              const mod = FOUNDATION_MODULES[key];
-              if (!mod) return null;
-              
-              const Icon = mod.icon;
-              const isActive = currentModule === key;
-              const showSection = mod.section && mod.section !== lastSection;
-              if (mod.section) lastSection = mod.section;
+            {(() => {
+              // 모듈 메뉴를 섹션별로 그룹핑
+              const modulesBySection = groupBySection(moduleNav || []);
+              // 이미 렌더링된 섹션 추적
+              const renderedSections = new Set<string>();
+              let trackSection: string | undefined;
 
-              return (
-                <div key={key}>
-                  {showSection && (
-                    <div className="he-nav__section">{mod.section}</div>
-                  )}
-                  <button
-                    className={`he-nav__item ${isActive ? 'he-nav__item--active' : ''}`}
-                    onClick={() => handleNavItemClick(mod.defaultPath)}
-                  >
-                    <div className="he-nav__icon">
-                      <Icon size={20} />
-                    </div>
-                    <span className="he-nav__label">{mod.title}</span>
-                    {mod.items && (
-                      <svg className="he-nav__chevron" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
-                        <path d="M11 8L6 13l-.7-.7L9.6 8 5.3 3.7 6 3z" />
-                      </svg>
+              // 특정 섹션의 모듈 아이템 렌더
+              const renderModulesForSection = (section: string) => {
+                const mods = modulesBySection[section];
+                if (!mods || mods.length === 0) return null;
+                renderedSections.add(section);
+                return mods.map(mod => {
+                  const Icon = getIconComponent(mod.icon);
+                  const isActive = currentModule === mod.id;
+                  return (
+                    <button
+                      key={mod.id}
+                      className={`he-nav__item ${isActive ? 'he-nav__item--active' : ''}`}
+                      onClick={() => handleNavItemClick(mod.defaultPath)}
+                    >
+                      <div className="he-nav__icon"><Icon size={20} /></div>
+                      <span className="he-nav__label">{mod.title}</span>
+                      {mod.items?.length > 0 && (
+                        <svg className="he-nav__chevron" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                          <path d="M11 8L6 13l-.7-.7L9.6 8 5.3 3.7 6 3z" />
+                        </svg>
+                      )}
+                    </button>
+                  );
+                });
+              };
+
+              // Foundation + 해당 섹션의 모듈을 함께 렌더
+              const foundationItems = FOUNDATION_NAV_ORDER.map((key) => {
+                const mod = FOUNDATION_MODULES[key];
+                if (!mod) return null;
+
+                const Icon = mod.icon;
+                const isActive = currentModule === key;
+                const showSection = mod.section && mod.section !== trackSection;
+                if (mod.section) trackSection = mod.section;
+
+                // 다음 Foundation 아이템의 섹션을 확인하여, 현재 섹션의 마지막 아이템인지 판단
+                const currentIdx = FOUNDATION_NAV_ORDER.indexOf(key);
+                const nextKey = FOUNDATION_NAV_ORDER[currentIdx + 1];
+                const nextMod = nextKey ? FOUNDATION_MODULES[nextKey] : null;
+                const isLastInSection = !nextMod || (nextMod.section && nextMod.section !== mod.section);
+
+                return (
+                  <div key={key}>
+                    {showSection && (
+                      <div className="he-nav__section">{mod.section}</div>
                     )}
-                  </button>
-                </div>
-              );
-            })}
+                    <button
+                      className={`he-nav__item ${isActive ? 'he-nav__item--active' : ''}`}
+                      onClick={() => handleNavItemClick(mod.defaultPath)}
+                    >
+                      <div className="he-nav__icon">
+                        <Icon size={20} />
+                      </div>
+                      <span className="he-nav__label">{mod.title}</span>
+                      {mod.items && (
+                        <svg className="he-nav__chevron" viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+                          <path d="M11 8L6 13l-.7-.7L9.6 8 5.3 3.7 6 3z" />
+                        </svg>
+                      )}
+                    </button>
+                    {/* 현재 섹션의 마지막 Foundation 아이템 뒤에 같은 섹션의 모듈 삽입 */}
+                    {isLastInSection && mod.section && renderModulesForSection(mod.section)}
+                  </div>
+                );
+              });
 
-            {/* Module 메뉴 (API에서 로드) */}
-            {(moduleNav || []).length > 0 && (
-              <>
-                {Object.entries(groupBySection(moduleNav)).map(([section, mods]) => (
-                  <div key={section}>
+              // Foundation 섹션에 속하지 않은 나머지 모듈 (새 섹션)
+              const remainingModules = Object.entries(modulesBySection)
+                .filter(([section]) => !renderedSections.has(section))
+                .map(([section, mods]) => (
+                  <div key={`mod-section-${section}`}>
                     <div className="he-nav__section">{section}</div>
                     {mods.map(mod => {
                       const Icon = getIconComponent(mod.icon);
@@ -552,9 +593,10 @@ export default function ConsoleLayout() {
                       );
                     })}
                   </div>
-                ))}
-              </>
-            )}
+                ));
+
+              return [...foundationItems, ...remainingModules];
+            })()}
           </div>
         </nav>
 
