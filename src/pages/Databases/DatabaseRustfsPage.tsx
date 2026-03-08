@@ -84,6 +84,8 @@ export default function DatabaseRustfsPage() {
     setLoading(false);
   };
 
+  useEffect(() => { fetchStats(); }, []);
+
   const bucketHeaders = [
     { key: 'name', header: '버킷 이름' },
     { key: 'objects', header: '객체 수' },
@@ -135,9 +137,7 @@ export default function DatabaseRustfsPage() {
                   <StatCard label="총 사용량" value={data ? formatBytes(data.total_size_bytes) : '—'} icon={<Meter size={16} />} loading={loading} />
                 </div>
 
-                {!data && !loading && (
-                  <p style={{ color: 'var(--cds-text-helper)' }}>Status 탭을 클릭하면 정보를 로드합니다.</p>
-                )}
+
               </div>
             </TabPanel>
 
@@ -174,7 +174,7 @@ export default function DatabaseRustfsPage() {
                 ) : data ? (
                   <p style={{ color: 'var(--cds-text-helper)', padding: '1rem 0' }}>버킷이 없습니다.</p>
                 ) : (
-                  <p style={{ color: 'var(--cds-text-helper)' }}>Buckets 탭을 클릭하면 정보를 로드합니다.</p>
+                  <InlineLoading description="로딩 중..." />
                 )}
               </div>
             </TabPanel>
