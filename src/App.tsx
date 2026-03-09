@@ -107,11 +107,9 @@ const ChatChannelsPage = lazy(() => import('./pages/Chat/ChatChannelsPage'));
 const ChatUsersPage = lazy(() => import('./pages/Chat/ChatUsersPage'));
 const ChatSettingsPage = lazy(() => import('./pages/Chat/ChatSettingsPage'));
 
-// Drive (Nextcloud)
-const DriveOverviewPage = lazy(() => import('./pages/Drive/DrivePage'));
-const DriveFoldersPage = lazy(() => import('./pages/Drive/DriveFoldersPage'));
-const DriveUsersPage = lazy(() => import('./pages/Drive/DriveUsersPage'));
-const DriveSettingsPage = lazy(() => import('./pages/Drive/DriveSettingsPage'));
+// Drive — iframe (C 방식: ModuleSector)
+// 구 Nextcloud 페이지 제거 → PolyON-Drive (Rust) 자체 Admin UI 사용
+import ModuleSector from './components/ModuleSector';
 
 // Wiki (AFFiNE)
 const WikiOverviewPage = lazy(() => import('./pages/Wiki/WikiPage'));
@@ -278,11 +276,12 @@ export default function App() {
             <Route path="/chat/users" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatUsersPage /></ModuleGuard>} />
             <Route path="/chat/settings" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatSettingsPage /></ModuleGuard>} />
 
-            {/* Drive (Nextcloud) */}
-            <Route path="/drive" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveOverviewPage /></ModuleGuard>} />
-            <Route path="/drive/folders" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveFoldersPage /></ModuleGuard>} />
-            <Route path="/drive/users" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveUsersPage /></ModuleGuard>} />
-            <Route path="/drive/settings" element={<ModuleGuard moduleId="nextcloud" moduleName="PolyON Drive"><DriveSettingsPage /></ModuleGuard>} />
+            {/* Drive — PolyON-Drive (Rust) iframe */}
+            <Route path="/drive" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" /></ModuleGuard>} />
+            <Route path="/drive/users" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" hashPath="#/users" /></ModuleGuard>} />
+            <Route path="/drive/quota" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" hashPath="#/quota" /></ModuleGuard>} />
+            <Route path="/drive/activity" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" hashPath="#/activity" /></ModuleGuard>} />
+            <Route path="/drive/settings" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" hashPath="#/settings" /></ModuleGuard>} />
 
             {/* Wiki (AFFiNE) */}
             <Route path="/wiki" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiOverviewPage /></ModuleGuard>} />
