@@ -364,41 +364,48 @@ export default function SettingsSysinfoPage() {
   const [registerImageUrl, setRegisterImageUrl] = useState('');
   const [registerError, setRegisterError] = useState('');
 
-  const loadData = async () => {
+  // 컴포넌트 목록은 즉시 표시, 헬스체크는 비동기 로딩 (스켈레톤 20초 방지)
+  const loadComponents = async () => {
     try {
       const data = await settingsApi.getSystemComponents();
       const g: Record<string, Component[]> = {};
       for (const comp of data.components) {
-        const cat = comp.category || 'core';
+        const cat = comp.category || 'foundation';
         if (!g[cat]) g[cat] = [];
         g[cat].push(comp);
       }
       setGrouped(g);
 
-      // Version info
+      // Version info (빠름, 같이 로드)
       try {
         const ver = await settingsApi.getSystemVersion();
         setVersionInfo(ver);
       } catch (err) {
         console.warn('Failed to load version info:', err);
       }
-
-      // Health - Keycloak 직접 호출 제거, settingsApi.getEnginesStatus()만 사용
-      const hm: Record<string, HealthStatus> = {};
-      try {
-        const eng = await settingsApi.getEnginesStatus();
-        for (const [k, v] of Object.entries(eng.engines || {})) {
-          hm[k] = v as HealthStatus;
-        }
-      } catch (err) {
-        console.warn('Failed to load engines status:', err);
-      }
-      setHealthMap(hm);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadHealth = async () => {
+    try {
+      const eng = await settingsApi.getEnginesStatus();
+      const hm: Record<string, HealthStatus> = {};
+      for (const [k, v] of Object.entries(eng.engines || {})) {
+        hm[k] = v as HealthStatus;
+      }
+      setHealthMap(hm);
+    } catch (err) {
+      console.warn('Failed to load engines status:', err);
+    }
+  };
+
+  const loadData = async () => {
+    await loadComponents();
+    loadHealth(); // 비동기 — await 없이 백그라운드 실행
   };
 
   useEffect(() => {
