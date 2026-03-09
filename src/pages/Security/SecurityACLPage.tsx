@@ -93,7 +93,7 @@ function AceTable({ aces }) {
 }
 
 const SERVICE_ROWS = [
-  { name: 'PolyON UI', auth: 'Keycloak OIDC', scope: '내부 네트워크', sso: true },
+  { name: 'PolyON Console', auth: 'Keycloak OIDC', scope: '내부 네트워크', sso: true },
   { name: 'Keycloak', auth: '자체 인증', scope: '내부 네트워크', sso: null },
   { name: 'Stalwart Mail', auth: 'Basic Auth / OIDC', scope: '내부 + 외부 (메일)', sso: 'planned' },
   { name: 'RustFS', auth: 'Access/Secret Key', scope: '내부 네트워크', sso: null },

@@ -14,7 +14,7 @@ interface SystemHealth {
 }
 
 const SERVICE_URLS = [
-  { label: 'PolyON UI',       url: 'http://localhost:8443' },
+  { label: 'PolyON Console',       url: 'http://localhost:8443' },
   { label: 'Keycloak',        url: 'http://localhost:8443/auth/' },
   { label: 'RustFS Console',  url: 'http://localhost:9001/rustfs/console/' },
   { label: 'Stalwart Admin',  url: 'http://localhost:8480' },

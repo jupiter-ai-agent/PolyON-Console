@@ -229,25 +229,24 @@ export default function ModuleSector({
           kind="error"
           title="모듈 로딩 실패"
           subtitle={error}
-          actions={
-            <Button
-              kind="ghost"
-              size="sm"
-              renderIcon={Renew}
-              onClick={() => {
-                setError(null);
-                setLoading(true);
-                // iframe 리로드
-                const iframe = iframeRef.current;
-                if (iframe) {
-                  iframe.src = iframeSrc;
-                }
-              }}
-            >
-              재시도
-            </Button>
-          }
         />
+        <div style={{ marginTop: '0.5rem' }}>
+          <Button
+            kind="ghost"
+            size="sm"
+            renderIcon={Renew}
+            onClick={() => {
+              setError(null);
+              setLoading(true);
+              const iframe = iframeRef.current;
+              if (iframe) {
+                iframe.src = iframeSrc;
+              }
+            }}
+          >
+            재시도
+          </Button>
+        </div>
       </div>
     );
   }

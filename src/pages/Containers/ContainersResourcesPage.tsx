@@ -22,7 +22,7 @@ const RESOURCE_LIMITS = [
   { name: 'polyon-mail',       service: 'Stalwart',         memory: '512M',  notes: '메일 서버' },
   { name: 'polyon-prometheus', service: 'Prometheus',       memory: '512M',  notes: '메트릭' },
   { name: 'polyon-grafana',    service: 'Grafana',          memory: '256M',  notes: '모니터링 UI' },
-  { name: 'polyon-console',         service: 'nginx + Static',   memory: '128M',  notes: 'PolyON UI' },
+  { name: 'polyon-console',         service: 'nginx + Static',   memory: '128M',  notes: 'PolyON Console' },
   { name: 'polyon-pgadmin',    service: 'pgAdmin',          memory: '256M',  notes: 'DB 관리' },
 ];
 

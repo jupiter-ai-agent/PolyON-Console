@@ -103,7 +103,7 @@ export default function CoreAPIDetailPage() {
           </div>
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <span style={{ color: 'var(--cds-text-helper)', minWidth: 100 }}>의존받는 서비스</span>
-            <span>PolyON UI, 모든 엔진, Portal</span>
+            <span>PolyON Console, 모든 엔진, Portal</span>
           </div>
         </div>
       </Tile>

@@ -39,7 +39,7 @@ export default function CoreUIDetailPage() {
           U
         </div>
         <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--cds-text-primary)', lineHeight: 1.2 }}>PolyON UI</h1>
+          <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 700, color: 'var(--cds-text-primary)', lineHeight: 1.2 }}>PolyON Console</h1>
           <p style={{ margin: '0.25rem 0 0', fontSize: '0.875rem', color: 'var(--cds-text-secondary)' }}>Admin Console</p>
         </div>
       </div>

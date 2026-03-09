@@ -270,11 +270,11 @@ export default function App() {
             <Route path="/databases/rustfs" element={<DatabaseRustfsPage />} />
 
             {/* Chat (Mattermost) — ModuleGuard로 설치 여부 확인 */}
-            <Route path="/chat" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatPage /></ModuleGuard>} />
-            <Route path="/chat/teams" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatTeamsPage /></ModuleGuard>} />
-            <Route path="/chat/channels" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatChannelsPage /></ModuleGuard>} />
-            <Route path="/chat/users" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatUsersPage /></ModuleGuard>} />
-            <Route path="/chat/settings" element={<ModuleGuard moduleId="mattermost" moduleName="HELIOS Chat"><ChatSettingsPage /></ModuleGuard>} />
+            <Route path="/chat" element={<ModuleGuard moduleId="mattermost" moduleName="PolyON Chat"><ChatPage /></ModuleGuard>} />
+            <Route path="/chat/teams" element={<ModuleGuard moduleId="mattermost" moduleName="PolyON Chat"><ChatTeamsPage /></ModuleGuard>} />
+            <Route path="/chat/channels" element={<ModuleGuard moduleId="mattermost" moduleName="PolyON Chat"><ChatChannelsPage /></ModuleGuard>} />
+            <Route path="/chat/users" element={<ModuleGuard moduleId="mattermost" moduleName="PolyON Chat"><ChatUsersPage /></ModuleGuard>} />
+            <Route path="/chat/settings" element={<ModuleGuard moduleId="mattermost" moduleName="PolyON Chat"><ChatSettingsPage /></ModuleGuard>} />
 
             {/* Drive — PolyON-Drive (Rust) iframe */}
             <Route path="/drive" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" /></ModuleGuard>} />

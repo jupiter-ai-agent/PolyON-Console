@@ -83,15 +83,14 @@ const STATUS_STYLES: Record<string, StatusStyle> = {
 };
 
 const CATEGORY_LABELS: Record<string, { title: string; desc: string }> = {
-  core: { title: '코어', desc: 'PolyON 플랫폼 자체 구성 요소' },
+  foundation: { title: 'Foundation', desc: 'PolyON 플랫폼 Foundation — Platform · Infrastructure · Capability' },
   engine: { title: '앱 엔진', desc: '사원이 사용하는 업무 서비스 — 모듈 설치/삭제 가능' },
   process: { title: '프로세스', desc: '비즈니스 프로세스 및 업무 자동화 — 모듈 설치/삭제 가능' },
   ai: { title: 'AI', desc: 'AI 에이전트 및 지능 레이어 — 모듈 설치/삭제 가능' },
-  infra: { title: '인프라', desc: '데이터베이스, 스토리지, 네트워크' },
   monitoring: { title: '모니터링', desc: '관측 및 대시보드' },
 };
 
-const DISPLAY_ORDER = ['core', 'infra', 'engine', 'ai', 'process', 'monitoring'];
+const DISPLAY_ORDER = ['foundation', 'engine', 'ai', 'process', 'monitoring'];
 
 interface ComponentCardProps {
   comp: Component;
@@ -116,12 +115,13 @@ function ComponentCard({
   // 상태 결정: health API 결과 우선, 없으면 comp.status(DB 원본) 사용
   const effectiveStatus = health?.status || comp.status || 'planned';
   const st = STATUS_STYLES[effectiveStatus] || STATUS_STYLES.planned;
-  const isClickable = category === 'core' && !!navigate;
+  const isClickable = category === 'foundation' && !!navigate;
   const [hovered, setHovered] = useState(false);
   
   // Foundation 모듈은 삭제 불가 (stalwart=Mail은 engine 카테고리지만 Foundation)
-  const FOUNDATION_IDS = ['stalwart', 'postgresql', 'redis', 'opensearch', 'rustfs', 'traefik', 'polyon-dc', 'keycloak', 'polyon-core', 'polyon-console'];
-  const isFoundation = FOUNDATION_IDS.includes(comp.id);
+  // Foundation 카테고리 전체가 삭제 불가
+  const isFoundationCategory = category === 'foundation';
+  const isFoundation = isFoundationCategory;
   const isModuleCategory = ['engine', 'ai', 'process'].includes(category || '');
   const isMonitoringWithModules = category === 'monitoring' && ['prometheus', 'grafana'].includes(comp.id);
   const showButtons = !isFoundation && (isModuleCategory || isMonitoringWithModules);
