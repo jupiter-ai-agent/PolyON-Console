@@ -111,8 +111,10 @@ export default function InstallProgressModal({ open, comp, imageUrl, subdomain, 
       try {
         const healthData = await settingsApi.getEnginesStatus();
         const cname = comp.container_name || `polyon-${comp.id}`;
-        const h = (healthData as any)?.engines?.[cname] || (healthData as any)?.health?.[cname];
-        if (h?.status === 'up' || h?.status === 'running') {
+        const engines = (healthData as any)?.engines || {};
+        const health = (healthData as any)?.health || {};
+        const h = engines[cname] || engines[comp.id] || health[cname] || health[comp.id];
+        if (h?.status === 'up' || h?.status === 'running' || h?.status === 'healthy') {
           updateStep(3, 'complete', '서비스 정상 기동 확인');
           setDone(true);
           setCurrentStep(4);
