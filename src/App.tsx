@@ -90,6 +90,9 @@ const SecurityAccessPolicyPage = lazy(() => import('./pages/Security/SecurityAcc
 const SecurityAuditLogPage = lazy(() => import('./pages/Security/SecurityAuditLogPage'));
 
 // Containers
+// PRC
+const PRCPage = lazy(() => import('./pages/PRC/PRCPage'));
+
 const ContainersPage = lazy(() => import('./pages/Containers/ContainersPage'));
 const ContainersTopologyPage = lazy(() => import('./pages/Containers/ContainersTopologyPage'));
 const ContainersResourcesPage = lazy(() => import('./pages/Containers/ContainersResourcesPage'));
@@ -259,6 +262,12 @@ export default function App() {
             <Route path="/security/audit-log" element={<SecurityAuditLogPage />} />
 
             {/* Containers */}
+            {/* PRC */}
+            <Route path="/prc" element={<PRCPage />} />
+            <Route path="/prc/providers" element={<PRCPage />} />
+            <Route path="/prc/claims" element={<PRCPage />} />
+            <Route path="/prc/saga-log" element={<PRCPage />} />
+
             <Route path="/containers" element={<ContainersPage />} />
             <Route path="/containers/topology" element={<ContainersTopologyPage />} />
             <Route path="/containers/resources" element={<ContainersResourcesPage />} />

@@ -242,6 +242,20 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
       { label: 'Logs', path: '/monitoring/logs', icon: Terminal },
     ],
   },
+  prc: {
+    title: 'Platform Resources',
+    desc: '플랫폼 리소스 · PRC',
+    section: 'INFRASTRUCTURE',
+    defaultPath: '/prc',
+    icon: DataBase,
+    serviceId: 'prc',
+    items: [
+      { label: '개요', path: '/prc', icon: Dashboard },
+      { label: 'Providers', path: '/prc/providers', icon: DataBase },
+      { label: 'Claims', path: '/prc/claims', icon: Document },
+      { label: 'Saga Log', path: '/prc/saga-log', icon: Activity },
+    ],
+  },
   security: {
     title: 'Security',
     desc: '보안 · 감사 · 정책',
