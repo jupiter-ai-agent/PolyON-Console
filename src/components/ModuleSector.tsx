@@ -29,6 +29,8 @@ interface ModuleSectorProps {
   minHeight?: string;
   /** 초기 해시 경로 (예: #/settings) */
   hashPath?: string;
+  /** polyon:ready handshake를 건너뛰고 바로 표시 (외부 앱용: Odoo 등) */
+  skipHandshake?: boolean;
 }
 
 type SDKMessageType =
@@ -54,6 +56,7 @@ export default function ModuleSector({
   sandbox = 'allow-scripts allow-same-origin allow-forms allow-popups',
   minHeight = '600px',
   hashPath,
+  skipHandshake = false,
 }: ModuleSectorProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const navigate = useNavigate();
@@ -206,8 +209,12 @@ export default function ModuleSector({
     return () => clearInterval(interval);
   }, []);
 
-  // 5초 타임아웃 — polyon:ready 미수신 시 에러
+  // skipHandshake: polyon:ready 없이 바로 표시 (외부 앱: Odoo 등)
   useEffect(() => {
+    if (skipHandshake) {
+      setLoading(false);
+      return;
+    }
     const timeout = setTimeout(() => {
       if (loading) {
         setLoading(false);
@@ -216,7 +223,7 @@ export default function ModuleSector({
     }, 5000);
 
     return () => clearTimeout(timeout);
-  }, [loading]);
+  }, [loading, skipHandshake]);
 
   // iframe src 조합
   const iframeSrc = hashPath ? `${src}${hashPath}` : src;

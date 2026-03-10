@@ -293,7 +293,7 @@ export default function App() {
             <Route path="/drive/settings" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" hashPath="#/settings" /></ModuleGuard>} />
 
             {/* Odoo — PP Odoo (iframe) */}
-            <Route path="/odoo" element={<ModuleGuard moduleId="odoo" moduleName="PP Odoo"><ModuleSector moduleId="odoo" src="/modules/odoo/web" /></ModuleGuard>} />
+            <Route path="/odoo" element={<ModuleGuard moduleId="odoo" moduleName="PP Odoo"><ModuleSector moduleId="odoo" src="/modules/odoo/web" skipHandshake /></ModuleGuard>} />
 
             {/* Wiki (AFFiNE) */}
             <Route path="/wiki" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiOverviewPage /></ModuleGuard>} />
