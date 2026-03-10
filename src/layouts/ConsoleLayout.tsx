@@ -38,6 +38,8 @@ import {
   User,
   RecentlyViewed,
   DataShare,
+  Document,
+  CloudServiceManagement,
   ChevronDown,
 } from '@carbon/icons-react';
 import { useAppStore } from '../store/useAppStore';
