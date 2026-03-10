@@ -92,6 +92,7 @@ const SecurityAuditLogPage = lazy(() => import('./pages/Security/SecurityAuditLo
 // Containers
 // PRC
 const PRCPage = lazy(() => import('./pages/PRC/PRCPage'));
+const OdooFrame = lazy(() => import('./components/OdooFrame'));
 
 const ContainersPage = lazy(() => import('./pages/Containers/ContainersPage'));
 const ContainersTopologyPage = lazy(() => import('./pages/Containers/ContainersTopologyPage'));
@@ -293,7 +294,7 @@ export default function App() {
             <Route path="/drive/settings" element={<ModuleGuard moduleId="drive" moduleName="PolyON Drive"><ModuleSector moduleId="drive" src="/modules/drive/admin/" hashPath="#/settings" /></ModuleGuard>} />
 
             {/* Odoo — PP Odoo (iframe) */}
-            <Route path="/odoo" element={<ModuleGuard moduleId="odoo" moduleName="PP Odoo"><ModuleSector moduleId="odoo" src="/modules/odoo/web" skipHandshake /></ModuleGuard>} />
+            <Route path="/odoo" element={<ModuleGuard moduleId="odoo" moduleName="PP Odoo"><OdooFrame /></ModuleGuard>} />
 
             {/* Wiki (AFFiNE) */}
             <Route path="/wiki" element={<ModuleGuard moduleId="affine" moduleName="PolyON Wiki"><WikiOverviewPage /></ModuleGuard>} />
