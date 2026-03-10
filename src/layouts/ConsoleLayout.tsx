@@ -317,6 +317,7 @@ const FOUNDATION_NAV_ORDER = [
   'containers',
   'database',
   'monitoring',  // monitoring은 Foundation 유지 (시스템 모니터링은 기본)
+  'prc',         // PRC — Platform Resource Claims
   // GOVERNANCE
   'security',
   // SYSTEM
