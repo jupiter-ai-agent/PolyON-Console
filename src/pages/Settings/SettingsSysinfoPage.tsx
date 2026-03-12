@@ -206,7 +206,10 @@ function ComponentCard({
           </span>
           {comp.engine && (
             <>
-              <span style={{ color: 'var(--cds-text-helper)', fontWeight: 500, marginLeft: '1rem' }}>엔진</span>
+              {(health?.version || comp.version) && (
+                <span style={{ color: 'var(--cds-text-helper)', fontWeight: 500, marginLeft: '0.75rem' }}>—</span>
+              )}
+              <span style={{ color: 'var(--cds-text-helper)', fontWeight: 500, marginLeft: (health?.version || comp.version) ? '0.75rem' : '1rem' }}>엔진</span>
               <span style={{ marginLeft: '0.5rem', fontFamily: "'IBM Plex Mono', monospace", fontWeight: 500 }}>
                 {comp.engine}
               </span>
