@@ -25,6 +25,9 @@ const DCsPage = lazy(() => import('./pages/Networking/DCsPage'));
 const VPNPage = lazy(() => import('./pages/Networking/VPNPage'));
 const FirewallPage = lazy(() => import('./pages/Networking/FirewallPage'));
 
+// AppEngine
+const AppEnginePage = lazy(() => import('./pages/AppEngine/AppEnginePage'));
+
 // Mail
 const MailPage = lazy(() => import('./pages/Mail/MailPage'));
 const MailAccountsPage = lazy(() => import('./pages/Mail/MailAccountsPage'));
@@ -199,6 +202,7 @@ export default function App() {
             <Route path="/services/firewall" element={<FirewallPage />} />
 
             {/* Mail */}
+            <Route path="/appengine" element={<AppEnginePage />} />
             <Route path="/mail" element={<MailPage />} />
             <Route path="/mail/accounts" element={<MailAccountsPage />} />
             <Route path="/mail/groups" element={<MailGroupsPage />} />

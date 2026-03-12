@@ -436,6 +436,14 @@ body {
   background: #f4f4f4;
 }
 
+// iframe 전체화면용 — 패딩/스크롤 제거
+.he-main--iframe {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
 // ── Tile 화이트 배경 강제 (Gray 10 위에 White 카드) ──
 .he-main .cds--tile {
   background: #ffffff;
