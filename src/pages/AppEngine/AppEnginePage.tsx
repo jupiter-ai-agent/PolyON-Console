@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Loading } from '@carbon/react';
 import { useAuth } from '../../auth/useAuth';
 
-const APPENGINE_HOST = 'https://apps.cmars.com';
+// apps-admin.cmars.com: 관리자 전용 서브도메인 (쿠키 분리)
+// apps.cmars.com: 일반 사원용 (polyon realm)
+const APPENGINE_HOST = 'https://apps-admin.cmars.com';
 
 export default function AppEnginePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
