@@ -206,7 +206,7 @@ export default function AppEngineModulesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stateFilter, setStateFilter] = useState('uninstalled');
-  const [categoryFilter, setCategoryFilter] = useState('uninstalled');
+  const [categoryFilter, setCategoryFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
