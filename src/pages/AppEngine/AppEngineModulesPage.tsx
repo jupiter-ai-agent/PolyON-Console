@@ -18,7 +18,7 @@ interface OdooModule {
   shortdesc: string;
   state: string;
   author: string;
-  description: string;
+  summary: string;
   category_id: [number, string] | false | null;
   icon_image: string;
 }
@@ -146,7 +146,7 @@ function ModuleCard({ mod, actionLoading, onInstall, onUninstall }: ModuleCardPr
           lineHeight: '1.2em',
         }}
       >
-        {mod.shortdesc || '-'}
+        {mod.summary || mod.shortdesc || '-'}
       </div>
 
       {/* 카테고리 */}
@@ -205,8 +205,8 @@ export default function AppEngineModulesPage() {
   const [modules, setModules] = useState<OdooModule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [stateFilter, setStateFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [stateFilter, setStateFilter] = useState('uninstalled');
+  const [categoryFilter, setCategoryFilter] = useState('uninstalled');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [notification, setNotification] = useState<{
@@ -260,7 +260,7 @@ export default function AppEngineModulesPage() {
         if (catId !== categoryFilter) return false;
       }
       if (q) {
-        const haystack = `${m.name} ${m.shortdesc} ${m.author} ${m.description}`.toLowerCase();
+        const haystack = `${m.name} ${m.shortdesc} ${m.author} ${m.summary}`.toLowerCase();
         if (!haystack.includes(q)) return false;
       }
       return true;
@@ -346,10 +346,10 @@ export default function AppEngineModulesPage() {
           size="sm"
           style={{ minWidth: '160px' }}
         >
-          <SelectItem value="all" text="전체 상태" />
+          <SelectItem value="uninstalled" text="설치 가능" />
           <SelectItem value="installed" text="설치됨" />
-          <SelectItem value="uninstalled" text="미설치" />
           <SelectItem value="to_upgrade" text="업그레이드 대기" />
+          <SelectItem value="all" text="전체 보기" />
         </Select>
 
         <Select
