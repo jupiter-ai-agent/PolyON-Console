@@ -20,7 +20,7 @@ interface OdooModule {
   author: string;
   description: string;
   category_id: [number, string] | false | null;
-  icon_data: string;
+  icon_image: string;
 }
 
 interface ModulesResponse {
@@ -96,9 +96,9 @@ function ModuleCard({ mod, actionLoading, onInstall, onUninstall }: ModuleCardPr
             overflow: 'hidden',
           }}
         >
-          {mod.icon_data ? (
+          {mod.icon_image ? (
             <img
-              src={`data:image/png;base64,${mod.icon_data}`}
+              src={`data:image/png;base64,${mod.icon_image}`}
               alt={mod.shortdesc || mod.name}
               style={{ width: '64px', height: '64px', objectFit: 'cover' }}
             />
@@ -146,7 +146,7 @@ function ModuleCard({ mod, actionLoading, onInstall, onUninstall }: ModuleCardPr
           lineHeight: '1.2em',
         }}
       >
-        {mod.description || mod.shortdesc || '-'}
+        {mod.shortdesc || '-'}
       </div>
 
       {/* 카테고리 */}
