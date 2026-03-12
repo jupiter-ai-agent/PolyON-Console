@@ -191,11 +191,10 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
     title: 'AppEngine',
     desc: 'Odoo ERP · 비즈니스 앱 관리',
     section: 'SERVICES',
-    defaultPath: '/appengine',
+    defaultPath: '/appengine/users',
     icon: Launch,
     serviceId: 'appengine',
     items: [
-      { label: 'ERP 관리', path: '/appengine', icon: Launch },
       { label: '사용자/권한', path: '/appengine/users', icon: UserMultiple },
       { label: '모듈/앱 관리', path: '/appengine/modules', icon: ContainerSoftware },
     ],
@@ -644,7 +643,7 @@ export default function ConsoleLayout() {
         )}
 
         {/* Main Content */}
-        <main className={`he-main ${!hasSubmenu ? 'he-main--no-submenu' : ''} ${location.pathname === '/appengine' ? 'he-main--iframe' : ''}`}>
+        <main className={`he-main ${!hasSubmenu ? 'he-main--no-submenu' : ''}`}>
           <Outlet />
         </main>
       </div>
