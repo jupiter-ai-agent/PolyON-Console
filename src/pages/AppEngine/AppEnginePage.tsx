@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import { Loading } from '@carbon/react';
 
-const APPENGINE_ADMIN_URL = 'https://apps.cmars.com:1120/polyon/oidc/admin/login?redirect=/web';
+// console.cmars.com/appengine-admin/* → Traefik StripPrefix → Odoo
+// admin realm OIDC 로그인 후 Odoo 백오피스로 이동
+const APPENGINE_ADMIN_URL = '/appengine-admin/polyon/oidc/admin/login?redirect=/web';
 
 export default function AppEnginePage() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
