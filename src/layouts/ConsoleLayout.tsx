@@ -41,6 +41,7 @@ import {
   Document,
   CloudServiceManagement,
   ChevronDown,
+  Launch,
 } from '@carbon/icons-react';
 import { useAppStore } from '../store/useAppStore';
 import { apiFetch } from '../api/client';
@@ -185,6 +186,16 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
         ],
       },
     ],
+  },
+  appengine: {
+    title: 'AppEngine',
+    desc: 'Odoo ERP · 비즈니스 앱 관리',
+    section: 'SERVICES',
+    defaultPath: null,
+    externalUrl: 'https://apps.cmars.com:1120/polyon/oidc/admin/login',
+    icon: Launch,
+    serviceId: 'appengine',
+    items: null,
   },
   networking: {
     title: 'Networking',
@@ -567,7 +578,13 @@ export default function ConsoleLayout() {
                     )}
                     <button
                       className={`he-nav__item ${isActive ? 'he-nav__item--active' : ''}`}
-                      onClick={() => handleNavItemClick(mod.defaultPath)}
+                      onClick={() => {
+                        if ((mod as any).externalUrl) {
+                          window.open((mod as any).externalUrl, '_blank', 'noopener,noreferrer');
+                        } else {
+                          handleNavItemClick(mod.defaultPath);
+                        }
+                      }}
                     >
                       <div className="he-nav__icon">
                         <Icon size={20} />
