@@ -323,6 +323,7 @@ const FOUNDATION_NAV_ORDER = [
   'tree-view',
   // SERVICES
   'mail',
+  'appengine',
   // INFRASTRUCTURE
   'networking',
   'containers',
