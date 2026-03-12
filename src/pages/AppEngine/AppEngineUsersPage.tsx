@@ -115,7 +115,7 @@ export default function AppEngineUsersPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch<ListUsersResponse>('/api/v1/appengine/users');
+      const res = await apiFetch<ListUsersResponse>('/appengine/users');
       setUsers(res.users || []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : 'Unknown error');
@@ -126,7 +126,7 @@ export default function AppEngineUsersPage() {
 
   const loadAllGroups = useCallback(async () => {
     try {
-      const res = await apiFetch<ListGroupsResponse>('/api/v1/appengine/groups');
+      const res = await apiFetch<ListGroupsResponse>('/appengine/groups');
       setAllGroups(res.groups || []);
     } catch {
       // non-critical
@@ -148,7 +148,7 @@ export default function AppEngineUsersPage() {
     setDetailError(null);
     setDetailLoading(true);
     try {
-      const res = await apiFetch<GetUserResponse>(`/api/v1/appengine/users/${user.id}`);
+      const res = await apiFetch<GetUserResponse>(`/appengine/users/${user.id}`);
       setUserGroups(res.groups || []);
       setSelectedGroupIDs(new Set((res.groups || []).map((g) => g.id)));
     } catch (e: unknown) {
@@ -174,14 +174,14 @@ export default function AppEngineUsersPage() {
     setSaveLoading(true);
     setDetailError(null);
     try {
-      await apiFetch(`/api/v1/appengine/users/${selectedUser.id}/groups`, {
+      await apiFetch(`/appengine/users/${selectedUser.id}/groups`, {
         method: 'PUT',
         body: JSON.stringify({ group_ids: Array.from(selectedGroupIDs) }),
       });
       setSaveSuccess(true);
       setEditingGroups(false);
       // Refresh group display
-      const res = await apiFetch<GetUserResponse>(`/api/v1/appengine/users/${selectedUser.id}`);
+      const res = await apiFetch<GetUserResponse>(`/appengine/users/${selectedUser.id}`);
       setUserGroups(res.groups || []);
       setSelectedGroupIDs(new Set((res.groups || []).map((g) => g.id)));
     } catch (e: unknown) {

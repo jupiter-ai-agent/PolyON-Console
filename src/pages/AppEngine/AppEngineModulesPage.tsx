@@ -77,7 +77,7 @@ export default function AppEngineModulesPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch<ModulesResponse>('/api/v1/appengine/modules');
+      const res = await apiFetch<ModulesResponse>('/appengine/modules');
       setModules(res.modules || []);
     } catch (err: any) {
       setError(err.message || 'AppEngine 모듈 목록 조회 실패');
@@ -133,7 +133,7 @@ export default function AppEngineModulesPage() {
     setActionLoading(key);
     setNotification(null);
     try {
-      await apiFetch(`/api/v1/appengine/modules/${encodeURIComponent(mod.name)}/${action}`, { method: 'POST' });
+      await apiFetch(`/appengine/modules/${encodeURIComponent(mod.name)}/${action}`, { method: 'POST' });
       setNotification({
         kind: 'success',
         title: '작업 요청 완료',
