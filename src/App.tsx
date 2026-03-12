@@ -27,6 +27,8 @@ const FirewallPage = lazy(() => import('./pages/Networking/FirewallPage'));
 
 // AppEngine
 const AppEnginePage = lazy(() => import('./pages/AppEngine/AppEnginePage'));
+const AppEngineModulesPage = lazy(() => import('./pages/AppEngine/AppEngineModulesPage'));
+const AppEngineUsersPage = lazy(() => import('./pages/AppEngine/AppEngineUsersPage'));
 
 // Mail
 const MailPage = lazy(() => import('./pages/Mail/MailPage'));
@@ -203,6 +205,8 @@ export default function App() {
 
             {/* Mail */}
             <Route path="/appengine" element={<AppEnginePage />} />
+            <Route path="/appengine/users" element={<AppEngineUsersPage />} />
+            <Route path="/appengine/modules" element={<AppEngineModulesPage />} />
             <Route path="/mail" element={<MailPage />} />
             <Route path="/mail/accounts" element={<MailAccountsPage />} />
             <Route path="/mail/groups" element={<MailGroupsPage />} />

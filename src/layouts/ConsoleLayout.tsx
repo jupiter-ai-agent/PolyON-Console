@@ -194,7 +194,11 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
     defaultPath: '/appengine',
     icon: Launch,
     serviceId: 'appengine',
-    items: null,
+    items: [
+      { label: 'ERP 관리', path: '/appengine', icon: Launch },
+      { label: '사용자/권한', path: '/appengine/users', icon: UserMultiple },
+      { label: '모듈/앱 관리', path: '/appengine/modules', icon: ContainerSoftware },
+    ],
   },
   networking: {
     title: 'Networking',
@@ -640,7 +644,7 @@ export default function ConsoleLayout() {
         )}
 
         {/* Main Content */}
-        <main className={`he-main ${!hasSubmenu ? 'he-main--no-submenu' : ''} ${location.pathname.startsWith('/appengine') ? 'he-main--iframe' : ''}`}>
+        <main className={`he-main ${!hasSubmenu ? 'he-main--no-submenu' : ''} ${location.pathname === '/appengine' ? 'he-main--iframe' : ''}`}>
           <Outlet />
         </main>
       </div>
