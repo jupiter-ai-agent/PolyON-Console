@@ -101,6 +101,7 @@ export default function AppEngineUsersPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [infoMessage, setInfoMessage] = useState<string | null>(null);
 
   // Group edit state
   const [editingGroups, setEditingGroups] = useState(false);
@@ -141,6 +142,11 @@ export default function AppEngineUsersPage() {
   // ── Open user detail ─────────────────────────────────────────────────────────
 
   const openUser = async (user: OdooUser) => {
+    if (!user.id) {
+      setInfoMessage('Odoo에 아직 등록되지 않은 사용자입니다.');
+      setTimeout(() => setInfoMessage(null), 4000);
+      return;
+    }
     setSelectedUser(user);
     setModalOpen(true);
     setEditingGroups(false);
@@ -262,6 +268,17 @@ export default function AppEngineUsersPage() {
           subtitle={error}
           hideCloseButton={false}
           onCloseButtonClick={() => setError(null)}
+          style={{ marginBottom: '1rem' }}
+        />
+      )}
+
+      {infoMessage && (
+        <InlineNotification
+          kind="info"
+          title="안내"
+          subtitle={infoMessage}
+          hideCloseButton={false}
+          onCloseButtonClick={() => setInfoMessage(null)}
           style={{ marginBottom: '1rem' }}
         />
       )}
