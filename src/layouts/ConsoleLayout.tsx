@@ -129,6 +129,7 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
     serviceId: 'mail',
     items: [
       { label: '개요', path: '/mail', icon: Email },
+      { label: '스토리지 현황', path: '/mail/storage', icon: DataBase },
       {
         type: 'group', label: '디렉터리',
         children: [

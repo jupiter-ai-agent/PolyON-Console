@@ -59,6 +59,7 @@ const MailTLSPage = lazy(() => import('./pages/Mail/MailTLSPage'));
 const MailSievePage = lazy(() => import('./pages/Mail/MailSievePage'));
 const MailMaintenancePage = lazy(() => import('./pages/Mail/MailMaintenancePage'));
 const MailConfigPage = lazy(() => import('./pages/Mail/MailConfigPage'));
+const MailStoragePage = lazy(() => import('./pages/Mail/MailStoragePage'));
 
 // Apps & Homepage
 const AppsPage = lazy(() => import('./pages/Apps/AppsPage'));
@@ -239,6 +240,7 @@ export default function App() {
             <Route path="/mail/sieve" element={<MailSievePage />} />
             <Route path="/mail/maintenance" element={<MailMaintenancePage />} />
             <Route path="/mail/config" element={<MailConfigPage />} />
+            <Route path="/mail/storage" element={<MailStoragePage />} />
 
             {/* Apps & Homepage */}
             <Route path="/apps" element={<AppsPage />} />
