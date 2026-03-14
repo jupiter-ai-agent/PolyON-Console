@@ -137,7 +137,7 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
           { label: '메일링 리스트', path: '/mail/lists' },
           { label: '도메인', path: '/mail/domains' },
           { label: '역할', path: '/mail/roles' },
-          { label: '테넌트', path: '/mail/tenants' },
+
           { label: 'API 키', path: '/mail/api-keys' },
           { label: 'OAuth 클라이언트', path: '/mail/oauth-clients' },
         ],
