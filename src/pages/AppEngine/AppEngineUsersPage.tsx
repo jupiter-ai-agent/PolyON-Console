@@ -40,8 +40,8 @@ interface OdooUser {
 interface OdooGroup {
   id: number;
   name: string;
-  full_name: string | [number, string] | false | null;
-  category_id: [number, string] | false | null;
+  privilege_id: [number, string] | false | null;
+  comment: string | false | null;
 }
 
 interface ListUsersResponse {
@@ -65,13 +65,11 @@ interface ListGroupsResponse {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function getFullName(g: OdooGroup): string {
-  if (typeof g.full_name === 'string' && g.full_name) return g.full_name;
-  if (Array.isArray(g.full_name) && g.full_name[1]) return g.full_name[1];
   return g.name;
 }
 
 function getCategoryName(g: OdooGroup): string {
-  if (Array.isArray(g.category_id) && g.category_id[1]) return g.category_id[1] as string;
+  if (Array.isArray(g.privilege_id) && g.privilege_id[1]) return g.privilege_id[1] as string;
   return '기타';
 }
 
