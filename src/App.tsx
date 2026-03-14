@@ -31,6 +31,7 @@ const AppEngineModulesPage = lazy(() => import('./pages/AppEngine/AppEngineModul
 const AppEngineUsersPage = lazy(() => import('./pages/AppEngine/AppEngineUsersPage'));
 
 const AppEngineLDAPPage = lazy(() => import('./pages/AppEngine/AppEngineLDAPPage'));
+const AppEngineCronPage = lazy(() => import('./pages/AppEngine/AppEngineCronPage'));
 
 // Mail
 const MailPage = lazy(() => import('./pages/Mail/MailPage'));
@@ -211,6 +212,7 @@ export default function App() {
             <Route path="/appengine/modules" element={<AppEngineModulesPage />} />
 
             <Route path="/appengine/ldap" element={<AppEngineLDAPPage />} />
+            <Route path="/appengine/cron" element={<AppEngineCronPage />} />
             <Route path="/mail" element={<MailPage />} />
             <Route path="/mail/accounts" element={<MailAccountsPage />} />
             <Route path="/mail/groups" element={<MailGroupsPage />} />

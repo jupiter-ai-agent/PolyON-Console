@@ -43,6 +43,7 @@ import {
   ChevronDown,
   Launch,
   Wifi,
+  Time,
 } from '@carbon/icons-react';
 import { useAppStore } from '../store/useAppStore';
 import { apiFetch } from '../api/client';
@@ -198,7 +199,7 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
     items: [
       { label: '사용자/권한', path: '/appengine/users', icon: UserMultiple },
       { label: '모듈/앱 관리', path: '/appengine/modules', icon: ContainerSoftware },
-
+      { label: '스케줄러', path: '/appengine/cron', icon: Time },
       { label: 'AD/LDAP 진단', path: '/appengine/ldap', icon: Wifi },
     ],
   },
