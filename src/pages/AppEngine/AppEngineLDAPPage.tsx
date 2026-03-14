@@ -101,7 +101,6 @@ interface WizardGroup {
   description: string;
   member_count: number;
   ldap_dn: string;
-  exists_in_odoo: boolean;
 }
 
 interface WizardUser {
@@ -115,7 +114,6 @@ interface WizardUser {
   job_title: string;
   group_count: number;
   ldap_dn: string;
-  exists_in_odoo: boolean;
 }
 
 interface WizardSchedule {
@@ -747,14 +745,12 @@ export default function AppEngineLDAPPage() {
                                   name: g.name,
                                   description: g.description || '',
                                   member_count: g.member_count,
-                                  exists_in_odoo: g.exists_in_odoo,
                                 }))}
                                 headers={[
                                   { key: 'selected', header: 'Sync' },
                                   { key: 'name', header: 'Group Name' },
                                   { key: 'description', header: 'Description' },
                                   { key: 'member_count', header: 'Members' },
-                                  { key: 'exists_in_odoo', header: 'In Odoo' },
                                 ]}
                               >
                                 {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -788,10 +784,6 @@ export default function AppEngineLDAPPage() {
                                                     />
                                                   ) : cell.info.header === 'member_count' ? (
                                                     <Tag type="blue" size="sm">{cell.value}</Tag>
-                                                  ) : cell.info.header === 'exists_in_odoo' ? (
-                                                    cell.value
-                                                      ? <Tag type="green" size="sm">In Odoo</Tag>
-                                                      : <Tag type="gray" size="sm">Not in Odoo</Tag>
                                                   ) : (
                                                     cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
                                                   )}
@@ -834,7 +826,6 @@ export default function AppEngineLDAPPage() {
                                   last_name: u.last_name || '',
                                   job_title: u.job_title || '',
                                   group_count: u.group_count,
-                                  exists_in_odoo: u.exists_in_odoo,
                                 }))}
                                 headers={[
                                   { key: 'sync_mode', header: 'Policy' },
@@ -845,7 +836,6 @@ export default function AppEngineLDAPPage() {
                                   { key: 'last_name', header: 'Last Name' },
                                   { key: 'job_title', header: 'Job Title' },
                                   { key: 'group_count', header: 'Groups' },
-                                  { key: 'exists_in_odoo', header: 'In Odoo' },
                                 ]}
                               >
                                 {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -873,10 +863,6 @@ export default function AppEngineLDAPPage() {
                                                     : <Tag type="gray" size="sm">No</Tag>
                                                 ) : cell.info.header === 'group_count' ? (
                                                   <Tag type="blue" size="sm">{cell.value}</Tag>
-                                                ) : cell.info.header === 'exists_in_odoo' ? (
-                                                  cell.value
-                                                    ? <Tag type="green" size="sm">In Odoo</Tag>
-                                                    : <Tag type="gray" size="sm">Not in Odoo</Tag>
                                                 ) : (
                                                   cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
                                                 )}
