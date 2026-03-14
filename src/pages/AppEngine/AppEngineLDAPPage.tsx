@@ -371,7 +371,7 @@ export default function AppEngineLDAPPage() {
   }, [cfg]);
 
   useEffect(() => {
-    if (mainTabIdx === 3 && cfg && !wizardInfo && !wizardLoading) {
+    if (mainTabIdx === 1 && cfg && !wizardInfo && !wizardLoading) {
       loadWizardData();
     }
   }, [mainTabIdx, cfg, wizardInfo, wizardLoading, loadWizardData]);
@@ -520,72 +520,14 @@ export default function AppEngineLDAPPage() {
         description="AppEngine LDAP 설정 조회 · 테스트 · 동기화 제어"
       />
 
-      {/* ── Toolbar ── */}
-      <div style={{ padding: '12px 16px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', borderBottom: '1px solid #393939' }}>
-        <Button kind="secondary" size="sm" renderIcon={testLoading ? undefined : Wifi} onClick={testConnection} disabled={testLoading}>
-          {testLoading ? <InlineLoading description="테스트 중..." /> : 'Test Connection'}
-        </Button>
-        <Button kind="ghost" size="sm" renderIcon={UserMultiple} onClick={openUsers} disabled={!cfg}>
-          Test LDAP Users
-        </Button>
-        <Button kind="ghost" size="sm" renderIcon={Group} onClick={openGroups} disabled={!cfg}>
-          Test LDAP Groups
-        </Button>
-        <div style={{ flex: 1 }} />
-        {cfg && (
-          <Button
-            kind="ghost" size="sm" renderIcon={syncLoading ? undefined : Restart}
-            onClick={runSync}
-            disabled={syncLoading || !merged?.sync_groups}
-          >
-            {syncLoading ? <InlineLoading description="동기화 중..." /> : 'Sync All Users'}
-          </Button>
-        )}
-        {hasEdits && (
-          <Button kind="primary" size="sm" renderIcon={Save} onClick={saveEdits} disabled={saving}>
-            {saving ? <InlineLoading description="저장 중..." /> : '저장'}
-          </Button>
-        )}
-      </div>
+      {/* ── Top-level tabs: LDAP 연결 / Sync Wizard ── */}
 
-      {/* ── Notifications ── */}
-      <div style={{ padding: '0 16px' }}>
-        {testResult && (
-          <div style={{ paddingTop: '8px' }}>
-            <InlineNotification
-              kind={testResult.success ? 'success' : 'error'}
-              title={testResult.success ? '연결 성공' : '연결 실패'}
-              subtitle={`${testResult.message}${testResult.latency_ms > 0 ? ` (${testResult.latency_ms}ms)` : ''}`}
-              lowContrast onClose={() => setTestResult(null)}
-            />
-          </div>
-        )}
-        {syncResult && (
-          <div style={{ paddingTop: '8px' }}>
-            <InlineNotification
-              kind={syncResult.ok ? 'success' : 'error'}
-              title={syncResult.ok ? '완료' : '실패'}
-              subtitle={syncResult.msg}
-              lowContrast onClose={() => setSyncResult(null)}
-            />
-          </div>
-        )}
-        {saveResult && (
-          <div style={{ paddingTop: '8px' }}>
-            <InlineNotification
-              kind={saveResult.ok ? 'success' : 'error'}
-              title={saveResult.ok ? '저장 완료' : '저장 실패'}
-              subtitle={saveResult.msg}
-              lowContrast onClose={() => setSaveResult(null)}
-            />
-          </div>
-        )}
-        {error && (
-          <div style={{ paddingTop: '8px' }}>
-            <InlineNotification kind="error" title="오류" subtitle={error} lowContrast />
-          </div>
-        )}
-      </div>
+      {/* 전역 에러 / 로딩 알림 */}
+      {error && (
+        <div style={{ padding: '0 16px', paddingTop: '8px' }}>
+          <InlineNotification kind="error" title="오류" subtitle={error} lowContrast />
+        </div>
+      )}
 
       {/* ── Loading ── */}
       {loading && !cfg && (
@@ -598,13 +540,65 @@ export default function AppEngineLDAPPage() {
       {merged && (
         <div style={{ padding: '0 16px' }}>
           <Tabs selectedIndex={mainTabIdx} onChange={({ selectedIndex }) => setMainTabIdx(selectedIndex)}>
-            <TabList aria-label="LDAP 설정 탭">
-              <Tab>서버 정보</Tab>
-              <Tab>사용자 설정</Tab>
-              <Tab>그룹 설정</Tab>
+            <TabList aria-label="LDAP 관리 탭">
+              <Tab>LDAP 연결</Tab>
               <Tab>Sync Wizard</Tab>
             </TabList>
             <TabPanels>
+
+              {/* ══════════════════════════════════════════
+                  Tab 1: LDAP 연결
+                  ══════════════════════════════════════════ */}
+              <TabPanel>
+                {/* 연결 액션 바 */}
+                <div style={{ paddingTop: '12px', paddingBottom: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', borderBottom: '1px solid #393939', marginBottom: '4px' }}>
+                  <Button kind="primary" size="sm" renderIcon={testLoading ? undefined : Wifi} onClick={testConnection} disabled={testLoading}>
+                    {testLoading ? <InlineLoading description="테스트 중..." /> : 'Test Connection'}
+                  </Button>
+                  <Button kind="ghost" size="sm" renderIcon={UserMultiple} onClick={openUsers} disabled={!cfg}>
+                    Test LDAP Users
+                  </Button>
+                  <Button kind="ghost" size="sm" renderIcon={Group} onClick={openGroups} disabled={!cfg}>
+                    Test LDAP Groups
+                  </Button>
+                  <div style={{ flex: 1 }} />
+                  {hasEdits && (
+                    <Button kind="secondary" size="sm" renderIcon={Save} onClick={saveEdits} disabled={saving}>
+                      {saving ? <InlineLoading description="저장 중..." /> : '저장'}
+                    </Button>
+                  )}
+                </div>
+
+                {/* 연결 / 저장 결과 알림 */}
+                {testResult && (
+                  <div style={{ paddingTop: '8px' }}>
+                    <InlineNotification
+                      kind={testResult.success ? 'success' : 'error'}
+                      title={testResult.success ? '연결 성공' : '연결 실패'}
+                      subtitle={`${testResult.message}${testResult.latency_ms > 0 ? ` (${testResult.latency_ms}ms)` : ''}`}
+                      lowContrast onClose={() => setTestResult(null)}
+                    />
+                  </div>
+                )}
+                {saveResult && (
+                  <div style={{ paddingTop: '8px' }}>
+                    <InlineNotification
+                      kind={saveResult.ok ? 'success' : 'error'}
+                      title={saveResult.ok ? '저장 완료' : '저장 실패'}
+                      subtitle={saveResult.msg}
+                      lowContrast onClose={() => setSaveResult(null)}
+                    />
+                  </div>
+                )}
+
+                {/* 서버 정보 / 사용자 설정 / 그룹 설정 서브탭 */}
+                <Tabs>
+                  <TabList aria-label="LDAP 설정 서브탭">
+                    <Tab>서버 정보</Tab>
+                    <Tab>사용자 설정</Tab>
+                    <Tab>그룹 설정</Tab>
+                  </TabList>
+                  <TabPanels>
 
               {/* ── Tab 1: 서버 정보 (읽기 전용) ── */}
               <TabPanel>
@@ -678,7 +672,13 @@ export default function AppEngineLDAPPage() {
                 </div>
               </TabPanel>
 
-              {/* ── Tab 4: Sync Wizard ── */}
+                  </TabPanels>
+                </Tabs>
+              </TabPanel>
+
+              {/* ══════════════════════════════════════════
+                  Tab 2: Sync Wizard
+                  ══════════════════════════════════════════ */}
               <TabPanel>
                 <div style={{ paddingTop: '16px' }}>
                   {/* Wizard loading / error */}
