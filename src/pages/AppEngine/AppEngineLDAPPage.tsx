@@ -20,6 +20,8 @@ import {
   TabPanel,
   Toggle,
   TextInput,
+  Select,
+  SelectItem,
   InlineLoading,
   StructuredListWrapper,
   StructuredListRow,
@@ -466,6 +468,25 @@ export default function AppEngineLDAPPage() {
     }
   };
 
+  // 개별 사용자 정책 변경 (즉시 반영)
+  const setUserPolicy = async (userId: number, policy: string) => {
+    if (!cfg) return;
+    setWizardUsers(prev => prev.map(u =>
+      u.id === userId ? { ...u, sync_mode: policy as WizardUser['sync_mode'] } : u
+    ));
+    try {
+      await apiFetch(`/appengine/ldap/wizard/users?ldap_id=${cfg.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ users: [{ id: userId, sync_mode: policy }] }),
+      });
+      const infoRes = await apiFetch<{ wizard: WizardInfo }>(`/appengine/ldap/wizard?ldap_id=${cfg.id}`);
+      setWizardInfo(infoRes.wizard);
+    } catch (e) {
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '정책 변경 실패' });
+      loadWizardData();
+    }
+  };
+
   const saveSchedule = async () => {
     if (!cfg || !scheduleLocal) return;
     setScheduleSaving(true);
@@ -851,25 +872,42 @@ export default function AppEngineLDAPPage() {
                                         </TableRow>
                                       </TableHead>
                                       <TableBody>
-                                        {rows.map(row => (
-                                          <TableRow key={row.id}>
-                                            {row.cells.map(cell => (
-                                              <TableCell key={cell.id}>
-                                                {cell.info.header === 'sync_mode' ? (
-                                                  <SyncModeTag mode={String(cell.value)} />
-                                                ) : cell.info.header === 'is_sync_target' ? (
-                                                  cell.value
-                                                    ? <Tag type="green" size="sm">Yes</Tag>
-                                                    : <Tag type="gray" size="sm">No</Tag>
-                                                ) : cell.info.header === 'group_count' ? (
-                                                  <Tag type="blue" size="sm">{cell.value}</Tag>
-                                                ) : (
-                                                  cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
-                                                )}
-                                              </TableCell>
-                                            ))}
-                                          </TableRow>
-                                        ))}
+                                        {rows.map(row => {
+                                          const userId = Number(row.id);
+                                          const userSyncMode = wizardUsers.find(u => u.id === userId)?.sync_mode ?? 'group';
+                                          return (
+                                            <TableRow key={row.id}>
+                                              {row.cells.map(cell => (
+                                                <TableCell key={cell.id}>
+                                                  {cell.info.header === 'sync_mode' ? (
+                                                    <Select
+                                                      id={`policy-${userId}`}
+                                                      labelText=""
+                                                      hideLabel
+                                                      size="sm"
+                                                      value={userSyncMode}
+                                                      onChange={e => setUserPolicy(userId, e.target.value)}
+                                                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                                                      style={{ minWidth: '130px' }}
+                                                    >
+                                                      <SelectItem value="group" text="Group Policy" />
+                                                      <SelectItem value="enable" text="Include" />
+                                                      <SelectItem value="disable" text="Exclude" />
+                                                    </Select>
+                                                  ) : cell.info.header === 'is_sync_target' ? (
+                                                    cell.value
+                                                      ? <Tag type="green" size="sm">Yes</Tag>
+                                                      : <Tag type="gray" size="sm">No</Tag>
+                                                  ) : cell.info.header === 'group_count' ? (
+                                                    <Tag type="blue" size="sm">{cell.value}</Tag>
+                                                  ) : (
+                                                    cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
+                                                  )}
+                                                </TableCell>
+                                              ))}
+                                            </TableRow>
+                                          );
+                                        })}
                                       </TableBody>
                                     </Table>
                                   </TableContainer>
