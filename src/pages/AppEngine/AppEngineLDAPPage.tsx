@@ -522,9 +522,6 @@ export default function AppEngineLDAPPage() {
 
       {/* ── Toolbar ── */}
       <div style={{ padding: '12px 16px', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', borderBottom: '1px solid #393939' }}>
-        <Button kind="ghost" size="sm" renderIcon={Renew} onClick={loadConfig} disabled={loading}>
-          새로고침
-        </Button>
         <Button kind="secondary" size="sm" renderIcon={testLoading ? undefined : Wifi} onClick={testConnection} disabled={testLoading}>
           {testLoading ? <InlineLoading description="테스트 중..." /> : 'Test Connection'}
         </Button>
