@@ -32,7 +32,9 @@ interface OdooUser {
   login: string;
   email: string | false | null;
   active: boolean;
-  groups_id: number[];
+  group_ids: number[];
+  sync_mode: 'group' | 'enable' | 'disable';
+  is_sync_target: boolean;
 }
 
 interface OdooGroup {
@@ -216,6 +218,8 @@ export default function AppEngineUsersPage() {
   // ── DataTable rows ────────────────────────────────────────────────────────────
 
   const headers = [
+    { key: 'sync_mode', header: '정책' },
+    { key: 'is_sync_target', header: 'Sync' },
     { key: 'name', header: '이름' },
     { key: 'login', header: '로그인' },
     { key: 'email', header: '이메일' },
@@ -226,11 +230,13 @@ export default function AppEngineUsersPage() {
 
   const rows = paged.map((u) => ({
     id: String(u.id),
+    sync_mode: u.sync_mode ?? 'group',
+    is_sync_target: u.is_sync_target ?? false,
     name: u.name,
     login: u.login,
     email: getEmail(u),
     active: u.active,
-    groups: Array.isArray(u.groups_id) ? u.groups_id.length : 0,
+    groups: Array.isArray(u.group_ids) ? u.group_ids.length : 0,
     _user: u,
   }));
 
@@ -346,6 +352,29 @@ export default function AppEngineUsersPage() {
                         onClick={() => user && openUser(user)}
                       >
                         {row.cells.map((cell: any) => {
+                          if (cell.info.header === 'sync_mode') {
+                            const mode = String(cell.value);
+                            const modeMap: Record<string, { type: string; label: string }> = {
+                              enable: { type: 'green', label: 'Include' },
+                              disable: { type: 'red', label: 'Exclude' },
+                              group: { type: 'blue', label: 'Group' },
+                            };
+                            const m = modeMap[mode] ?? { type: 'gray', label: mode };
+                            return (
+                              <TableCell key={cell.id}>
+                                <Tag type={m.type as any} size="sm">{m.label}</Tag>
+                              </TableCell>
+                            );
+                          }
+                          if (cell.info.header === 'is_sync_target') {
+                            return (
+                              <TableCell key={cell.id}>
+                                <Tag type={cell.value ? 'green' : 'gray'} size="sm">
+                                  {cell.value ? 'Yes' : 'No'}
+                                </Tag>
+                              </TableCell>
+                            );
+                          }
                           if (cell.info.header === 'active') {
                             return (
                               <TableCell key={cell.id}>
