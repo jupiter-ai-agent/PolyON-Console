@@ -205,40 +205,26 @@ export default function MailAccountsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const [usersRes, stalwartRes] = await Promise.allSettled([
-        fetch('/api/v1/users').then((r) => r.json() as Promise<{ users?: { username?: string; mail?: string; given_name?: string; surname?: string; cn?: string }[] }>),
-        mailApi.listPrincipals({ types: 'individual', limit: 500 }),
-      ]);
+      // Stalwart principal 기반으로 메일 계정 조회
+      const stalwartRes = await mailApi.listPrincipals({ types: 'individual', limit: 500 });
+      const rawItems = stalwartRes.data?.items ?? [];
 
-      const adUsers = usersRes.status === 'fulfilled'
-        ? (usersRes.value.users ?? []).filter((u) => u.mail?.includes('@'))
-        : [];
-
-      const quotaMap: Record<string, { quota?: number; usedQuota?: number }> = {};
-      if (stalwartRes.status === 'fulfilled') {
-        const rawItems = stalwartRes.value.data?.items ?? [];
-        // If items are ID numbers/strings, fetch details in batches
-        if (rawItems.length > 0 && typeof rawItems[0] !== 'object') {
-          const details = await loadQuotaDetails(rawItems as (string | number)[]);
-          for (const p of details) {
-            if (p.name) quotaMap[p.name] = { quota: p.quota, usedQuota: p.usedQuota };
-          }
-        } else {
-          for (const p of rawItems) {
-            const pp = p as Principal;
-            if (pp.name) quotaMap[pp.name] = { quota: pp.quota, usedQuota: pp.usedQuota };
-          }
-        }
+      let principals: Principal[] = [];
+      if (rawItems.length > 0 && typeof rawItems[0] !== 'object') {
+        // ID 배열인 경우 상세 조회
+        principals = await loadQuotaDetails(rawItems as (string | number)[]);
+      } else {
+        principals = (rawItems as Principal[]);
       }
 
-      const accs: Principal[] = adUsers.map((u) => ({
-        _id: u.username,
-        name: u.username,
-        description: [u.given_name, u.surname].filter(Boolean).join(' ') || u.cn || u.username,
-        emails: u.mail ? [u.mail] : [],
+      const accs: Principal[] = principals.map((p) => ({
+        _id: p.name,
+        name: p.name,
+        description: p.description ?? '',
+        emails: p.emails ?? [],
         type: 'individual',
-        quota: quotaMap[u.username ?? '']?.quota ?? 0,
-        usedQuota: quotaMap[u.username ?? '']?.usedQuota ?? 0,
+        quota: p.quota ?? 0,
+        usedQuota: p.usedQuota ?? 0,
       }));
 
       let filtered = accs;
