@@ -20,15 +20,13 @@ import {
   TabPanel,
   Toggle,
   TextInput,
-  Select,
-  SelectItem,
   InlineLoading,
   StructuredListWrapper,
   StructuredListRow,
   StructuredListCell,
   StructuredListBody,
 } from '@carbon/react';
-import { Wifi, UserMultiple, Group, Renew, Save, CloudUpload, Restart } from '@carbon/icons-react';
+import { Wifi, UserMultiple, Group, Renew, Save, Restart } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
 import { apiFetch } from '../../api/client';
 
@@ -59,11 +57,6 @@ interface LDAPConfig {
   group_attribute: string;
   sync_groups: boolean;
   create_role_per_group: boolean;
-  import_enabled: boolean;
-  import_interval: number;
-  import_on_startup: boolean;
-  update_existing_users: boolean;
-  user_deletion_strategy: string;
   last_sync_date: string;
   last_sync_status: string;
   last_sync_user_count: number;
@@ -84,6 +77,54 @@ interface LDAPGroup {
   name: string;
   description: string;
   member_count: number;
+}
+
+interface WizardInfo {
+  id: number;
+  ldap_server_name: string;
+  user_count: number;
+  group_count: number;
+  sync_user_count: number;
+  selected_group_count: number;
+  sync_enabled: boolean;
+  sync_interval: number;
+  last_sync_date: string;
+  last_sync_status: string;
+  last_sync_user_count: number;
+}
+
+interface WizardGroup {
+  id: number;
+  selected: boolean;
+  sequence: number;
+  name: string;
+  description: string;
+  member_count: number;
+  ldap_dn: string;
+  exists_in_odoo: boolean;
+}
+
+interface WizardUser {
+  id: number;
+  sync_mode: 'group' | 'enable' | 'disable';
+  is_sync_target: boolean;
+  screen_name: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  job_title: string;
+  group_count: number;
+  ldap_dn: string;
+  exists_in_odoo: boolean;
+}
+
+interface WizardSchedule {
+  id: number;
+  sync_enabled: boolean;
+  sync_interval: number;
+  last_sync_date: string;
+  last_sync_status: string;
+  last_sync_user_count: number;
 }
 
 // ── Read-only config row ────────────────────────────────────────────────────
@@ -143,6 +184,14 @@ function EditField({
   );
 }
 
+// ── Sync Mode Tag ──────────────────────────────────────────────────────────
+
+function SyncModeTag({ mode }: { mode: string }) {
+  if (mode === 'enable') return <Tag type="green" size="sm">Enable</Tag>;
+  if (mode === 'disable') return <Tag type="red" size="sm">Disable</Tag>;
+  return <Tag type="blue" size="sm">Group</Tag>;
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────────────
 
 export default function AppEngineLDAPPage() {
@@ -150,34 +199,43 @@ export default function AppEngineLDAPPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // active config (first by default)
-  const [activeIdx, setActiveIdx] = useState(0);
+  const [activeIdx] = useState(0);
 
-  // edit state (Groups + Schedule tabs are editable)
   const [edits, setEdits] = useState<Partial<LDAPConfig>>({});
   const [saving, setSaving] = useState(false);
   const [saveResult, setSaveResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
-  // connection test
   const [testResult, setTestResult] = useState<{ success: boolean; message: string; latency_ms: number } | null>(null);
   const [testLoading, setTestLoading] = useState(false);
 
-  // sync / import
-  const [actionLoading, setActionLoading] = useState<'sync' | 'import' | null>(null);
-  const [actionResult, setActionResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [syncLoading, setSyncLoading] = useState(false);
+  const [syncResult, setSyncResult] = useState<{ ok: boolean; msg: string } | null>(null);
 
-  // Users modal
+  // Test Users/Groups modals
   const [usersOpen, setUsersOpen] = useState(false);
   const [users, setUsers] = useState<LDAPUser[]>([]);
   const [usersLoading, setUsersLoading] = useState(false);
   const [usersError, setUsersError] = useState<string | null>(null);
   const [userSearch, setUserSearch] = useState('');
 
-  // Groups modal
   const [groupsOpen, setGroupsOpen] = useState(false);
   const [groups, setGroups] = useState<LDAPGroup[]>([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [groupsError, setGroupsError] = useState<string | null>(null);
+
+  // Wizard state
+  const [wizardInfo, setWizardInfo] = useState<WizardInfo | null>(null);
+  const [wizardGroups, setWizardGroups] = useState<WizardGroup[]>([]);
+  const [wizardUsers, setWizardUsers] = useState<WizardUser[]>([]);
+  const [wizardSchedule, setWizardSchedule] = useState<WizardSchedule | null>(null);
+  const [wizardLoading, setWizardLoading] = useState(false);
+  const [wizardError, setWizardError] = useState<string | null>(null);
+  const [wizardRefreshing, setWizardRefreshing] = useState(false);
+  const [wizardSyncing, setWizardSyncing] = useState(false);
+  const [wizardActionResult, setWizardActionResult] = useState<{ ok: boolean; msg: string } | null>(null);
+  const [scheduleSaving, setScheduleSaving] = useState(false);
+  const [scheduleLocal, setScheduleLocal] = useState<{ sync_enabled: boolean; sync_interval: number } | null>(null);
+  const [mainTabIdx, setMainTabIdx] = useState(0);
 
   const cfg = configs[activeIdx] ?? null;
   const merged: LDAPConfig | null = cfg ? { ...cfg, ...edits } : null;
@@ -189,6 +247,7 @@ export default function AppEngineLDAPPage() {
       const data = await apiFetch<{ configs: LDAPConfig[]; total: number }>('/appengine/ldap/config');
       setConfigs(data.configs ?? []);
       setEdits({});
+      setWizardInfo(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : '설정 조회 실패');
     } finally {
@@ -235,20 +294,18 @@ export default function AppEngineLDAPPage() {
     }
   };
 
-  const runAction = async (action: 'sync' | 'import') => {
+  const runSync = async () => {
     if (!cfg) return;
-    setActionLoading(action);
-    setActionResult(null);
+    setSyncLoading(true);
+    setSyncResult(null);
     try {
-      const data = await apiFetch<{ status: string; result: string }>(
-        `/appengine/ldap/${action}/${cfg.id}`, { method: 'POST' }
-      );
-      setActionResult({ ok: true, msg: data.result || (action === 'sync' ? '동기화 완료' : 'Import 완료') });
-      await loadConfig(); // refresh sync status
+      await apiFetch(`/appengine/ldap/sync/${cfg.id}`, { method: 'POST' });
+      setSyncResult({ ok: true, msg: '동기화 완료' });
+      await loadConfig();
     } catch (e) {
-      setActionResult({ ok: false, msg: e instanceof Error ? e.message : `${action} 실패` });
+      setSyncResult({ ok: false, msg: e instanceof Error ? e.message : '동기화 실패' });
     } finally {
-      setActionLoading(null);
+      setSyncLoading(false);
     }
   };
 
@@ -285,6 +342,150 @@ export default function AppEngineLDAPPage() {
     }
   };
 
+  // ── Wizard functions ──────────────────────────────────────────────────────
+
+  const loadWizardData = useCallback(async () => {
+    if (!cfg) return;
+    setWizardLoading(true);
+    setWizardError(null);
+    try {
+      const [infoRes, groupsRes, usersRes, scheduleRes] = await Promise.all([
+        apiFetch<{ wizard: WizardInfo }>(`/appengine/ldap/wizard?ldap_id=${cfg.id}`),
+        apiFetch<{ groups: WizardGroup[] }>(`/appengine/ldap/wizard/groups?ldap_id=${cfg.id}`),
+        apiFetch<{ users: WizardUser[] }>(`/appengine/ldap/wizard/users?ldap_id=${cfg.id}`),
+        apiFetch<{ schedule: WizardSchedule }>(`/appengine/ldap/wizard/schedule?ldap_id=${cfg.id}`),
+      ]);
+      setWizardInfo(infoRes.wizard);
+      setWizardGroups(groupsRes.groups ?? []);
+      setWizardUsers(usersRes.users ?? []);
+      setWizardSchedule(scheduleRes.schedule);
+      setScheduleLocal({
+        sync_enabled: scheduleRes.schedule.sync_enabled,
+        sync_interval: scheduleRes.schedule.sync_interval,
+      });
+    } catch (e) {
+      setWizardError(e instanceof Error ? e.message : 'Wizard 데이터 로드 실패');
+    } finally {
+      setWizardLoading(false);
+    }
+  }, [cfg]);
+
+  useEffect(() => {
+    if (mainTabIdx === 3 && cfg && !wizardInfo && !wizardLoading) {
+      loadWizardData();
+    }
+  }, [mainTabIdx, cfg, wizardInfo, wizardLoading, loadWizardData]);
+
+  const refreshWizard = async () => {
+    if (!cfg) return;
+    setWizardRefreshing(true);
+    setWizardActionResult(null);
+    try {
+      const res = await apiFetch<{ wizard: WizardInfo; status: string }>(
+        `/appengine/ldap/wizard/refresh?ldap_id=${cfg.id}`, { method: 'POST' }
+      );
+      if (res.wizard) setWizardInfo(res.wizard);
+      // Reload groups & users after refresh
+      const [groupsRes, usersRes] = await Promise.all([
+        apiFetch<{ groups: WizardGroup[] }>(`/appengine/ldap/wizard/groups?ldap_id=${cfg.id}`),
+        apiFetch<{ users: WizardUser[] }>(`/appengine/ldap/wizard/users?ldap_id=${cfg.id}`),
+      ]);
+      setWizardGroups(groupsRes.groups ?? []);
+      setWizardUsers(usersRes.users ?? []);
+      setWizardActionResult({ ok: true, msg: 'LDAP 데이터 갱신 완료' });
+    } catch (e) {
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : 'Refresh 실패' });
+    } finally {
+      setWizardRefreshing(false);
+    }
+  };
+
+  const wizardSyncNow = async () => {
+    if (!cfg) return;
+    setWizardSyncing(true);
+    setWizardActionResult(null);
+    try {
+      await apiFetch(`/appengine/ldap/wizard/sync?ldap_id=${cfg.id}`, { method: 'POST' });
+      setWizardActionResult({ ok: true, msg: '동기화 완료' });
+      // Refresh wizard info to update last_sync fields
+      const infoRes = await apiFetch<{ wizard: WizardInfo }>(`/appengine/ldap/wizard?ldap_id=${cfg.id}`);
+      setWizardInfo(infoRes.wizard);
+    } catch (e) {
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '동기화 실패' });
+    } finally {
+      setWizardSyncing(false);
+    }
+  };
+
+  const toggleGroupSelected = async (groupId: number, selected: boolean) => {
+    if (!cfg) return;
+    // Optimistic update
+    setWizardGroups(prev => prev.map(g => g.id === groupId ? { ...g, selected } : g));
+    try {
+      await apiFetch(`/appengine/ldap/wizard/groups?ldap_id=${cfg.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ groups: [{ id: groupId, selected }] }),
+      });
+      // Refresh wizard info for counter update
+      const infoRes = await apiFetch<{ wizard: WizardInfo }>(`/appengine/ldap/wizard?ldap_id=${cfg.id}`);
+      setWizardInfo(infoRes.wizard);
+    } catch (e) {
+      // Revert on error
+      setWizardGroups(prev => prev.map(g => g.id === groupId ? { ...g, selected: !selected } : g));
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '그룹 변경 실패' });
+    }
+  };
+
+  const selectAllGroups = async (select: boolean) => {
+    if (!cfg) return;
+    setWizardGroups(prev => prev.map(g => ({ ...g, selected: select })));
+    try {
+      await apiFetch(`/appengine/ldap/wizard/groups?ldap_id=${cfg.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(select ? { select_all: true } : { deselect_all: true }),
+      });
+      const infoRes = await apiFetch<{ wizard: WizardInfo }>(`/appengine/ldap/wizard?ldap_id=${cfg.id}`);
+      setWizardInfo(infoRes.wizard);
+    } catch (e) {
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '그룹 일괄 변경 실패' });
+      loadWizardData();
+    }
+  };
+
+  const setAllUserPolicy = async (policy: string) => {
+    if (!cfg) return;
+    setWizardUsers(prev => prev.map(u => ({ ...u, sync_mode: policy as WizardUser['sync_mode'] })));
+    try {
+      await apiFetch(`/appengine/ldap/wizard/users?ldap_id=${cfg.id}`, {
+        method: 'PUT',
+        body: JSON.stringify({ set_all: policy }),
+      });
+      const infoRes = await apiFetch<{ wizard: WizardInfo }>(`/appengine/ldap/wizard?ldap_id=${cfg.id}`);
+      setWizardInfo(infoRes.wizard);
+    } catch (e) {
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '사용자 정책 일괄 변경 실패' });
+      loadWizardData();
+    }
+  };
+
+  const saveSchedule = async () => {
+    if (!cfg || !scheduleLocal) return;
+    setScheduleSaving(true);
+    try {
+      await apiFetch(`/appengine/ldap/wizard/schedule?ldap_id=${cfg.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(scheduleLocal),
+      });
+      const res = await apiFetch<{ schedule: WizardSchedule }>(`/appengine/ldap/wizard/schedule?ldap_id=${cfg.id}`);
+      setWizardSchedule(res.schedule);
+      setWizardActionResult({ ok: true, msg: '스케줄 저장 완료' });
+    } catch (e) {
+      setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '스케줄 저장 실패' });
+    } finally {
+      setScheduleSaving(false);
+    }
+  };
+
   const filteredUsers = userSearch
     ? users.filter(u =>
         `${u.screen_name} ${u.email} ${u.first_name} ${u.last_name}`.toLowerCase().includes(userSearch.toLowerCase())
@@ -316,22 +517,13 @@ export default function AppEngineLDAPPage() {
         </Button>
         <div style={{ flex: 1 }} />
         {cfg && (
-          <>
-            <Button
-              kind="ghost" size="sm" renderIcon={actionLoading === 'sync' ? undefined : Restart}
-              onClick={() => runAction('sync')}
-              disabled={!!actionLoading || !merged?.sync_groups}
-            >
-              {actionLoading === 'sync' ? <InlineLoading description="동기화 중..." /> : 'Sync All Users'}
-            </Button>
-            <Button
-              kind="ghost" size="sm" renderIcon={actionLoading === 'import' ? undefined : CloudUpload}
-              onClick={() => runAction('import')}
-              disabled={!!actionLoading || !merged?.import_enabled}
-            >
-              {actionLoading === 'import' ? <InlineLoading description="Import 중..." /> : 'Import Now'}
-            </Button>
-          </>
+          <Button
+            kind="ghost" size="sm" renderIcon={syncLoading ? undefined : Restart}
+            onClick={runSync}
+            disabled={syncLoading || !merged?.sync_groups}
+          >
+            {syncLoading ? <InlineLoading description="동기화 중..." /> : 'Sync All Users'}
+          </Button>
         )}
         {hasEdits && (
           <Button kind="primary" size="sm" renderIcon={Save} onClick={saveEdits} disabled={saving}>
@@ -352,13 +544,13 @@ export default function AppEngineLDAPPage() {
             />
           </div>
         )}
-        {actionResult && (
+        {syncResult && (
           <div style={{ paddingTop: '8px' }}>
             <InlineNotification
-              kind={actionResult.ok ? 'success' : 'error'}
-              title={actionResult.ok ? '완료' : '실패'}
-              subtitle={actionResult.msg}
-              lowContrast onClose={() => setActionResult(null)}
+              kind={syncResult.ok ? 'success' : 'error'}
+              title={syncResult.ok ? '완료' : '실패'}
+              subtitle={syncResult.msg}
+              lowContrast onClose={() => setSyncResult(null)}
             />
           </div>
         )}
@@ -389,13 +581,12 @@ export default function AppEngineLDAPPage() {
       {/* ── Main tabs ── */}
       {merged && (
         <div style={{ padding: '0 16px' }}>
-          <Tabs>
+          <Tabs selectedIndex={mainTabIdx} onChange={({ selectedIndex }) => setMainTabIdx(selectedIndex)}>
             <TabList aria-label="LDAP 설정 탭">
               <Tab>서버 정보</Tab>
               <Tab>사용자 설정</Tab>
               <Tab>그룹 설정</Tab>
-              <Tab>자동 Import</Tab>
-              <Tab>동기화 현황</Tab>
+              <Tab>Sync Wizard</Tab>
             </TabList>
             <TabPanels>
 
@@ -471,90 +662,286 @@ export default function AppEngineLDAPPage() {
                 </div>
               </TabPanel>
 
-              {/* ── Tab 4: 자동 Import (편집 가능) ── */}
+              {/* ── Tab 4: Sync Wizard ── */}
               <TabPanel>
-                <div style={{ maxWidth: '520px', paddingTop: '16px' }}>
-                  <div style={{ marginBottom: '20px' }}>
-                    <Toggle
-                      id="import_enabled"
-                      labelText="Enable Scheduled Import"
-                      toggled={merged.import_enabled}
-                      onToggle={v => setEdit('import_enabled', v)}
-                    />
-                  </div>
-                  {merged.import_enabled && (
-                    <>
-                      <div style={{ marginBottom: '16px' }}>
-                        <TextInput
-                          id="import_interval"
-                          labelText="Import Interval (minutes)"
-                          value={String(merged.import_interval || 60)}
-                          onChange={e => setEdit('import_interval', parseInt(e.target.value) || 60)}
-                          type="number"
-                          style={{ width: '160px' }}
-                        />
-                      </div>
-                      <div style={{ marginBottom: '16px' }}>
-                        <Toggle
-                          id="import_on_startup"
-                          labelText="Import on Startup"
-                          toggled={merged.import_on_startup}
-                          onToggle={v => setEdit('import_on_startup', v)}
-                        />
-                      </div>
-                      <div style={{ marginBottom: '16px' }}>
-                        <Toggle
-                          id="update_existing_users"
-                          labelText="Update Existing Users"
-                          toggled={merged.update_existing_users}
-                          onToggle={v => setEdit('update_existing_users', v)}
-                        />
-                      </div>
-                      <div style={{ marginBottom: '16px' }}>
-                        <Select
-                          id="user_deletion_strategy"
-                          labelText="User Deletion Strategy"
-                          value={merged.user_deletion_strategy || 'deactivate'}
-                          onChange={e => setEdit('user_deletion_strategy', e.target.value)}
-                        >
-                          <SelectItem value="deactivate" text="Deactivate User" />
-                          <SelectItem value="delete" text="Delete User" />
-                          <SelectItem value="nothing" text="Keep User" />
-                        </Select>
-                      </div>
-                    </>
+                <div style={{ paddingTop: '16px' }}>
+                  {/* Wizard loading / error */}
+                  {wizardLoading && (
+                    <div style={{ padding: '40px', display: 'flex', justifyContent: 'center' }}>
+                      <Loading description="Wizard 데이터 로드 중..." withOverlay={false} />
+                    </div>
                   )}
-                </div>
-              </TabPanel>
+                  {wizardError && (
+                    <InlineNotification kind="error" title="Wizard 오류" subtitle={wizardError} lowContrast />
+                  )}
+                  {wizardActionResult && (
+                    <div style={{ marginBottom: '8px' }}>
+                      <InlineNotification
+                        kind={wizardActionResult.ok ? 'success' : 'error'}
+                        title={wizardActionResult.ok ? '완료' : '실패'}
+                        subtitle={wizardActionResult.msg}
+                        lowContrast onClose={() => setWizardActionResult(null)}
+                      />
+                    </div>
+                  )}
 
-              {/* ── Tab 5: 동기화 현황 (읽기 전용) ── */}
-              <TabPanel>
-                <div style={{ maxWidth: '600px', paddingTop: '16px' }}>
-                  <ConfigSection title="Sync Status">
-                    <ConfigRow label="Last Sync Date" value={merged.last_sync_date || '—'} />
-                    <ConfigRow label="Last Sync Status" value={merged.last_sync_status || '—'} />
-                    <ConfigRow label="Last Sync User Count" value={merged.last_sync_user_count ?? 0} />
-                  </ConfigSection>
-                  <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
-                    <Button
-                      kind="primary" size="sm" renderIcon={Restart}
-                      onClick={() => runAction('sync')}
-                      disabled={!!actionLoading || !merged.sync_groups}
-                    >
-                      {actionLoading === 'sync' ? <InlineLoading description="동기화 중..." /> : 'Sync All Users & Groups'}
-                    </Button>
-                    <Button
-                      kind="secondary" size="sm" renderIcon={CloudUpload}
-                      onClick={() => runAction('import')}
-                      disabled={!!actionLoading || !merged.import_enabled}
-                    >
-                      {actionLoading === 'import' ? <InlineLoading description="Import 중..." /> : 'Import Now'}
-                    </Button>
-                  </div>
-                  {!merged.import_enabled && (
-                    <p style={{ fontSize: '0.8rem', color: '#6f6f6f', marginTop: '12px' }}>
-                      Import Now 는 "자동 Import" 탭에서 활성화 후 사용 가능합니다.
-                    </p>
+                  {!wizardLoading && wizardInfo && (
+                    <>
+                      {/* ── Wizard Header ── */}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap',
+                        padding: '12px 0 16px', borderBottom: '1px solid #393939', marginBottom: '16px',
+                      }}>
+                        <div>
+                          <span style={{ fontSize: '0.75rem', color: '#8d8d8d', marginRight: '8px' }}>LDAP Server</span>
+                          <span style={{ fontWeight: 600 }}>{wizardInfo.ldap_server_name || cfg?.ldap_server}</span>
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <Tag type="blue" size="sm">
+                            {wizardInfo.selected_group_count}/{wizardInfo.group_count} Groups Selected
+                          </Tag>
+                          <Tag type="green" size="sm">
+                            {wizardInfo.sync_user_count}/{wizardInfo.user_count} Users Will Sync
+                          </Tag>
+                        </div>
+                        <div style={{ flex: 1 }} />
+                        <Button
+                          kind="ghost" size="sm" renderIcon={wizardRefreshing ? undefined : Renew}
+                          onClick={refreshWizard} disabled={wizardRefreshing}
+                        >
+                          {wizardRefreshing ? <InlineLoading description="Refresh 중..." /> : 'Refresh from LDAP'}
+                        </Button>
+                        <Button
+                          kind="primary" size="sm" renderIcon={wizardSyncing ? undefined : Restart}
+                          onClick={wizardSyncNow} disabled={wizardSyncing}
+                        >
+                          {wizardSyncing ? <InlineLoading description="동기화 중..." /> : 'Sync Now'}
+                        </Button>
+                      </div>
+
+                      {/* ── Wizard Sub-tabs ── */}
+                      <Tabs>
+                        <TabList aria-label="Sync Wizard 서브탭">
+                          <Tab>Groups</Tab>
+                          <Tab>Users</Tab>
+                          <Tab>Schedule</Tab>
+                        </TabList>
+                        <TabPanels>
+
+                          {/* ── Groups 서브탭 ── */}
+                          <TabPanel>
+                            <div style={{ paddingTop: '12px' }}>
+                              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                                <Button kind="secondary" size="sm" onClick={() => selectAllGroups(true)}>
+                                  Select All
+                                </Button>
+                                <Button kind="ghost" size="sm" onClick={() => selectAllGroups(false)}>
+                                  Deselect All
+                                </Button>
+                              </div>
+                              <DataTable
+                                rows={wizardGroups.map(g => ({
+                                  id: String(g.id),
+                                  _id: g.id,
+                                  selected: g.selected,
+                                  name: g.name,
+                                  description: g.description || '',
+                                  member_count: g.member_count,
+                                  exists_in_odoo: g.exists_in_odoo,
+                                }))}
+                                headers={[
+                                  { key: 'selected', header: 'Sync' },
+                                  { key: 'name', header: 'Group Name' },
+                                  { key: 'description', header: 'Description' },
+                                  { key: 'member_count', header: 'Members' },
+                                  { key: 'exists_in_odoo', header: 'In Odoo' },
+                                ]}
+                              >
+                                {({ rows, headers, getHeaderProps, getTableProps }) => (
+                                  <TableContainer>
+                                    <Table {...getTableProps()} size="sm">
+                                      <TableHead>
+                                        <TableRow>
+                                          {headers.map(h => (
+                                            <TableHeader {...getHeaderProps({ header: h })} key={h.key}>
+                                              {h.header}
+                                            </TableHeader>
+                                          ))}
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {rows.map(row => {
+                                          const grpId = Number(row.id);
+                                          const grp = wizardGroups.find(g => g.id === grpId);
+                                          return (
+                                            <TableRow key={row.id}>
+                                              {row.cells.map(cell => (
+                                                <TableCell key={cell.id}>
+                                                  {cell.info.header === 'selected' ? (
+                                                    <Toggle
+                                                      id={`grp-toggle-${grpId}`}
+                                                      labelText=""
+                                                      hideLabel
+                                                      toggled={grp?.selected ?? false}
+                                                      onToggle={v => toggleGroupSelected(grpId, v)}
+                                                      size="sm"
+                                                    />
+                                                  ) : cell.info.header === 'member_count' ? (
+                                                    <Tag type="blue" size="sm">{cell.value}</Tag>
+                                                  ) : cell.info.header === 'exists_in_odoo' ? (
+                                                    cell.value
+                                                      ? <Tag type="green" size="sm">In Odoo</Tag>
+                                                      : <Tag type="gray" size="sm">Not in Odoo</Tag>
+                                                  ) : (
+                                                    cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
+                                                  )}
+                                                </TableCell>
+                                              ))}
+                                            </TableRow>
+                                          );
+                                        })}
+                                      </TableBody>
+                                    </Table>
+                                  </TableContainer>
+                                )}
+                              </DataTable>
+                            </div>
+                          </TabPanel>
+
+                          {/* ── Users 서브탭 ── */}
+                          <TabPanel>
+                            <div style={{ paddingTop: '12px' }}>
+                              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                                <Button kind="ghost" size="sm" onClick={() => setAllUserPolicy('group')}>
+                                  All Group Policy
+                                </Button>
+                                <Button kind="ghost" size="sm" onClick={() => setAllUserPolicy('enable')}>
+                                  All Include
+                                </Button>
+                                <Button kind="ghost" size="sm" onClick={() => setAllUserPolicy('disable')}>
+                                  All Exclude
+                                </Button>
+                              </div>
+                              <DataTable
+                                rows={wizardUsers.map(u => ({
+                                  id: String(u.id),
+                                  _id: u.id,
+                                  sync_mode: u.sync_mode,
+                                  is_sync_target: u.is_sync_target,
+                                  screen_name: u.screen_name || '',
+                                  email: u.email || '',
+                                  first_name: u.first_name || '',
+                                  last_name: u.last_name || '',
+                                  job_title: u.job_title || '',
+                                  group_count: u.group_count,
+                                  exists_in_odoo: u.exists_in_odoo,
+                                }))}
+                                headers={[
+                                  { key: 'sync_mode', header: 'Policy' },
+                                  { key: 'is_sync_target', header: 'Sync' },
+                                  { key: 'screen_name', header: 'Screen Name' },
+                                  { key: 'email', header: 'Email' },
+                                  { key: 'first_name', header: 'First Name' },
+                                  { key: 'last_name', header: 'Last Name' },
+                                  { key: 'job_title', header: 'Job Title' },
+                                  { key: 'group_count', header: 'Groups' },
+                                  { key: 'exists_in_odoo', header: 'In Odoo' },
+                                ]}
+                              >
+                                {({ rows, headers, getHeaderProps, getTableProps }) => (
+                                  <TableContainer>
+                                    <Table {...getTableProps()} size="sm">
+                                      <TableHead>
+                                        <TableRow>
+                                          {headers.map(h => (
+                                            <TableHeader {...getHeaderProps({ header: h })} key={h.key}>
+                                              {h.header}
+                                            </TableHeader>
+                                          ))}
+                                        </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                        {rows.map(row => (
+                                          <TableRow key={row.id}>
+                                            {row.cells.map(cell => (
+                                              <TableCell key={cell.id}>
+                                                {cell.info.header === 'sync_mode' ? (
+                                                  <SyncModeTag mode={String(cell.value)} />
+                                                ) : cell.info.header === 'is_sync_target' ? (
+                                                  cell.value
+                                                    ? <Tag type="green" size="sm">Yes</Tag>
+                                                    : <Tag type="gray" size="sm">No</Tag>
+                                                ) : cell.info.header === 'group_count' ? (
+                                                  <Tag type="blue" size="sm">{cell.value}</Tag>
+                                                ) : cell.info.header === 'exists_in_odoo' ? (
+                                                  cell.value
+                                                    ? <Tag type="green" size="sm">In Odoo</Tag>
+                                                    : <Tag type="gray" size="sm">Not in Odoo</Tag>
+                                                ) : (
+                                                  cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
+                                                )}
+                                              </TableCell>
+                                            ))}
+                                          </TableRow>
+                                        ))}
+                                      </TableBody>
+                                    </Table>
+                                  </TableContainer>
+                                )}
+                              </DataTable>
+                            </div>
+                          </TabPanel>
+
+                          {/* ── Schedule 서브탭 ── */}
+                          <TabPanel>
+                            <div style={{ maxWidth: '480px', paddingTop: '16px' }}>
+                              {scheduleLocal && (
+                                <>
+                                  <div style={{ marginBottom: '20px' }}>
+                                    <Toggle
+                                      id="wizard_sync_enabled"
+                                      labelText="Enable Auto Sync"
+                                      toggled={scheduleLocal.sync_enabled}
+                                      onToggle={v => setScheduleLocal(prev => prev ? { ...prev, sync_enabled: v } : prev)}
+                                    />
+                                  </div>
+                                  <div style={{ marginBottom: '20px' }}>
+                                    <TextInput
+                                      id="wizard_sync_interval"
+                                      labelText="Sync Interval (minutes)"
+                                      value={String(scheduleLocal.sync_interval || 60)}
+                                      onChange={e => setScheduleLocal(prev =>
+                                        prev ? { ...prev, sync_interval: parseInt(e.target.value) || 60 } : prev
+                                      )}
+                                      type="number"
+                                      style={{ width: '160px' }}
+                                    />
+                                  </div>
+                                </>
+                              )}
+
+                              {wizardSchedule && (
+                                <div style={{ marginBottom: '20px' }}>
+                                  <ConfigSection title="Last Sync Info">
+                                    <ConfigRow label="Last Sync Date" value={wizardSchedule.last_sync_date || '—'} />
+                                    <ConfigRow label="Last Sync Status" value={wizardSchedule.last_sync_status || '—'} />
+                                    <ConfigRow label="Last Sync User Count" value={wizardSchedule.last_sync_user_count ?? 0} />
+                                  </ConfigSection>
+                                </div>
+                              )}
+
+                              <Button
+                                kind="primary" size="sm" renderIcon={Save}
+                                onClick={saveSchedule} disabled={scheduleSaving}
+                              >
+                                {scheduleSaving ? <InlineLoading description="저장 중..." /> : '저장'}
+                              </Button>
+                            </div>
+                          </TabPanel>
+
+                        </TabPanels>
+                      </Tabs>
+                    </>
                   )}
                 </div>
               </TabPanel>
@@ -564,7 +951,7 @@ export default function AppEngineLDAPPage() {
         </div>
       )}
 
-      {/* ── Users Modal ── */}
+      {/* ── Test Users Modal ── */}
       <Modal
         open={usersOpen}
         modalHeading={`LDAP Users${users.length > 0 ? ` (${users.length})` : ''}`}
@@ -636,7 +1023,7 @@ export default function AppEngineLDAPPage() {
         )}
       </Modal>
 
-      {/* ── Groups Modal ── */}
+      {/* ── Test Groups Modal ── */}
       <Modal
         open={groupsOpen}
         modalHeading={`LDAP Groups${groups.length > 0 ? ` (${groups.length})` : ''}`}
