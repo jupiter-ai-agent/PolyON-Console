@@ -32,6 +32,7 @@ const AppEngineUsersPage = lazy(() => import('./pages/AppEngine/AppEngineUsersPa
 
 const AppEngineLDAPPage = lazy(() => import('./pages/AppEngine/AppEngineLDAPPage'));
 const AppEngineCronPage = lazy(() => import('./pages/AppEngine/AppEngineCronPage'));
+const AppEngineStoragePage = lazy(() => import('./pages/AppEngine/AppEngineStoragePage'));
 
 // Mail
 const MailPage = lazy(() => import('./pages/Mail/MailPage'));
@@ -213,6 +214,7 @@ export default function App() {
 
             <Route path="/appengine/ldap" element={<AppEngineLDAPPage />} />
             <Route path="/appengine/cron" element={<AppEngineCronPage />} />
+            <Route path="/appengine/storage" element={<AppEngineStoragePage />} />
             <Route path="/mail" element={<MailPage />} />
             <Route path="/mail/accounts" element={<MailAccountsPage />} />
             <Route path="/mail/groups" element={<MailGroupsPage />} />

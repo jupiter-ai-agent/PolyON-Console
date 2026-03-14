@@ -201,6 +201,7 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
       { label: '모듈/앱 관리', path: '/appengine/modules', icon: ContainerSoftware },
       { label: '스케줄러', path: '/appengine/cron', icon: Time },
       { label: 'AD/LDAP 진단', path: '/appengine/ldap', icon: Wifi },
+      { label: '스토리지 현황', path: '/appengine/storage', icon: DataBase },
     ],
   },
   networking: {
