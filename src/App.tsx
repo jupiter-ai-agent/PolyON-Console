@@ -29,7 +29,7 @@ const FirewallPage = lazy(() => import('./pages/Networking/FirewallPage'));
 const AppEnginePage = lazy(() => import('./pages/AppEngine/AppEnginePage'));
 const AppEngineModulesPage = lazy(() => import('./pages/AppEngine/AppEngineModulesPage'));
 const AppEngineUsersPage = lazy(() => import('./pages/AppEngine/AppEngineUsersPage'));
-const AppEngineGroupSyncPage = lazy(() => import('./pages/AppEngine/AppEngineGroupSyncPage'));
+
 const AppEngineLDAPPage = lazy(() => import('./pages/AppEngine/AppEngineLDAPPage'));
 
 // Mail
@@ -209,8 +209,7 @@ export default function App() {
             <Route path="/appengine" element={<AppEnginePage />} />
             <Route path="/appengine/users" element={<AppEngineUsersPage />} />
             <Route path="/appengine/modules" element={<AppEngineModulesPage />} />
-            <Route path="/appengine/group-sync" element={<AppEngineGroupSyncPage />} />
-            <Route path="/appengine/ad-groups" element={<AppEngineGroupSyncPage />} />
+
             <Route path="/appengine/ldap" element={<AppEngineLDAPPage />} />
             <Route path="/mail" element={<MailPage />} />
             <Route path="/mail/accounts" element={<MailAccountsPage />} />

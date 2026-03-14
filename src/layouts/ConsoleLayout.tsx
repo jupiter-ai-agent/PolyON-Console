@@ -198,7 +198,7 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
     items: [
       { label: '사용자/권한', path: '/appengine/users', icon: UserMultiple },
       { label: '모듈/앱 관리', path: '/appengine/modules', icon: ContainerSoftware },
-      { label: 'AD 그룹 동기화', path: '/appengine/ad-groups', icon: GroupPresentation },
+
       { label: 'AD/LDAP 진단', path: '/appengine/ldap', icon: Wifi },
     ],
   },
