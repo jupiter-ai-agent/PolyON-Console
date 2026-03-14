@@ -233,7 +233,7 @@ export default function AppEngineLDAPPage() {
   const [wizardRefreshing, setWizardRefreshing] = useState(false);
   const [wizardSyncing, setWizardSyncing] = useState(false);
   const [wizardActionResult, setWizardActionResult] = useState<{ ok: boolean; msg: string } | null>(null);
-  const [scheduleSaving, setScheduleSaving] = useState(false);
+
   const [scheduleLocal, setScheduleLocal] = useState<{ sync_enabled: boolean; sync_interval: number } | null>(null);
   const [mainTabIdx, setMainTabIdx] = useState(0);
 
@@ -487,21 +487,20 @@ export default function AppEngineLDAPPage() {
     }
   };
 
-  const saveSchedule = async () => {
+  // 변경 즉시 저장 (버튼 없음)
+  const saveScheduleWith = async (patch: Partial<{ sync_enabled: boolean; sync_interval: number }>) => {
     if (!cfg || !scheduleLocal) return;
-    setScheduleSaving(true);
+    const next = { ...scheduleLocal, ...patch };
+    setScheduleLocal(next);
     try {
       await apiFetch(`/appengine/ldap/wizard/schedule?ldap_id=${cfg.id}`, {
         method: 'PUT',
-        body: JSON.stringify(scheduleLocal),
+        body: JSON.stringify(next),
       });
       const res = await apiFetch<{ schedule: WizardSchedule }>(`/appengine/ldap/wizard/schedule?ldap_id=${cfg.id}`);
       setWizardSchedule(res.schedule);
-      setWizardActionResult({ ok: true, msg: '스케줄 저장 완료' });
     } catch (e) {
       setWizardActionResult({ ok: false, msg: e instanceof Error ? e.message : '스케줄 저장 실패' });
-    } finally {
-      setScheduleSaving(false);
     }
   };
 
@@ -923,7 +922,7 @@ export default function AppEngineLDAPPage() {
                                       id="wizard_sync_enabled"
                                       labelText="Enable Auto Sync"
                                       toggled={scheduleLocal.sync_enabled}
-                                      onToggle={v => setScheduleLocal(prev => prev ? { ...prev, sync_enabled: v } : prev)}
+                                      onToggle={v => saveScheduleWith({ sync_enabled: v })}
                                     />
                                   </div>
                                   <div style={{ marginBottom: '20px' }}>
@@ -934,6 +933,7 @@ export default function AppEngineLDAPPage() {
                                       onChange={e => setScheduleLocal(prev =>
                                         prev ? { ...prev, sync_interval: parseInt(e.target.value) || 60 } : prev
                                       )}
+                                      onBlur={e => saveScheduleWith({ sync_interval: parseInt(e.target.value) || 60 })}
                                       type="number"
                                       style={{ width: '160px' }}
                                     />
@@ -950,13 +950,6 @@ export default function AppEngineLDAPPage() {
                                   </ConfigSection>
                                 </div>
                               )}
-
-                              <Button
-                                kind="primary" size="sm" renderIcon={Save}
-                                onClick={saveSchedule} disabled={scheduleSaving}
-                              >
-                                {scheduleSaving ? <InlineLoading description="저장 중..." /> : '저장'}
-                              </Button>
                             </div>
                           </TabPanel>
 
