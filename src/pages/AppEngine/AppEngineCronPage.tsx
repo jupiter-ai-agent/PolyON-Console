@@ -25,9 +25,9 @@ interface CronRecord {
   interval_number: number;
   interval_type: string;
   nextcall: string | false | null;
-  numbercall: number;
-  model_id: [number, string] | false | null;
+  lastcall: string | false | null;
   priority: number;
+  failure_count: number;
 }
 
 interface CronResponse {
@@ -41,7 +41,7 @@ const headers = [
   { key: 'name', header: '이름' },
   { key: 'interval', header: '주기' },
   { key: 'nextcall', header: '다음 실행' },
-  { key: 'numbercall', header: '실행 횟수' },
+  { key: 'lastcall', header: '마지막 실행' },
   { key: 'actions', header: '액션' },
 ];
 
@@ -133,7 +133,7 @@ export default function AppEngineCronPage() {
     name: cron.name,
     interval: `${cron.interval_number} ${cron.interval_type}`,
     nextcall: formatNextCall(cron.nextcall),
-    numbercall: cron.numbercall === -1 ? '\u221e' : String(cron.numbercall),
+    lastcall: formatNextCall(cron.lastcall),
     actions: cron,
   }));
 
@@ -235,7 +235,7 @@ export default function AppEngineCronPage() {
                         <TableCell>{cron.name}</TableCell>
                         <TableCell>{`${cron.interval_number} ${cron.interval_type}`}</TableCell>
                         <TableCell>{formatNextCall(cron.nextcall)}</TableCell>
-                        <TableCell>{cron.numbercall === -1 ? '\u221e' : cron.numbercall}</TableCell>
+                        <TableCell>{formatNextCall(cron.lastcall)}</TableCell>
                         <TableCell>
                           <Button
                             kind="ghost"
