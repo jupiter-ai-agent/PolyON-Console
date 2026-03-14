@@ -6,6 +6,10 @@ export function setTokenProvider(fn: () => string | null) {
   _getToken = fn;
 }
 
+export function getToken(): string | null {
+  return _getToken ? _getToken() : null;
+}
+
 export async function apiFetch<T>(path: string, opts?: RequestInit): Promise<T> {
   const token = _getToken ? _getToken() : null;
   const authHeader: Record<string, string> = token

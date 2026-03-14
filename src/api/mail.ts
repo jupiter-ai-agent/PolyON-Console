@@ -4,6 +4,8 @@
  * 기존 stalwart-api.js를 TypeScript로 재구현
  */
 
+import { getToken } from './client';
+
 const MAIL_BASE = '/mail-proxy';
 
 // ── 타입 정의 ──────────────────────────────────────────────────────────────
@@ -185,7 +187,9 @@ async function mailReq<T = unknown>(
     ? '?' + new URLSearchParams(Object.fromEntries(Object.entries(params).map(([k, v]) => [k, String(v)]))).toString()
     : '';
   const url = `${MAIL_BASE}${path}${qs}`;
-  const opts: RequestInit = { method, headers: {} };
+  const token = getToken();
+  const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
+  const opts: RequestInit = { method, headers: { ...authHeader } };
   if (body !== null) {
     (opts.headers as Record<string, string>)['Content-Type'] = 'application/json';
     opts.body = JSON.stringify(body);
@@ -202,9 +206,11 @@ async function mailReq<T = unknown>(
 
 async function mailReqText(method: string, path: string, body: string): Promise<unknown> {
   const url = `${MAIL_BASE}${path}`;
+  const token = getToken();
+  const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
   const res = await fetch(url, {
     method,
-    headers: { 'Content-Type': 'text/plain' },
+    headers: { 'Content-Type': 'text/plain', ...authHeader },
     body,
   });
   if (!res.ok) {
