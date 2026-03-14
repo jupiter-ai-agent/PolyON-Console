@@ -116,6 +116,7 @@ interface WizardUser {
   job_title: string;
   group_count: number;
   ldap_dn: string;
+  member_group_dns: string; // JSON array of group DNs
 }
 
 interface WizardSchedule {
@@ -469,11 +470,25 @@ export default function AppEngineLDAPPage() {
   };
 
   // 개별 사용자 정책 변경 (즉시 반영)
+  // policy 변경 시 is_sync_target 로컬 재계산
+  const calcIsSyncTarget = (user: WizardUser, policy: string): boolean => {
+    if (policy === 'enable') return true;
+    if (policy === 'disable') return false;
+    // group: 선택된 그룹과 교집합 여부
+    const selectedDns = new Set(wizardGroups.filter(g => g.selected).map(g => g.ldap_dn).filter(Boolean));
+    if (!selectedDns.size) return false;
+    try {
+      const userDns: string[] = JSON.parse(user.member_group_dns || '[]');
+      return userDns.some(dn => selectedDns.has(dn));
+    } catch { return false; }
+  };
+
   const setUserPolicy = async (userId: number, policy: string) => {
     if (!cfg) return;
-    setWizardUsers(prev => prev.map(u =>
-      u.id === userId ? { ...u, sync_mode: policy as WizardUser['sync_mode'] } : u
-    ));
+    setWizardUsers(prev => prev.map(u => {
+      if (u.id !== userId) return u;
+      return { ...u, sync_mode: policy as WizardUser['sync_mode'], is_sync_target: calcIsSyncTarget(u, policy) };
+    }));
     try {
       await apiFetch(`/appengine/ldap/wizard/users?ldap_id=${cfg.id}`, {
         method: 'PUT',
@@ -846,7 +861,7 @@ export default function AppEngineLDAPPage() {
                                 }))}
                                 headers={[
                                   { key: 'sync_mode', header: 'Policy' },
-                                  { key: 'is_sync_target', header: 'Sync' },
+                                  { key: 'is_sync_target', header: 'Target' },
                                   { key: 'screen_name', header: 'Screen Name' },
                                   { key: 'email', header: 'Email' },
                                   { key: 'first_name', header: 'First Name' },
@@ -891,9 +906,9 @@ export default function AppEngineLDAPPage() {
                                                       <SelectItem value="disable" text="Exclude" />
                                                     </Select>
                                                   ) : cell.info.header === 'is_sync_target' ? (
-                                                    cell.value
-                                                      ? <Tag type="green" size="sm">Yes</Tag>
-                                                      : <Tag type="gray" size="sm">No</Tag>
+                                                    <span style={{ fontSize: '1rem', color: cell.value ? '#24a148' : '#6f6f6f' }}>
+                                                      {cell.value ? '●' : '○'}
+                                                    </span>
                                                   ) : cell.info.header === 'group_count' ? (
                                                     <Tag type="blue" size="sm">{cell.value}</Tag>
                                                   ) : (
