@@ -110,7 +110,7 @@ export default function TraefikPage() {
               { label: 'TCP 라우터', value: overview.tcp?.routers?.total ?? 0, accent: '#6929c4' },
               { label: '엔트리포인트', value: entrypoints.length, accent: '#0043ce' },
             ].map(({ label, value, accent }) => (
-              <Tile key={label} style={{ padding: '20px', background: '#161616', borderLeft: `4px solid ${accent}` }}>
+              <Tile key={label} style={{ padding: '20px', borderLeft: `4px solid ${accent}` }}>
                 <p style={{ margin: 0, fontSize: '0.75rem', color: '#8d8d8d', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
                 <p style={{ margin: '8px 0 0', fontSize: '2rem', fontWeight: 700, color: '#f4f4f4' }}>{value}</p>
               </Tile>
@@ -245,7 +245,7 @@ export default function TraefikPage() {
               <TabPanel>
                 <div style={{ paddingTop: '12px', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
                   {entrypoints.map(ep => (
-                    <Tile key={ep.name} style={{ padding: '16px', background: '#262626' }}>
+                    <Tile key={ep.name} style={{ padding: '16px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                         <Tag type="blue" size="sm">{ep.name}</Tag>
                         {ep.http && <Tag type="teal" size="sm">HTTP</Tag>}
