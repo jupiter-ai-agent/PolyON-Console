@@ -83,8 +83,7 @@ export default function DNSPage() {
     setRecords([]);
     setShowAddForm(false);
     try {
-      const res = await apiFetch(`/dns/zones/${zone}/records`) as any;
-      const data = await res.json();
+      const data = await apiFetch(`/dns/zones/${zone}/records`) as any;
       setRecords(parseRecords(data.output || data.error || ''));
     } catch {}
     setRecordsLoading(false);
