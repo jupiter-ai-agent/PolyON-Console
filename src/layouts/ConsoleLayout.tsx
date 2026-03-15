@@ -205,6 +205,22 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
       { label: '스토리지 현황', path: '/appengine/storage', icon: DataBase },
     ],
   },
+  auth: {
+    title: 'Auth',
+    desc: 'Keycloak SSO 관리',
+    section: 'SERVICES',
+    defaultPath: '/auth',
+    icon: Security,
+    serviceId: 'auth',
+    items: [
+      { label: '개요', path: '/auth', icon: Security },
+      { label: '클라이언트', path: '/auth/clients', icon: Application },
+      { label: '사용자', path: '/auth/users', icon: UserMultiple },
+      { label: '그룹', path: '/auth/groups', icon: GroupPresentation },
+      { label: 'LDAP 연동', path: '/auth/federation', icon: Wifi },
+      { label: '세션', path: '/auth/sessions', icon: Activity },
+    ],
+  },
   networking: {
     title: 'Networking',
     desc: 'DNS · DC · VPN · Firewall',
@@ -332,6 +348,7 @@ const FOUNDATION_NAV_ORDER = [
   // SERVICES
   'mail',
   'appengine',
+  'auth',
   // INFRASTRUCTURE
   'networking',
   'containers',

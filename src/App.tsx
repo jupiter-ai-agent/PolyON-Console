@@ -25,6 +25,14 @@ const DCsPage = lazy(() => import('./pages/Networking/DCsPage'));
 const VPNPage = lazy(() => import('./pages/Networking/VPNPage'));
 const FirewallPage = lazy(() => import('./pages/Networking/FirewallPage'));
 
+// Auth (Keycloak)
+const AuthOverviewPage = lazy(() => import('./pages/Auth/AuthOverviewPage'));
+const AuthClientsPage = lazy(() => import('./pages/Auth/AuthClientsPage'));
+const AuthUsersPage = lazy(() => import('./pages/Auth/AuthUsersPage'));
+const AuthGroupsPage = lazy(() => import('./pages/Auth/AuthGroupsPage'));
+const AuthFederationPage = lazy(() => import('./pages/Auth/AuthFederationPage'));
+const AuthSessionsPage = lazy(() => import('./pages/Auth/AuthSessionsPage'));
+
 // AppEngine
 const AppEnginePage = lazy(() => import('./pages/AppEngine/AppEnginePage'));
 const AppEngineModulesPage = lazy(() => import('./pages/AppEngine/AppEngineModulesPage'));
@@ -207,6 +215,14 @@ export default function App() {
             <Route path="/dcs" element={<DCsPage />} />
             <Route path="/services/vpn" element={<VPNPage />} />
             <Route path="/services/firewall" element={<FirewallPage />} />
+
+            {/* Auth (Keycloak) */}
+            <Route path="/auth" element={<AuthOverviewPage />} />
+            <Route path="/auth/clients" element={<AuthClientsPage />} />
+            <Route path="/auth/users" element={<AuthUsersPage />} />
+            <Route path="/auth/groups" element={<AuthGroupsPage />} />
+            <Route path="/auth/federation" element={<AuthFederationPage />} />
+            <Route path="/auth/sessions" element={<AuthSessionsPage />} />
 
             {/* Mail */}
             <Route path="/appengine" element={<AppEnginePage />} />
