@@ -22,20 +22,20 @@ export default function DCsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const [dcRes, cRes, fsmoRes, lvlRes, replRes] = await Promise.allSettled([
+      const [dcRes, dcsRes, fsmoRes, lvlRes, replRes] = await Promise.allSettled([
         apiFetch('/domain/info'),
-        apiFetch('/containers/'),
+        apiFetch('/domain/dcs'),
         apiFetch('/domain/fsmo'),
         apiFetch('/dns/domain/level'),
         apiFetch('/domain/replication'),
       ]);
 
-      if (dcRes.status === 'fulfilled' && cRes.status === 'fulfilled') {
-        const domainInfo = dcRes.value;
-        const containers = cRes.value.containers || [];
-        const dc = containers.find(c => c.name === 'polyon-dc');
-        const isHealthy = dc && dc.state === 'running' && dc.status.includes('healthy');
-        setDcStatus({ ...domainInfo, isHealthy, dcStatus: dc?.status || '—' });
+      if (dcRes.status === 'fulfilled') {
+        const domainInfo = dcRes.value as any;
+        // /domain/dcs: LDAP에서 DC 목록 조회 → 성공이면 정상
+        const isHealthy = dcsRes.status === 'fulfilled' && ((dcsRes.value as any).dcs?.length ?? 0) > 0;
+        const dcs = dcsRes.status === 'fulfilled' ? ((dcsRes.value as any).dcs || []) : [];
+        setDcStatus({ ...domainInfo, isHealthy, dcs });
       }
       if (fsmoRes.status === 'fulfilled') setFsmo(fsmoRes.value);
       if (lvlRes.status === 'fulfilled') setLevel(lvlRes.value);
@@ -60,14 +60,19 @@ export default function DCsPage() {
     { key: 'detail', header: '상세' },
   ];
   const dcRows = dcStatus
-    ? [
-        {
-          id: '0',
-          host: `dc1.${(dcStatus.realm || '').toLowerCase()}`,
-          status: dcStatus.isHealthy ? <Tag type="green">정상</Tag> : <Tag type="red">오류</Tag>,
-          detail: dcStatus.dcStatus,
-        },
-      ]
+    ? (dcStatus.dcs && dcStatus.dcs.length > 0
+        ? dcStatus.dcs.map((dc, i) => ({
+            id: String(i),
+            host: dc.dns_hostname || dc.name || `dc${i+1}.${(dcStatus.realm||'').toLowerCase()}`,
+            status: <Tag type="green">정상</Tag>,
+            detail: dc.os || '—',
+          }))
+        : [{
+            id: '0',
+            host: `dc1.${(dcStatus.realm || '').toLowerCase()}`,
+            status: <Tag type="red">오류</Tag>,
+            detail: 'LDAP 조회 실패',
+          }])
     : [];
 
   // FSMO DataTable
