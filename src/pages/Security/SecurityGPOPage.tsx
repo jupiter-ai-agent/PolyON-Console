@@ -1,3 +1,4 @@
+import { apiFetch } from '../../api/client';
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import {
@@ -44,9 +45,7 @@ export default function SecurityGPOPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/security/gpo');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
+      const data = await apiFetch('/security/gpo') as any;
       setGpos(data.gpos || []);
     } catch (e) {
       setError(e.message);
@@ -59,8 +58,7 @@ export default function SecurityGPOPage() {
   const loadContainers = async (guid) => {
     if (containers[guid]) return;
     try {
-      const res = await fetch(`/api/v1/security/gpo/${encodeURIComponent(guid)}/containers`);
-      const data = await res.json();
+      const data = await apiFetch(`/security/gpo/${encodeURIComponent(guid)}/containers`) as any;
       setContainers(prev => ({ ...prev, [guid]: data.containers || [] }));
     } catch {
       setContainers(prev => ({ ...prev, [guid]: [] }));
@@ -70,13 +68,10 @@ export default function SecurityGPOPage() {
   const doCreate = async () => {
     if (!createName.trim()) return;
     try {
-      const res = await fetch('/api/v1/security/gpo', {
+      const data = await apiFetch('/security/gpo', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ display_name: createName }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
       setCreateOpen(false);
       setCreateName('');
       await load();
@@ -89,8 +84,6 @@ export default function SecurityGPOPage() {
     if (!confirm(`GPO "${name}" (${guid})을(를) 삭제하시겠습니까?`)) return;
     try {
       const res = await fetch(`/api/v1/security/gpo/${encodeURIComponent(guid)}`, { method: 'DELETE' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
       await load();
     } catch (e) {
       alert('GPO 삭제 실패: ' + e.message);
@@ -100,13 +93,10 @@ export default function SecurityGPOPage() {
   const doLink = async () => {
     if (!linkDn.trim()) { alert('컨테이너 DN을 입력하세요.'); return; }
     try {
-      const res = await fetch('/api/v1/security/gpo/link', {
+      await apiFetch('/security/gpo/link', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ container_dn: linkDn, gpo_guid: linkGuid, enforce: linkEnforce, disable: linkDisable }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
       setLinkOpen(false);
       setContainers(prev => { const n = { ...prev }; delete n[linkGuid]; return n; });
       if (expandedGuid === linkGuid) loadContainers(linkGuid);
@@ -118,13 +108,10 @@ export default function SecurityGPOPage() {
   const doUnlink = async (containerDn, guid) => {
     if (!confirm(`"${containerDn}"에서 GPO 링크를 해제하시겠습니까?`)) return;
     try {
-      const res = await fetch('/api/v1/security/gpo/link', {
+      await apiFetch('/security/gpo/link', {
         method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ container_dn: containerDn, gpo_guid: guid }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
       setContainers(prev => { const n = { ...prev }; delete n[guid]; return n; });
       loadContainers(guid);
     } catch (e) {
@@ -148,7 +135,7 @@ export default function SecurityGPOPage() {
     const verUser = ver >> 16;
     const verComputer = ver & 0xffff;
     const flags = g.flags || '0';
-    let statusType = 'green', statusLabel = '활성';
+    let statusType: 'green' | 'red' | 'gray' = 'green', statusLabel = '활성';
     if (flags === '3') { statusType = 'red'; statusLabel = '모두 비활성'; }
     else if (flags === '1' || flags === '2') { statusType = 'gray'; statusLabel = '부분 비활성'; }
     const isDefault = DEFAULT_GPOS.includes(name);

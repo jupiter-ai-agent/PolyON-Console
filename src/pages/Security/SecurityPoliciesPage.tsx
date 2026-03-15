@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Button, TextInput, Select, SelectItem, InlineLoading, Tag } from '@carbon/react';
 import { Key, Edit, Checkmark, Locked, Security as Shield, Renew } from  '@carbon/icons-react';
+import { apiFetch } from '../../api/client';
 
 function Row({ label, value }) {
   return (
@@ -26,10 +27,8 @@ export default function SecurityPoliciesPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/security/password-policy');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
-      const p = data.policy || {};
+      const data = await apiFetch('/security/password-policy');
+      const p = (data as any).policy || {};
       setPolicy(p);
       setPwdForm({
         min_length: p.min_length ?? 7,
@@ -54,13 +53,10 @@ export default function SecurityPoliciesPage() {
   const savePwd = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/v1/security/password-policy', {
+      await apiFetch('/security/password-policy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(pwdForm),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
       setEditPwd(false);
       await load();
     } catch (e) {
@@ -72,13 +68,10 @@ export default function SecurityPoliciesPage() {
   const saveLock = async () => {
     setSaving(true);
     try {
-      const res = await fetch('/api/v1/security/password-policy', {
+      await apiFetch('/security/password-policy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(lockForm),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
       setEditLock(false);
       await load();
     } catch (e) {

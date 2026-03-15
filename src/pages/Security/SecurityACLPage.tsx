@@ -1,3 +1,4 @@
+import { apiFetch } from '../../api/client';
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import {
@@ -136,9 +137,7 @@ export default function SecurityACLPage() {
     setOuLoading(true);
     setOuError('');
     try {
-      const res = await fetch('/api/v1/security/acl/ous');
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
+      const data = await apiFetch('/security/acl/ous') as any;
       setOuAcls(data.ou_acls || []);
     } catch (e) {
       setOuError(e.message);
@@ -154,9 +153,7 @@ export default function SecurityACLPage() {
     setLookupError('');
     setLookupResult(null);
     try {
-      const res = await fetch(`/api/v1/security/acl?dn=${encodeURIComponent(lookupDn)}`);
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || 'API 오류');
+      const data = await apiFetch(`/security/acl?dn=${encodeURIComponent(lookupDn)}`) as any;
       setLookupResult({ aces: parseAces(data.output || ''), raw: data.output || '결과 없음' });
     } catch (e) {
       setLookupError(e.message);

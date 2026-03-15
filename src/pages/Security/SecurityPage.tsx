@@ -1,3 +1,4 @@
+import { apiFetch } from '../../api/client';
 // @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Tag, InlineLoading, Button } from '@carbon/react';
@@ -8,9 +9,8 @@ export default function SecurityPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/v1/security/password-policy')
-      .then(r => r.json())
-      .then(data => { setPolicy(data.policy || {}); setLoading(false); })
+    apiFetch('/security/password-policy')
+      .then((data: any) => { setPolicy(data.policy || {}); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
