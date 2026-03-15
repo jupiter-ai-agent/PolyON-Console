@@ -40,7 +40,7 @@ function ClientsTable({ realm }: { realm: string }) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    apiFetch(`/api/v1/auth/clients?realm=${realm}`)
+    apiFetch(`/auth/clients?realm=${realm}`)
       .then(r => r.json())
       .then(data => {
         setClients(data.clients || []);

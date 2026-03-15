@@ -40,7 +40,7 @@ function UsersTable({ realm }: { realm: string }) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    apiFetch(`/api/v1/auth/users?realm=${realm}&max=100`)
+    apiFetch(`/auth/users?realm=${realm}&max=100`)
       .then(r => r.json())
       .then(data => {
         setUsers(data.users || []);

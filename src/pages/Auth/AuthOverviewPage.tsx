@@ -20,7 +20,7 @@ export default function AuthOverviewPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    apiFetch('/api/v1/auth/overview')
+    apiFetch('/auth/overview')
       .then(r => r.json())
       .then(data => {
         setRealms(data.realms || []);

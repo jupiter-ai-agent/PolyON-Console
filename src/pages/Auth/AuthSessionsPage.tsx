@@ -36,7 +36,7 @@ function SessionsView({ realm }: { realm: string }) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    apiFetch(`/api/v1/auth/sessions?realm=${realm}`)
+    apiFetch(`/auth/sessions?realm=${realm}`)
       .then(r => r.json())
       .then(d => {
         setData(d);

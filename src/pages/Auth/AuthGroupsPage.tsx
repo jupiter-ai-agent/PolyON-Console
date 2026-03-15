@@ -30,7 +30,7 @@ export default function AuthGroupsPage() {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    apiFetch('/api/v1/auth/groups?realm=polyon')
+    apiFetch('/auth/groups?realm=polyon')
       .then(r => r.json())
       .then(data => {
         setGroups(data.groups || []);
