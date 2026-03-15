@@ -308,6 +308,8 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
       { label: 'Access Control', path: '/security/acl', icon: Key },
       { label: '접근 정책', path: '/security/access-policy', icon: Key },
       { label: '감사 로그', path: '/security/audit-log', icon: Key },
+      { type: 'divider' },
+      { label: 'RBAC 정책 관리', path: '/policy', icon: Security },
     ],
   },
   settings: {
