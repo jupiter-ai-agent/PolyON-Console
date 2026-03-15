@@ -111,8 +111,8 @@ export default function TraefikPage() {
               { label: '엔트리포인트', value: entrypoints.length, accent: '#0043ce' },
             ].map(({ label, value, accent }) => (
               <Tile key={label} style={{ padding: '20px', borderLeft: `4px solid ${accent}` }}>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: '#8d8d8d', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
-                <p style={{ margin: '8px 0 0', fontSize: '2rem', fontWeight: 700, color: '#f4f4f4' }}>{value}</p>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--cds-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+                <p style={{ margin: '8px 0 0', fontSize: '2rem', fontWeight: 700, color: 'var(--cds-text-primary)' }}>{value}</p>
               </Tile>
             ))}
           </div>
