@@ -36,10 +36,18 @@ function StatusTag({ status }: { status?: string }) {
 }
 
 function shortName(name: string) {
+  // Host 룰에서 도메인 추출 시도
   // polyon-polyon-console-ingress-console-cmars-com@kubernetes → console.cmars.com
-  const match = name.match(/([a-z0-9-]+\.[a-z0-9-]+\.[a-z]+)@/);
-  if (match) return match[1];
+  const domainMatch = name.match(/([a-z0-9][a-z0-9-]+\.[a-z0-9-]+\.[a-z]{2,})@/);
+  if (domainMatch) return domainMatch[1];
+  // @provider 제거
   return name.replace(/@.*$/, '');
+}
+
+function extractHost(rule?: string): string {
+  if (!rule) return '—';
+  const m = rule.match(/Host\(`([^`]+)`\)/);
+  return m ? m[1] : rule.slice(0, 50);
 }
 
 // ── Main Page ─────────────────────────────────────────────────────────────────
@@ -97,14 +105,14 @@ export default function TraefikPage() {
           {/* ── 요약 카드 ── */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', margin: '16px 0' }}>
             {[
-              { label: 'HTTP 라우터', value: overview.http?.routers?.total ?? 0 },
-              { label: 'HTTP 서비스', value: overview.http?.services?.total ?? 0 },
-              { label: 'TCP 라우터', value: overview.tcp?.routers?.total ?? 0 },
-              { label: '엔트리포인트', value: entrypoints.length },
-            ].map(({ label, value }) => (
-              <Tile key={label} style={{ padding: '16px', background: '#262626' }}>
-                <p style={{ margin: 0, fontSize: '0.75rem', color: '#8d8d8d' }}>{label}</p>
-                <p style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 700 }}>{value}</p>
+              { label: 'HTTP 라우터', value: overview.http?.routers?.total ?? 0, accent: '#0f62fe' },
+              { label: 'HTTP 서비스', value: overview.http?.services?.total ?? 0, accent: '#198038' },
+              { label: 'TCP 라우터', value: overview.tcp?.routers?.total ?? 0, accent: '#6929c4' },
+              { label: '엔트리포인트', value: entrypoints.length, accent: '#0043ce' },
+            ].map(({ label, value, accent }) => (
+              <Tile key={label} style={{ padding: '20px', background: '#161616', borderLeft: `4px solid ${accent}` }}>
+                <p style={{ margin: 0, fontSize: '0.75rem', color: '#8d8d8d', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+                <p style={{ margin: '8px 0 0', fontSize: '2rem', fontWeight: 700, color: '#f4f4f4' }}>{value}</p>
               </Tile>
             ))}
           </div>
@@ -124,9 +132,9 @@ export default function TraefikPage() {
                   <DataTable
                     rows={routers.map((r, i) => ({
                       id: String(i),
-                      name: shortName(r.name),
+                      name: extractHost(r.rule) !== '—' ? extractHost(r.rule) : shortName(r.name),
                       rule: r.rule ?? '—',
-                      service: r.service?.replace(/@.*$/, '') ?? '—',
+                      service: r.service?.replace(/@.*$/, '').replace(/^.*?-(\w+)-\d+$/, '$1') ?? '—',
                       entrypoints: (r.entryPoints ?? []).join(', ') || '—',
                       status: r.status,
                       tls: r.tls ? 'TLS' : '—',
