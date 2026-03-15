@@ -61,6 +61,9 @@ export default function DNSPage() {
   const [editRecord, setEditRecord] = useState(null);
   const [form, setForm] = useState({ name: '', type: 'A', data: '' });
 
+  // 시스템 내부 존 필터 (UI에 노출 불필요)
+  const HIDDEN_ZONES = ['RootDNSServers', 'DomainDnsZones', 'ForestDnsZones', '..TrustAnchors'];
+
   const loadZones = async () => {
     setZonesLoading(true);
     try {
@@ -70,14 +73,21 @@ export default function DNSPage() {
       const z = [];
       lines.forEach(l => {
         const m = l.match(/pszZoneName\s*:\s*(.+)/);
-        if (m) z.push(m[1].trim());
+        if (m) {
+          const zone = m[1].trim();
+          if (!HIDDEN_ZONES.some(h => zone.includes(h))) z.push(zone);
+        }
       });
       setZones(z);
+      // 진입 시 첫 번째 존 자동 선택
+      if (z.length > 0) {
+        await selectZoneInner(z[0]);
+      }
     } catch {}
     setZonesLoading(false);
   };
 
-  const selectZone = async (zone) => {
+  const selectZoneInner = async (zone) => {
     setSelectedZone(zone);
     setRecordsLoading(true);
     setRecords([]);
@@ -88,6 +98,8 @@ export default function DNSPage() {
     } catch {}
     setRecordsLoading(false);
   };
+
+  const selectZone = selectZoneInner;
 
   useEffect(() => { loadZones(); }, []);
 
