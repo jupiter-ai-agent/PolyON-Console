@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   InlineLoading,
   DataTable,
@@ -80,7 +81,7 @@ export default function ContainersResourcesPage() {
   useEffect(() => {
     const loadVolumes = async () => {
       try {
-        const res  = await fetch('/api/v1/containers/volumes');
+        const res  = await apiFetch('/containers/volumes') as any;
         const data = await res.json();
         const vols = data.volumes || [];
         setVolumes(vols);

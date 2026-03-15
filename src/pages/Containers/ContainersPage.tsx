@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Button,
   Tag,
@@ -40,7 +41,7 @@ export default function ContainersPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/pods');
+      const res = await apiFetch('/pods') as any;
       if (!res.ok) {
         // API가 없으면 빈 상태 표시
         if (res.status === 404) {
@@ -71,7 +72,7 @@ export default function ContainersPage() {
     setLogLoading(true);
     setLogs('');
     try {
-      const res = await fetch(`/api/v1/pods/${name}/logs?tail=100`);
+      const res = await apiFetch(`/pods/${name}/logs?tail=100`) as any;
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.success && data.logs) {
@@ -88,7 +89,7 @@ export default function ContainersPage() {
   const restart = async (name) => {
     if (!confirm(`Pod '${name}'을 재시작하시겠습니까?`)) return;
     try {
-      const res = await fetch(`/api/v1/pods/${name}/restart`, { method: 'POST' });
+      const res = await apiFetch(`/pods/${name}/restart`, { method: 'POST' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (data.success) {

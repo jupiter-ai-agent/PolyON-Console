@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   InlineLoading,
   Tabs,
@@ -78,7 +79,7 @@ export default function DatabaseRustfsPage() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/databases/rustfs/stats');
+      const res = await apiFetch('/databases/rustfs/stats') as any;
       if (res.ok) setData(await res.json());
     } catch {}
     setLoading(false);

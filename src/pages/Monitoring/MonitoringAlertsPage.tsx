@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
+import { apiFetch } from '../../api/client';
 import { Tag, Button, SkeletonText, Modal, TextInput, TextArea, Select, SelectItem, InlineNotification } from '@carbon/react';
 import { Add, Renew, CheckmarkFilled, TrashCan, Edit, Time } from '@carbon/icons-react';
 import { PageHeader } from '../../components/PageHeader';
@@ -69,7 +70,7 @@ export default function MonitoringAlertsPage() {
 
   const loadActive = async () => {
     try {
-      const res = await fetch('/api/v1/system/prometheus/alerts');
+      const res = await apiFetch('/system/prometheus/alerts') as any;
       const data = await res.json();
       setActiveAlerts((data.data?.alerts) || []);
     } catch {
@@ -80,7 +81,7 @@ export default function MonitoringAlertsPage() {
 
   const loadRules = async () => {
     try {
-      const res = await fetch('/api/v1/alert-rules');
+      const res = await apiFetch('/alert-rules') as any;
       const data = await res.json();
       setRuleGroups(data.groups || []);
     } catch {
@@ -134,11 +135,11 @@ export default function MonitoringAlertsPage() {
     try {
       let res;
       if (editState.alert) {
-        res = await fetch(`/api/v1/alert-rules/${encodeURIComponent(editState.group)}/${encodeURIComponent(editState.alert)}`, {
+        res = await apiFetch(`/alert-rules/${encodeURIComponent(editState.group)}/${encodeURIComponent(editState.alert)}`, {
           method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(rule),
         });
       } else {
-        res = await fetch('/api/v1/alert-rules', {
+        res = await apiFetch('/alert-rules', {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ group, rule }),
         });
       }
@@ -154,7 +155,7 @@ export default function MonitoringAlertsPage() {
 
   const deleteRule = async (groupName, alertName) => {
     if (!confirm(`"${alertName}" 규칙을 삭제하시겠습니까?`)) return;
-    await fetch(`/api/v1/alert-rules/${encodeURIComponent(groupName)}/${encodeURIComponent(alertName)}`, { method: 'DELETE' });
+    await apiFetch(`/alert-rules/${encodeURIComponent(groupName)}/${encodeURIComponent(alertName)}`, { method: 'DELETE' });
     await loadRules();
   };
 

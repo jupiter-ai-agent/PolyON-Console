@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../../api/client';
 import { PageHeader } from '../../components/PageHeader';
 import {
   Button, InlineNotification, DataTable, Table, TableHead, TableRow, TableHeader, 
@@ -15,7 +16,7 @@ interface User {
 }
 
 async function fetchUsers(): Promise<User[]> {
-  const res = await fetch('/api/v1/users');
+  const res = await apiFetch('/users') as any;
   if (!res.ok) {
     throw new Error('사용자 목록 조회 실패');
   }

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState, useCallback } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Button,
   Toggle,
@@ -54,7 +55,7 @@ export default function FirewallPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/firewall/services');
+      const res = await apiFetch('/firewall/services') as any;
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const d = await res.json();
       setServices(d.services || []);
@@ -70,7 +71,7 @@ export default function FirewallPage() {
     if (svc.essential) return;
     setToggling(svc.id);
     try {
-      const res = await fetch('/api/v1/firewall/toggle', {
+      const res = await apiFetch('/firewall/toggle', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ service_id: svc.id, exposed: newVal }),

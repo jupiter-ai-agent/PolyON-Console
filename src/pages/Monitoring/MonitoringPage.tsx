@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Tabs, TabList, Tab, TabPanels, TabPanel,
   Select, SelectItem, Tag, SkeletonText,
@@ -201,7 +202,7 @@ function OverviewContent({ timeRange, dbStatus }) {
       setLoading(true);
       try {
         const promQuery = async (q) => {
-          const res = await fetch(`/api/v1/system/prometheus/query?query=${encodeURIComponent(q)}`);
+          const res = await apiFetch(`/system/prometheus/query?query=${encodeURIComponent(q)}`) as any;
           const json = await res.json();
           if (json.status === 'success' && json.data?.result?.length > 0) {
             return parseFloat(json.data.result[0].value[1]);
@@ -305,7 +306,7 @@ export default function MonitoringPage() {
   const [dbStatus, setDbStatus] = useState(null);
 
   useEffect(() => {
-    fetch('/api/v1/databases/status')
+    apiFetch('/databases/status')
       .then(r => r.json())
       .then(data => setDbStatus(data))
       .catch(() => setDbStatus(null));

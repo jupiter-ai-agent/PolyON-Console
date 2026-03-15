@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
+import { apiFetch } from '../../api/client';
 import { Button, InlineLoading } from '@carbon/react';
 import { Renew } from '@carbon/icons-react';
 
@@ -13,7 +14,7 @@ export default function ContainersTopologyPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/v1/services/topology');
+      const res = await apiFetch('/services/topology') as any;
       if (!res.ok) {
         if (res.status === 404) {
           setError('K8s 서비스 토폴로지 API가 아직 구현되지 않았습니다.');

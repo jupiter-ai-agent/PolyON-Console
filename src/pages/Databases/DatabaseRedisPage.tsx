@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState } from 'react';
+import { apiFetch } from '../../api/client';
 import { InlineLoading, Tabs, TabList, Tab, TabPanels, TabPanel, Tile } from '@carbon/react';
 import { GrafanaPanel, ManagerIframe } from './components/DatabaseShared';
 import {
@@ -49,7 +50,7 @@ export default function DatabaseRedisPage() {
   const fetchStatus = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/databases/status');
+      const res = await apiFetch('/databases/status') as any;
       setData(await res.json());
     } catch {}
     setLoading(false);

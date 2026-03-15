@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, type ChangeEvent } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Button,
   Checkbox,
@@ -92,12 +93,10 @@ function AddDomainModal({
     setCreating(true);
     try {
       if (autoprovision) {
-        const res = await fetch('/api/v1/mail/provision', {
+        const data = await apiFetch<{ success?: boolean; steps?: { status: string; detail: string }[] }>('/mail/provision', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ domain: name.trim(), mail_hostname: mailhost.trim() || `mail.${name.trim()}`, create_postmaster: true }),
         });
-        const data = await res.json() as { success?: boolean; steps?: { status: string; detail: string }[] };
         setProvisionResult(data.steps ?? null);
         onCreated(data.steps);
       } else {

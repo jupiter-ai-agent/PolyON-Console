@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState, useCallback } from 'react';
+import { apiFetch } from '../../api/client';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import { Button, Tag } from '@carbon/react';
@@ -51,7 +52,7 @@ export default function HomepageSitesPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/v1/sites');
+      const res = await apiFetch('/sites') as any;
       if (res.ok) {
         const d = await res.json();
         setSites(Array.isArray(d) ? d : (d.data || []));

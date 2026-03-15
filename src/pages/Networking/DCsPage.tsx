@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Tag,
   InlineLoading,
@@ -22,11 +23,11 @@ export default function DCsPage() {
   useEffect(() => {
     const load = async () => {
       const [dcRes, cRes, fsmoRes, lvlRes, replRes] = await Promise.allSettled([
-        fetch('/api/v1/domain/info').then(r => r.json()),
-        fetch('/api/v1/containers/').then(r => r.json()),
-        fetch('/api/v1/domain/fsmo').then(r => r.json()),
-        fetch('/api/v1/dns/domain/level').then(r => r.json()),
-        fetch('/api/v1/domain/replication').then(r => r.json()),
+        apiFetch('/domain/info'),
+        apiFetch('/containers/'),
+        apiFetch('/domain/fsmo'),
+        apiFetch('/dns/domain/level'),
+        apiFetch('/domain/replication'),
       ]);
 
       if (dcRes.status === 'fulfilled' && cRes.status === 'fulfilled') {

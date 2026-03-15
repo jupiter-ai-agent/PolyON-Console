@@ -1,5 +1,6 @@
 
 import { useEffect, useState, useCallback } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Button,
   DataTable,
@@ -64,7 +65,7 @@ export default function MailHistoryDeliveryPage() {
         limit: String(pageSize),
       });
       if (filterText) params.set('q', filterText);
-      const res = await fetch(`/api/v1/mail/history?${params}`);
+      const res = await apiFetch(`/mail/history?${params}`) as any;
       if (res.ok) {
         const data = await res.json();
         setItems(data.items ?? data.messages ?? []);

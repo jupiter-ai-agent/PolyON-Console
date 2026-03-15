@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Tile,
   Tag,
@@ -32,7 +33,7 @@ const fetchAuditLogs = async (params: { limit: number; offset: number; objectTyp
   if (params.username) query.set('username', params.username);
   if (params.startDate) query.set('start_date', params.startDate);
   if (params.endDate) query.set('end_date', params.endDate);
-  const resp = await fetch(`/api/v1/system/audit?${query}`);
+  const resp = await apiFetch(`/system/audit?${query}`) as any;
   return resp.json();
 };
 

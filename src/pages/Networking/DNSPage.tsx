@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Button,
   TextInput,
@@ -63,7 +64,7 @@ export default function DNSPage() {
   const loadZones = async () => {
     setZonesLoading(true);
     try {
-      const data = await fetch('/api/v1/dns/zones').then(r => r.json());
+      const data = await apiFetch('/dns/zones');
       const output = data.output || '';
       const lines = output.split('\n');
       const z = [];
@@ -82,7 +83,7 @@ export default function DNSPage() {
     setRecords([]);
     setShowAddForm(false);
     try {
-      const res = await fetch(`/api/v1/dns/zones/${zone}/records`);
+      const res = await apiFetch(`/dns/zones/${zone}/records`) as any;
       const data = await res.json();
       setRecords(parseRecords(data.output || data.error || ''));
     } catch {}
@@ -95,13 +96,13 @@ export default function DNSPage() {
     if (!form.name || !form.data) { alert('Name과 Data를 입력하세요.'); return; }
     try {
       if (editRecord) {
-        await fetch(`/api/v1/dns/zones/${selectedZone}/records`, {
+        await apiFetch(`/dns/zones/${selectedZone}/records`, {
           method: 'DELETE',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(editRecord),
         });
       }
-      await fetch(`/api/v1/dns/zones/${selectedZone}/records`, {
+      await apiFetch(`/dns/zones/${selectedZone}/records`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -117,7 +118,7 @@ export default function DNSPage() {
   const deleteRec = async (rec) => {
     if (!confirm('이 레코드를 삭제하시겠습니까?')) return;
     try {
-      await fetch(`/api/v1/dns/zones/${selectedZone}/records`, {
+      await apiFetch(`/dns/zones/${selectedZone}/records`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(rec),

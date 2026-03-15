@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState, useEffect, useRef } from 'react';
+import { apiFetch } from '../../api/client';
 import { Tabs, TabList, Tab } from '@carbon/react';
 
 const LOG_SERVICES = [
@@ -60,7 +61,7 @@ export default function MonitoringLogsPage() {
     setLoading(true);
     setLogs('');
     try {
-      const res = await fetch(`/api/v1/containers/${svcId}/logs?tail=500`);
+      const res = await apiFetch(`/containers/${svcId}/logs?tail=500`) as any;
       const data = await res.json();
       if (data.success && data.logs && data.logs.trim()) {
         setLogs(data.logs);

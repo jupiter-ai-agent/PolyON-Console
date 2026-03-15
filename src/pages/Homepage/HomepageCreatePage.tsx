@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useState } from 'react';
+import { apiFetch } from '../../api/client';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import { Button, TextInput, InlineNotification } from '@carbon/react';
@@ -26,7 +27,7 @@ export default function HomepageCreatePage() {
     setError('');
     setSubmitting(true);
     try {
-      const res = await fetch('/api/v1/sites', {
+      const res = await apiFetch('/sites', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...form, method }),

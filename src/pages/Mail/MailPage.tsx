@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { apiFetch } from '../../api/client';
 import {
   Button,
   DataTable,
@@ -86,7 +87,7 @@ function OverviewTab() {
     // Users (mail 속성 있는 AD 사용자)
     let users: string | number = '—';
     try {
-      const res = await fetch('/api/v1/users');
+      const res = await apiFetch('/users') as any;
       const data = await res.json() as { users?: { mail?: string }[] };
       users = (data.users ?? []).filter((u) => u.mail?.includes('@')).length;
     } catch { /* ignore */ }

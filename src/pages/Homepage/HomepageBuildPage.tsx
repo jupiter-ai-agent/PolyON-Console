@@ -1,5 +1,6 @@
 // @ts-nocheck
 import { useEffect, useState, useCallback } from 'react';
+import { apiFetch } from '../../api/client';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import {
@@ -78,7 +79,7 @@ export default function HomepageBuildPage() {
 
   const loadSites = useCallback(async () => {
     try {
-      const res = await fetch('/api/v1/sites');
+      const res = await apiFetch('/sites') as any;
       if (res.ok) {
         const d = await res.json();
         const list: Site[] = Array.isArray(d) ? d : (d.data || []);
@@ -96,7 +97,7 @@ export default function HomepageBuildPage() {
     if (!site) return;
     setLoading(true);
     try {
-      const res = await fetch(`/api/v1/sites/${site.id}/builds`);
+      const res = await apiFetch(`/sites/${site.id}/builds`) as any;
       if (res.ok) {
         const d = await res.json();
         setBuilds(d.builds || d || []);
@@ -117,7 +118,7 @@ export default function HomepageBuildPage() {
     if (!selectedSite) return;
     setBuilding(true);
     try {
-      await fetch(`/api/v1/sites/${selectedSite.id}/build`, { method: 'POST' });
+      await apiFetch(`/sites/${selectedSite.id}/build`, { method: 'POST' });
       setTimeout(() => loadBuilds(selectedSite), 1500);
     } catch { /* ignore */ }
     setBuilding(false);
