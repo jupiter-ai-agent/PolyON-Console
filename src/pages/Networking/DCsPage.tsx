@@ -22,25 +22,31 @@ export default function DCsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const [dcRes, dcsRes, fsmoRes, lvlRes, replRes] = await Promise.allSettled([
+      // replication은 단일 DC 환경에서 타임아웃이 길어 별도 처리
+      const [dcRes, dcsRes, fsmoRes, lvlRes] = await Promise.allSettled([
         apiFetch('/domain/info'),
         apiFetch('/domain/dcs'),
         apiFetch('/domain/fsmo'),
         apiFetch('/dns/domain/level'),
-        apiFetch('/domain/replication'),
       ]);
 
       if (dcRes.status === 'fulfilled') {
         const domainInfo = dcRes.value as any;
-        // /domain/dcs: LDAP에서 DC 목록 조회 → 성공이면 정상
         const isHealthy = dcsRes.status === 'fulfilled' && ((dcsRes.value as any).dcs?.length ?? 0) > 0;
         const dcs = dcsRes.status === 'fulfilled' ? ((dcsRes.value as any).dcs || []) : [];
         setDcStatus({ ...domainInfo, isHealthy, dcs });
       }
       if (fsmoRes.status === 'fulfilled') setFsmo(fsmoRes.value);
       if (lvlRes.status === 'fulfilled') setLevel(lvlRes.value);
-      if (replRes.status === 'fulfilled') setRepl(replRes.value);
       setLoading(false);
+
+      // replication은 백그라운드로 별도 로드 (느려도 페이지 진입 안 막음)
+      try {
+        const replData = await apiFetch('/domain/replication');
+        setRepl(replData);
+      } catch {
+        setRepl({ success: false, output: '단일 DC 환경 — 복제 파트너 없음' });
+      }
     };
     load();
   }, []);
