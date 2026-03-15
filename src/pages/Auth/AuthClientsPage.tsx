@@ -41,7 +41,6 @@ function ClientsTable({ realm }: { realm: string }) {
     setLoading(true);
     setError(null);
     apiFetch(`/auth/clients?realm=${realm}`)
-      .then(r => r.json())
       .then(data => {
         setClients(data.clients || []);
         setLoading(false);

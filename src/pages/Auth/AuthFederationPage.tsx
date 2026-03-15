@@ -39,7 +39,6 @@ export default function AuthFederationPage() {
     setLoading(true);
     setError(null);
     apiFetch('/auth/federation?realm=polyon')
-      .then(r => r.json())
       .then(data => {
         setProviders(data.providers || []);
         setLoading(false);
@@ -56,7 +55,6 @@ export default function AuthFederationPage() {
     setSyncing(true);
     setSyncResult(null);
     apiFetch('/auth/federation/sync?realm=polyon', { method: 'POST' })
-      .then(r => r.json())
       .then(data => {
         setSyncing(false);
         const allOk = data.results?.every((r: any) => r.success);

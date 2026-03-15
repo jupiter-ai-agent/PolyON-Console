@@ -37,7 +37,6 @@ function SessionsView({ realm }: { realm: string }) {
     setLoading(true);
     setError(null);
     apiFetch(`/auth/sessions?realm=${realm}`)
-      .then(r => r.json())
       .then(d => {
         setData(d);
         setLoading(false);

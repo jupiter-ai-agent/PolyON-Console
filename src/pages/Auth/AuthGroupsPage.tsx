@@ -31,7 +31,6 @@ export default function AuthGroupsPage() {
 
   useEffect(() => {
     apiFetch('/auth/groups?realm=polyon')
-      .then(r => r.json())
       .then(data => {
         setGroups(data.groups || []);
         setLoading(false);

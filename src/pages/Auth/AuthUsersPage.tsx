@@ -41,7 +41,6 @@ function UsersTable({ realm }: { realm: string }) {
     setLoading(true);
     setError(null);
     apiFetch(`/auth/users?realm=${realm}&max=100`)
-      .then(r => r.json())
       .then(data => {
         setUsers(data.users || []);
         setLoading(false);
