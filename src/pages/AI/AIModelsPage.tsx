@@ -8,26 +8,25 @@ import {
 import { Add, Renew, TrashCan } from '@carbon/icons-react';
 import { aiApi } from '../../api/ai';
 import type { ModelInfo } from '../../api/ai';
+import { AI_PROVIDERS, MODEL_PRESETS } from './utils/pipelineData';
 
-const PROVIDERS = [
-  { value: 'openai',     label: 'OpenAI',     color: '#10a37f' },
-  { value: 'anthropic',  label: 'Anthropic',  color: '#c97d4e' },
-  { value: 'gemini',     label: 'Google',     color: '#4285f4' },
-  { value: 'ollama',     label: 'Ollama (내부)', color: '#888' },
-  { value: 'custom',     label: 'Custom',     color: '#6929c4' },
-];
-
-const PRESETS: Record<string, string[]> = {
-  openai:    ['openai/gpt-4o', 'openai/gpt-4o-mini', 'openai/text-embedding-3-small', 'openai/text-embedding-3-large'],
-  anthropic: ['anthropic/claude-opus-4-6', 'anthropic/claude-sonnet-4-6', 'anthropic/claude-haiku-3-5'],
-  gemini:    ['gemini/gemini-2.5-pro-preview', 'gemini/gemini-2.0-flash'],
-  ollama:    ['ollama/llama3.2', 'ollama/mistral', 'ollama/nomic-embed-text'],
-  custom:    [],
+// 프로바이더별 색상
+const PROVIDER_COLORS: Record<string, string> = {
+  openai: '#10a37f', anthropic: '#d97706', gemini: '#4285f4',
+  xai: '#000000', deepseek: '#1b6ef3', mistral: '#f97316',
+  cohere: '#6366f1', groq: '#f55036', together_ai: '#7c3aed',
+  openrouter: '#0ea5e9', huggingface: '#ff9d00', azure: '#0078d4',
+  bedrock: '#ff9900', ollama: '#6929c4', lm_studio: '#525252',
 };
 
-function providerOf(model: string) {
-  const p = PROVIDERS.find(p => model.startsWith(p.value + '/'));
-  return p || { value: 'custom', label: 'Custom', color: '#6929c4' };
+function providerColor(model: string) {
+  const p = model.split('/')[0];
+  return PROVIDER_COLORS[p] || '#525252';
+}
+
+function providerLabel(model: string) {
+  const p = model.split('/')[0];
+  return AI_PROVIDERS.find(x => x.value === p)?.label || p;
 }
 
 function shortId(model: string) {
@@ -45,6 +44,8 @@ export default function AIModelsPage() {
   const [apiKey, setApiKey]       = useState('');
   const [saving, setSaving]       = useState(false);
   const [saveErr, setSaveErr]     = useState('');
+
+  const currentPresets = MODEL_PRESETS[provider] || [];
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -100,11 +101,12 @@ export default function AIModelsPage() {
 
   const rows = models.map((m, i) => {
     const actual = m.litellm_params?.model || '';
-    const prov = providerOf(actual);
+    const color = providerColor(actual);
+    const label = providerLabel(actual);
     return {
       id: m.model_info?.id || String(i),
       name:     m.model_name || shortId(actual),
-      provider: <Tag style={{ background: prov.color, color: '#fff' }}>{prov.label}</Tag>,
+      provider: <Tag style={{ background: color, color: '#fff' }}>{label}</Tag>,
       actual:   <span style={{ fontFamily: 'monospace', fontSize: '0.8125rem' }}>{actual}</span>,
       actions: (
         <Button
@@ -210,17 +212,33 @@ export default function AIModelsPage() {
             value={provider}
             onChange={e => { setProvider(e.target.value); setPreset(''); setModelId(''); }}
           >
-            {PROVIDERS.map(p => <SelectItem key={p.value} value={p.value} text={p.label} />)}
+            <SelectItem value="" text="── 유료 외부 ──" disabled />
+            {AI_PROVIDERS.filter(p => p.group === 'paid').map(p =>
+              <SelectItem key={p.value} value={p.value} text={p.label} />
+            )}
+            <SelectItem value="" text="── 무료 tier ──" disabled />
+            {AI_PROVIDERS.filter(p => p.group === 'free').map(p =>
+              <SelectItem key={p.value} value={p.value} text={p.label} />
+            )}
+            <SelectItem value="" text="── 로컬 (사내) ──" disabled />
+            {AI_PROVIDERS.filter(p => p.group === 'local').map(p =>
+              <SelectItem key={p.value} value={p.value} text={p.label} />
+            )}
           </Select>
 
-          {PRESETS[provider]?.length > 0 && (
+          {currentPresets.length > 0 && (
             <Select
-              id="add-preset" labelText="모델 선택 (프리셋)"
+              id="add-preset" labelText="모델 선택"
               value={preset}
-              onChange={e => { setPreset(e.target.value); if (e.target.value) setModelId(e.target.value); }}
+              onChange={e => {
+                setPreset(e.target.value);
+                if (e.target.value) setModelId(e.target.value);
+              }}
             >
               <SelectItem value="" text="-- 직접 입력 --" />
-              {PRESETS[provider].map(m => <SelectItem key={m} value={m} text={m} />)}
+              {currentPresets.map(m => (
+                <SelectItem key={m.id} value={m.id} text={m.label} />
+              ))}
             </Select>
           )}
 
