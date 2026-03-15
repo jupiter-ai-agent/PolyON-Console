@@ -173,6 +173,15 @@ const CoreAPIDetailPage = lazy(() => import('./pages/Settings/SysDetail/CoreAPID
 const CoreDCDetailPage = lazy(() => import('./pages/Settings/SysDetail/CoreDCDetailPage'));
 const CoreAuthDetailPage = lazy(() => import('./pages/Settings/SysDetail/CoreAuthDetailPage'));
 const CorePolicyDetailPage = lazy(() => import('./pages/Settings/SysDetail/CorePolicyDetailPage'));
+const PostgreSQLDetailPage = lazy(() => import('./pages/Settings/SysDetail/PostgreSQLDetailPage'));
+const RedisDetailPage = lazy(() => import('./pages/Settings/SysDetail/RedisDetailPage'));
+const OpenSearchDetailPage = lazy(() => import('./pages/Settings/SysDetail/OpenSearchDetailPage'));
+const RustFSDetailPage = lazy(() => import('./pages/Settings/SysDetail/RustFSDetailPage'));
+const TraefikDetailPage = lazy(() => import('./pages/Settings/SysDetail/TraefikDetailPage'));
+const StalwartDetailPage = lazy(() => import('./pages/Settings/SysDetail/StalwartDetailPage'));
+const GiteaDetailPage = lazy(() => import('./pages/Settings/SysDetail/GiteaDetailPage'));
+const EmbedDetailPage = lazy(() => import('./pages/Settings/SysDetail/EmbedDetailPage'));
+const AppEngineDetailPage = lazy(() => import('./pages/Settings/SysDetail/AppEngineDetailPage'));
 
 // Setup
 const SetupPage = lazy(() => import('./pages/Setup/SetupPage'));
@@ -373,6 +382,15 @@ export default function App() {
             <Route path="/settings/sysinfo/polyon-dc" element={<CoreDCDetailPage />} />
             <Route path="/settings/sysinfo/keycloak" element={<CoreAuthDetailPage />} />
             <Route path="/settings/sysinfo/opa" element={<CorePolicyDetailPage />} />
+            <Route path="/settings/sysinfo/postgresql" element={<PostgreSQLDetailPage />} />
+            <Route path="/settings/sysinfo/redis" element={<RedisDetailPage />} />
+            <Route path="/settings/sysinfo/opensearch" element={<OpenSearchDetailPage />} />
+            <Route path="/settings/sysinfo/rustfs" element={<RustFSDetailPage />} />
+            <Route path="/settings/sysinfo/traefik" element={<TraefikDetailPage />} />
+            <Route path="/settings/sysinfo/stalwart" element={<StalwartDetailPage />} />
+            <Route path="/settings/sysinfo/gitea" element={<GiteaDetailPage />} />
+            <Route path="/settings/sysinfo/polyon-embed" element={<EmbedDetailPage />} />
+            <Route path="/settings/sysinfo/appengine" element={<AppEngineDetailPage />} />
 
             {/* Fallback — Dynamic module router */}
             <Route path="*" element={<DynamicModuleRouter />} />
