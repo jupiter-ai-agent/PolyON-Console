@@ -94,10 +94,13 @@ export const aiApi = {
   deleteService: (name: string) =>
     apiFetch(`${AI}/models/service/${encodeURIComponent(name)}`, { method: 'DELETE' }),
 
-  registerModel: (model_name: string, actual_model: string) =>
+  registerModel: (model_name: string, actual_model: string, api_key?: string) =>
     apiFetch(`${AI}/models`, {
       method: 'POST',
-      body: JSON.stringify({ model_name, litellm_params: { model: actual_model } }),
+      body: JSON.stringify({
+        model_name,
+        litellm_params: { model: actual_model, ...(api_key ? { api_key } : {}) },
+      }),
     }),
 
   deleteModel: (modelId: string) =>
