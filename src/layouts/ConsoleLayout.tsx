@@ -232,6 +232,8 @@ const FOUNDATION_MODULES: Record<string, ModuleDef> = {
       { label: 'DNS', path: '/dns', icon: DnsServices },
       { label: 'Domain Controllers', path: '/dcs', icon: BareMetalServer },
       { type: 'divider' },
+      { label: 'Traefik 라우팅', path: '/traefik', icon: Globe },
+      { type: 'divider' },
       { label: 'VPN', path: '/services/vpn', icon: Globe },
       { label: 'Firewall Rules', path: '/services/firewall', icon: Security },
     ],

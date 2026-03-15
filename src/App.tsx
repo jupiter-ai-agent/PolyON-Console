@@ -107,6 +107,7 @@ const SecurityACLPage = lazy(() => import('./pages/Security/SecurityACLPage'));
 const SecurityAccessPolicyPage = lazy(() => import('./pages/Security/SecurityAccessPolicyPage'));
 const SecurityAuditLogPage = lazy(() => import('./pages/Security/SecurityAuditLogPage'));
 const PolicyPage = lazy(() => import('./pages/Policy/PolicyPage'));
+const TraefikPage = lazy(() => import('./pages/Traefik/TraefikPage'));
 
 // Containers
 // PRC
@@ -308,6 +309,7 @@ export default function App() {
 
             {/* Policy Management (RBAC) */}
             <Route path="/policy" element={<PolicyPage />} />
+            <Route path="/traefik" element={<TraefikPage />} />
 
             {/* Containers */}
             {/* PRC */}
