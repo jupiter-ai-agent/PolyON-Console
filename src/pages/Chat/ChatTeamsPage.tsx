@@ -12,10 +12,17 @@ import { Add, Edit, TrashCan } from '@carbon/icons-react';
 const BASE = '/api/v1/engines/chat';
 
 async function chatFetch<T>(path: string, opts?: RequestInit): Promise<T> {
+  const { getToken } = await import('../../api/client');
+  const token = getToken();
+  const authHeader: Record<string, string> = token
+    ? { Authorization: `Bearer ${token}` }
+    : {};
+
   const res = await fetch(BASE + path, {
     ...opts,
     headers: {
       'Content-Type': 'application/json',
+      ...authHeader,
       ...opts?.headers,
     },
   });
