@@ -84,7 +84,7 @@ const STATUS_STYLES: Record<string, StatusStyle> = {
 
 const CATEGORY_LABELS: Record<string, { title: string; desc: string }> = {
   foundation: { title: 'Foundation', desc: 'PolyON 플랫폼 Foundation — Platform · Infrastructure · Capability' },
-  engine: { title: '앱 엔진', desc: '사원이 사용하는 업무 서비스 — 모듈 설치/삭제 가능' },
+  engine: { title: 'Service', desc: '사원이 사용하는 업무 서비스 — 모듈 설치/삭제 가능' },
   process: { title: '프로세스', desc: '비즈니스 프로세스 및 업무 자동화 — 모듈 설치/삭제 가능' },
   ai: { title: 'AI', desc: 'AI 에이전트 및 지능 레이어 — 모듈 설치/삭제 가능' },
   monitoring: { title: '모니터링', desc: '관측 및 대시보드' },
@@ -114,7 +114,12 @@ function ComponentCard({
   const accent = comp.accent || '#393939';
   // 상태 결정: health API 결과 우선, 없으면 comp.status(DB 원본) 사용
   const effectiveStatus = health?.status || comp.status || 'planned';
-  const st = STATUS_STYLES[effectiveStatus] || STATUS_STYLES.planned;
+  const compStatusForBadge = comp.status || 'planned';
+  const canInstallCheck = compStatusForBadge === 'planned' && !!comp.container_name;
+  const showButtonsCheck = !['foundation'].includes(category || '') && ['engine','ai','process','monitoring'].includes(category || '');
+  // 설치 버튼이 보이는 모듈(=설치 가능 상태)은 상태 뱃지 숨김 — "Down"이 오류처럼 보이는 문제 방지
+  const hideBadge = showButtonsCheck && canInstallCheck;
+  const st = hideBadge ? null : (STATUS_STYLES[effectiveStatus] || STATUS_STYLES.planned);
   const isClickable = category === 'foundation' && !!navigate;
   const [hovered, setHovered] = useState(false);
   
