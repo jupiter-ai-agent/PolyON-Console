@@ -357,13 +357,40 @@ export default function AppEngineLDAPPage() {
         apiFetch<{ schedule: WizardSchedule }>(`/appengine/ldap/wizard/schedule?ldap_id=${cfg.id}`),
       ]);
       setWizardInfo(infoRes.wizard);
-      setWizardGroups(groupsRes.groups ?? []);
-      setWizardUsers(usersRes.users ?? []);
       setWizardSchedule(scheduleRes.schedule);
       setScheduleLocal({
         sync_enabled: scheduleRes.schedule.sync_enabled,
         sync_interval: scheduleRes.schedule.sync_interval,
       });
+
+      const groups = groupsRes.groups ?? [];
+      const users = usersRes.users ?? [];
+
+      // 첫 진입 시 wizard에 데이터가 없으면 자동으로 LDAP refresh 실행
+      if (groups.length === 0 && users.length === 0 && cfg) {
+        setWizardRefreshing(true);
+        try {
+          const refreshRes = await apiFetch<{ wizard: WizardInfo }>(
+            `/appengine/ldap/wizard/refresh?ldap_id=${cfg.id}`, { method: 'POST' }
+          );
+          if (refreshRes.wizard) setWizardInfo(refreshRes.wizard);
+          const [gRes, uRes] = await Promise.all([
+            apiFetch<{ groups: WizardGroup[] }>(`/appengine/ldap/wizard/groups?ldap_id=${cfg.id}`),
+            apiFetch<{ users: WizardUser[] }>(`/appengine/ldap/wizard/users?ldap_id=${cfg.id}`),
+          ]);
+          setWizardGroups(gRes.groups ?? []);
+          setWizardUsers(uRes.users ?? []);
+        } catch {
+          // refresh 실패 시 빈 목록 유지 (사용자가 수동 refresh 가능)
+          setWizardGroups([]);
+          setWizardUsers([]);
+        } finally {
+          setWizardRefreshing(false);
+        }
+      } else {
+        setWizardGroups(groups);
+        setWizardUsers(users);
+      }
     } catch (e) {
       setWizardError(e instanceof Error ? e.message : 'Wizard 데이터 로드 실패');
     } finally {
@@ -372,10 +399,13 @@ export default function AppEngineLDAPPage() {
   }, [cfg]);
 
   useEffect(() => {
-    if (mainTabIdx === 1 && cfg && !wizardInfo && !wizardLoading) {
-      loadWizardData();
+    // Sync Wizard 탭 진입 시 항상 데이터 로드 (wizardInfo 있어도 groups 없으면 재시도)
+    if (mainTabIdx === 1 && cfg && !wizardLoading) {
+      if (!wizardInfo || (wizardGroups.length === 0 && wizardUsers.length === 0)) {
+        loadWizardData();
+      }
     }
-  }, [mainTabIdx, cfg, wizardInfo, wizardLoading, loadWizardData]);
+  }, [mainTabIdx, cfg, wizardInfo, wizardGroups.length, wizardUsers.length, wizardLoading, loadWizardData]);
 
   const refreshWizard = async () => {
     if (!cfg) return;
