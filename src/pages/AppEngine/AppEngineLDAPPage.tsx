@@ -897,7 +897,7 @@ export default function AppEngineLDAPPage() {
                                   { key: 'first_name', header: 'First Name' },
                                   { key: 'last_name', header: 'Last Name' },
                                   { key: 'job_title', header: 'Job Title' },
-                                  { key: 'group_count', header: 'Groups' },
+                                  { key: 'member_group_dns', header: 'Groups' },
                                 ]}
                               >
                                 {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -939,9 +939,27 @@ export default function AppEngineLDAPPage() {
                                                     <span style={{ fontSize: '1rem', color: cell.value ? '#24a148' : '#6f6f6f' }}>
                                                       {cell.value ? '●' : '○'}
                                                     </span>
-                                                  ) : cell.info.header === 'group_count' ? (
-                                                    <Tag type="blue" size="sm">{cell.value}</Tag>
-                                                  ) : (
+                                                  ) : cell.info.header === 'member_group_dns' ? (() => {
+                                                    // member_group_dns: JSON array of DN strings → 그룹명 Tags로 표시
+                                                    let dns: string[] = [];
+                                                    try { dns = JSON.parse(cell.value || '[]'); } catch { dns = []; }
+                                                    if (dns.length === 0) return <span style={{ color: '#6f6f6f' }}>—</span>;
+                                                    return (
+                                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                                        {dns.map(dn => {
+                                                          // wizardGroups에서 이름 매칭, 없으면 CN 추출
+                                                          const matched = wizardGroups.find(g => g.ldap_dn === dn);
+                                                          const label = matched?.name || dn.match(/^CN=([^,]+)/i)?.[1] || dn;
+                                                          const isSelected = matched?.selected ?? false;
+                                                          return (
+                                                            <Tag key={dn} type={isSelected ? 'green' : 'gray'} size="sm" title={dn}>
+                                                              {label}
+                                                            </Tag>
+                                                          );
+                                                        })}
+                                                      </div>
+                                                    );
+                                                  })() : (
                                                     cell.value || <span style={{ color: '#6f6f6f' }}>—</span>
                                                   )}
                                                 </TableCell>
